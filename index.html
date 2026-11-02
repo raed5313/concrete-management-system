@@ -474,74 +474,223 @@ p{border-bottom:1px solid #ddd;padding:8px}
 <p>توقيع الزبون: __________　 توقيع المسؤول: __________</p>
 </div>`);
 }
+function receiptLoad(no) {
+  let l = data.loads.find(x => String(x.no) === no);
+  let o = l && data.orders.find(
+    x => String(x.no) === String(l.orderNo)
+  );
 
-function receiptLoad(no){
-let l=data.loads.find(x=>String(x.no)===no);
-let o=l&&data.orders.find(x=>String(x.no)===String(l.orderNo));
-if(!l||!o)return toast('الحمولة أو أمرها غير موجود');
+  if (!l || !o) return toast('الحمولة أو أمرها غير موجود');
 
-let d=l.date||o.date||'—';
+  let d = l.date || o.date || '—';
 
-printDoc('وصل تجهيز خرسانة',`
-<style>
-@page{size:A5 portrait;margin:6mm}
-*{box-sizing:border-box}
-body{font-family:Tahoma;color:#111;margin:0}
-.r{border:3px double #b28a29;padding:5mm;min-height:185mm}
-.head{text-align:center;border-bottom:3px solid #b28a29;padding-bottom:9px}
-.head h2{color:#a47b20;margin:4px}
-.en{font-size:10px}
-.title{text-align:center;background:#171717;color:#e7c36b;border:2px solid #b28a29;padding:9px;margin:10px 0;font-size:20px;font-weight:bold}
-.top{display:flex;gap:8px}
-.top div{border:1px solid #777;flex:1;text-align:center;padding:8px;font-weight:bold}
-.no{color:#a51d20;font-size:21px}
-.data{width:100%;border-collapse:collapse;margin:9px 0}
-.data td{border:1px solid #777;padding:8px;font-size:13px}
-.data td:first-child{background:#eee;font-weight:bold;width:30%}
-.section{text-align:center;background:#171717;color:#e7c36b;padding:8px;border:2px solid #b28a29}
-.big{display:flex;gap:8px;border:2px solid #b28a29;padding:8px}
-.big div{flex:1;border:1px solid #777;text-align:center;min-height:42mm}
-.big b{display:block;background:#eee;padding:8px}
-.big strong{display:block;font-size:42px;padding:12px}
-.sign{display:flex;gap:10px;margin-top:12px}
-.sign div{border:1px solid #777;flex:1;text-align:center;padding:18px 5px 28px;font-weight:bold}
-.foot{text-align:center;border-top:2px solid #b28a29;margin-top:12px;padding-top:7px;font-size:10px}
-</style>
-<div class="r">
-<div class="head">
-<h2>شركة صدى الإعمار</h2>
-<b>للخرسانة والكونكريت الجاهز</b>
-<div class="en">SADA AL-EMAR CONCRETE</div>
-<div class="en">BUILDING A BETTER TOMORROW</div>
-</div>
-<div class="title">وصل تجهيز خرسانة</div>
-<div class="top">
-<div>التاريخ<br>${esc(d)}</div>
-<div>رقم الوصل<br><span class="no">${esc(l.no)}</span></div>
-</div>
-<table class="data">
-<tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
-<tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
-<tr><td>نوع الصب</td><td>${esc(o.pour)}</td></tr>
-<tr><td>المواصفة</td><td>${esc(o.grade)}</td></tr>
-<tr><td>رقم الآلية</td><td>${esc(l.vehicle||'—')}</td></tr>
-<tr><td>رقم المضخة</td><td>${esc(l.pump||'—')}</td></tr>
-<tr><td>الكمية م³</td><td>${esc(l.qty)}</td></tr>
-</table>
-<div class="section">تفاصيل التجهيز</div>
-<div class="big">
-<div><b>رقم الحمولة</b><strong>${esc(l.no)}</strong></div>
-<div><b>الكمية المجهزة م³</b><strong>${esc(l.qty)}</strong></div>
-</div>
-<div class="sign">
-<div>توقيع الزبون<br><br>____________</div>
-<div>توقيع المعمل<br><br>____________</div>
-</div>
-<div class="foot">
-<b>صدى الإعمار للكونكريت الجاهز</b><br>
-وصل تجهيز رسمي — www.sada-alaamar.com
-</div>
-</div>`);
+  printDoc('وصل تجهيز خرسانة', `
+  <style>
+    @page {
+      size: 148mm 210mm;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 148mm;
+      min-height: 210mm;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      color: #111;
+    }
+
+    .r {
+      width: 148mm;
+      min-height: 210mm;
+      border: 3px double #b28a29;
+      padding: 6mm;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .head {
+      text-align: center;
+      border-bottom: 3px solid #b28a29;
+      padding-bottom: 9px;
+    }
+
+    .head h2 {
+      color: #a47b20;
+      margin: 4px;
+    }
+
+    .en {
+      font-size: 10px;
+    }
+
+    .title {
+      text-align: center;
+      background: #171717;
+      color: #e7c36b;
+      border: 2px solid #b28a29;
+      padding: 9px;
+      margin: 10px 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .top {
+      display: flex;
+      gap: 8px;
+    }
+
+    .top div {
+      border: 1px solid #777;
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+    }
+
+    .no {
+      color: #a51d20;
+      font-size: 21px;
+    }
+
+    .data {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 9px 0;
+    }
+
+    .data td {
+      border: 1px solid #777;
+      padding: 8px;
+      font-size: 13px;
+    }
+
+    .data td:first-child {
+      background: #eee;
+      font-weight: bold;
+      width: 30%;
+    }
+
+    .section {
+      text-align: center;
+      background: #171717;
+      color: #e7c36b;
+      padding: 8px;
+      border: 2px solid #b28a29;
+    }
+
+    .big {
+      display: flex;
+      gap: 8px;
+      border: 2px solid #b28a29;
+      padding: 8px;
+    }
+
+    .big div {
+      flex: 1;
+      border: 1px solid #777;
+      text-align: center;
+      min-height: 42mm;
+    }
+
+    .big b {
+      display: block;
+      background: #eee;
+      padding: 8px;
+    }
+
+    .big strong {
+      display: block;
+      font-size: 42px;
+      padding: 12px;
+    }
+
+    .sign {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .sign div {
+      border: 1px solid #777;
+      flex: 1;
+      text-align: center;
+      padding: 18px 5px 28px;
+      font-weight: bold;
+    }
+
+    .foot {
+      text-align: center;
+      border-top: 2px solid #b28a29;
+      margin-top: 12px;
+      padding-top: 7px;
+      font-size: 10px;
+    }
+  </style>
+
+  <div class="r">
+
+    <div class="head">
+      <h2>شركة صدى الإعمار</h2>
+      <b>للخرسانة والكونكريت الجاهز</b>
+      <div class="en">SADA AL-EMAR CONCRETE</div>
+      <div class="en">BUILDING A BETTER TOMORROW</div>
+    </div>
+
+    <div class="title">وصل تجهيز خرسانة</div>
+
+    <div class="top">
+      <div>
+        التاريخ<br>${esc(d)}
+      </div>
+      <div>
+        رقم الوصل<br>
+        <span class="no">${esc(l.no)}</span>
+      </div>
+    </div>
+
+    <table class="data">
+      <tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
+      <tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
+      <tr><td>نوع الصب</td><td>${esc(o.pour)}</td></tr>
+      <tr><td>المواصفة</td><td>${esc(o.grade)}</td></tr>
+      <tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr>
+      <tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr>
+      <tr><td>الكمية م³</td><td>${esc(l.qty)}</td></tr>
+    </table>
+
+    <div class="section">تفاصيل التجهيز</div>
+
+    <div class="big">
+      <div>
+        <b>رقم الحمولة</b>
+        <strong>${esc(l.no)}</strong>
+      </div>
+      <div>
+        <b>الكمية المجهزة م³</b>
+        <strong>${esc(l.qty)}</strong>
+      </div>
+    </div>
+
+    <div class="sign">
+      <div>توقيع الزبون<br><br>____________</div>
+      <div>توقيع المعمل<br><br>____________</div>
+    </div>
+
+    <div class="foot">
+      <b>صدى الإعمار للكونكريت الجاهز</b><br>
+      وصل تجهيز رسمي — www.sada-alaamar.com
+    </div>
+
+  </div>
+  `);
 }
 
 function clearData(){
