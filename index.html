@@ -213,9 +213,7 @@ function renderOrdersWithLoads() {
         </tr>
       `;
     }
-  );
-}
-
+  renderOrdersWithLoads();
 for(const [type,el,fields] of [['customers','customersBody',['name','phone','address']],['drivers','driversBody',['name','phone','note']],['vehicles','vehiclesBody',['name','capacity','kind']]])$(el).innerHTML=rows(data[type],x=>`<tr>${fields.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}<td><button class="btn danger" onclick="del('${type}','${esc(x.id)}','id')">حذف</button></td></tr>`)
 }
 function closeModal(){$('modal').classList.add('hidden')}
