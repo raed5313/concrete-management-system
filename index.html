@@ -3,99 +3,73 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>صدى الإعمار | إدارة الخرسانة الجاهزة والملف التغييري للمعمل</title>
+<title>صدى الإعمار | إدارة الخرسانة الجاهزة</title>
 <style>
-:root{
-  --bg:#090d12;
-  --p:#111a22;
-  --line:#29404d;
-  --cyan:#42d8e8;
-  --gold:#e4b84f;
-  --muted:#93a7b3;
-  --white:#f3f7fa;
-  --success:#2ecc71;
-  --danger:#e74c3c;
-}
+:root{--bg:#090d12;--p:#111a22;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--muted:#93a7b3;--white:#f3f7fa}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--white);font-family:Tahoma,Arial,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;transition:all 0.2s ease}
-.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
 .side{background:#0d151c;padding:14px;border-left:1px solid var(--line)}
 .brand,.panel,.stat{background:var(--p);border:1px solid var(--line);border-radius:13px;padding:14px}
 .brand{text-align:center;margin-bottom:12px}
-.brand h3{margin:5px;font-size:16px}
-.brand small{color:var(--cyan);font-weight:bold;font-size:11px}
+.brand h3{margin:5px}
+.brand small{color:var(--cyan)}
+.role-box{background:#080f15;border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:12px}
+.role-box label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.role-box select{width:100%;background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:6px;padding:6px}
 .nav{display:grid;gap:6px}
-.nav button,.btn{background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:8px;padding:10px 12px;text-align:right;font-size:13px;display:flex;align-items:center;justify-content:space-between}
-.nav button:hover,.btn:hover{filter:brightness(1.2)}
-.nav button.active{background:#173b45;border-color:var(--cyan);box-shadow:0 0 10px rgba(66,216,232,0.2)}
-.nav button .badge{background:#e74c3c;color:#fff;border-radius:12px;padding:2px 8px;font-size:11px}
+.nav button,.btn{background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:8px;padding:10px;text-align:right}
+.nav button.active{background:#173b45}
 .main{padding:18px;min-width:0}
 .top,.head,.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.top{margin-bottom:15px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.top{margin-bottom:15px}
 .muted,.sub{color:var(--muted);font-size:12px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:15px}
-.stat strong{display:block;color:var(--cyan);font-size:24px;margin-top:6px}
-.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
-.panel{margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-.panel h3{margin-top:0;margin-bottom:12px;color:var(--gold);font-size:16px;border-bottom:1px solid rgba(228,184,79,0.2);padding-bottom:6px}
-.btn.primary{background:#147d77;color:white;border-color:#1fa19a}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.stat strong{display:block;color:var(--cyan);font-size:23px;margin-top:8px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:10px}
+.panel{margin-bottom:12px}
+.btn.primary{background:#147d77;color:white}
 .btn.gold{background:#352c18;color:#f1cc71;border-color:#6f5924}
-.btn.success{background:#184a2c;color:#67e495;border-color:#2a7a49}
 .btn.danger{background:#351a22;color:#ff8791;border-color:#71313d}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
 .tablewrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:580px}
-td,th{padding:10px 8px;border-bottom:1px solid #293943;text-align:right;font-size:12px}
-th{background:#0c131a;color:var(--cyan)}
+table{width:100%;border-collapse:collapse;min-width:560px}
+td,th{padding:9px 7px;border-bottom:1px solid #293943;text-align:right;font-size:12px}
 .hidden{display:none!important}
-.modal{position:fixed;inset:0;background:rgba(0,12,20,0.85);backdrop-filter:blur(4px);display:grid;place-items:center;padding:12px;z-index:50;overflow:auto}
-.modal .panel{width:min(680px,100%);max-height:95vh;overflow:auto;border:1px solid var(--cyan)}
-.formgrid,.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.modal{position:fixed;inset:0;background:#000c;display:grid;place-items:center;padding:12px;z-index:5;overflow:auto}
+.modal .panel{width:min(650px,100%);max-height:95vh;overflow:auto}
+.formgrid,.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .field{display:grid;gap:5px}
-.field label{font-size:12px;color:#b9c8d0;font-weight:bold}
-.field input,.field select,.field textarea{background:#080f15;color:white;border:1px solid var(--line);border-radius:7px;padding:9px;min-width:0}
-.field input:focus,.field select:focus{border-color:var(--cyan);outline:none}
+.field label{font-size:12px;color:#b9c8d0}
+.field input,.field select{background:#080f15;color:white;border:1px solid var(--line);border-radius:7px;padding:10px;min-width:0}
 .full{grid-column:1/-1}
 .detail{background:#0b141b;padding:12px;border:1px solid var(--line);border-radius:8px}
 .detail span{display:block;color:var(--muted);font-size:11px}
-.detail strong{color:var(--cyan);font-size:18px}
-.toast-container{position:fixed;bottom:20px;left:20px;z-index:99;display:flex;flex-direction:column;gap:10px}
-.toast{background:#17392f;color:#67e495;padding:14px 20px;border-radius:8px;border:1px solid #2a7a49;box-shadow:0 5px 15px rgba(0,0,0,0.5);font-size:13px;display:flex;align-items:center;gap:10px;animation:slideIn 0.3s ease}
-.toast.alert{background:#4a1e1b;color:#ff9898;border-color:#8a342f}
-@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
-.loadbox{background:#0b131a;padding:12px;border-radius:8px;margin-top:6px;border:1px solid #1c2e39}
+.detail strong{color:var(--cyan)}
+.toast{display:none;position:fixed;bottom:15px;left:15px;background:#17392f;padding:12px;border-radius:8px;z-index:9}
+.loadbox{background:#0b131a;padding:10px;border-radius:8px}
 .goldtext{color:var(--gold)}
 
-/* أنماط الحالات */
-.badge-status{display:inline-block;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:bold}
-.status-pending{background:#3d2f10;color:#f39c12;border:1px solid #b78121}
-.status-ready{background:#143d23;color:#2ecc71;border:1px solid #1f8b4c}
-.status-locked{background:#333;color:#bbb;border:1px solid #555}
-
-/* بطاقات المعمل */
-.plant-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
-.plant-card{background:#111c26;border:1px solid #243946;border-radius:12px;padding:14px;position:relative}
-.plant-card.new-order{border:2px solid var(--gold);animation:pulse 2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(228,184,79,0.4)}70%{box-shadow:0 0 0 10px rgba(228,184,79,0)}100%{box-shadow:0 0 0 0 rgba(228,184,79,0)}}
-.plant-card .header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #233542;padding-bottom:8px;margin-bottom:10px}
-.plant-card .info-line{display:flex;justify-content:space-between;margin:6px 0;font-size:13px}
-.plant-card .progress-bar{background:#090f14;height:12px;border-radius:6px;overflow:hidden;margin:10px 0;border:1px solid #233542}
-.plant-card .progress-fill{background:linear-gradient(90deg,var(--cyan),var(--gold));height:100%;transition:width 0.3s ease}
+.order-open{background:#fff!important;color:#202020!important;}
+.order-locked{background:#fff0b8!important;color:#493b12!important;}
+.order-invoiced{background:#d9f2df!important;color:#174b2b!important;}
+.order-open td,.order-locked td,.order-invoiced td{color:inherit;}
 
 @media(max-width:800px){
-  .app{grid-template-columns:1fr}
-  .side{padding:8px}
-  .brand{display:flex;align-items:center;justify-content:space-between;text-align:right}
-  .brand h3{margin:0}
-  .nav{display:flex;overflow-x:auto;padding-bottom:5px}
-  .nav button{white-space:nowrap;font-size:12px;padding:8px 10px}
-  .main{padding:10px}
-  .layout{grid-template-columns:1fr}
+.app{grid-template-columns:1fr}
+.side{padding:8px}
+.brand{display:flex;align-items:center;gap:10px;text-align:right}
+.nav{display:flex;overflow:auto}
+.nav button{white-space:nowrap}
+.main{padding:10px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.layout{grid-template-columns:1fr}
 }
 @media(max-width:480px){
-  .formgrid,.details{grid-template-columns:1fr}
-  .full{grid-column:auto}
+.formgrid,.details{grid-template-columns:1fr}
+.full{grid-column:auto}
 }
 </style>
 </head>
@@ -104,706 +78,589 @@ th{background:#0c131a;color:var(--cyan)}
 <div class="app">
 <aside class="side">
 <div class="brand">
-  <div style="font-size:28px;color:#e4b84f">▦</div>
-  <div>
-    <h3>صدى الإعمار للكونكريت</h3>
-    <small>SADA AL-EMAR CONCRETE</small>
-  </div>
+<div style="font-size:25px;color:#e4b84f">▦</div>
+<h3>صدى الإعمار للكونكريت</h3>
+<small>SADA AL-EMAR CONCRETE</small>
 </div>
+
+<div class="role-box">
+<label>اختر صفحة / صلاحية المستخدم:</label>
+<select id="roleSelect" onchange="changeRole(this.value)">
+<option value="manager">المدير (صلاحيات كاملة عدا الحمولات)</option>
+<option value="plant">المعمل (عرض وتجهيز وطباعة A5)</option>
+<option value="accountant">المحاسب (تعديل وحذف بدون إضافة أوامر)</option>
+</select>
+</div>
+
 <nav class="nav" id="nav"></nav>
 </aside>
 
 <main class="main">
 <header class="top">
 <div>
-  <h2 id="pageTitle">لوحة التحكم</h2>
-  <div class="sub">إدارة أوامر التجهيز وشاشة التشغيل للمعمل</div>
+<h2 id="pageTitle">لوحة التحكم</h2>
+<div class="sub" id="roleSubTitle">متابعة أوامر التجهيز والحمولات</div>
 </div>
 <div class="actions">
-  <span id="today" class="muted"></span>
-  <button class="btn primary" onclick="openOrder()">＋ أمر تجهيز جديد</button>
+<span id="today" class="muted"></span>
+<button class="btn primary" id="newOrderBtn" onclick="openOrder()">＋ أمر تجهيز جديد</button>
 </div>
 </header>
 
-<!-- 1. الرئيسية -->
 <section id="dashboard">
 <div class="stats">
-  <div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
-  <div class="stat">الحمولات<strong id="statLoads">0</strong></div>
-  <div class="stat">المجهز م³<strong id="statQty">0</strong></div>
-  <div class="stat">قيد التجهيز<strong id="statPending">0</strong></div>
+<div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
+<div class="stat">الحمولات<strong id="statLoads">0</strong></div>
+<div class="stat">المجهز م³<strong id="statQty">0</strong></div>
+<div class="stat">قيد التجهيز<strong id="statPending">0</strong></div>
 </div>
 <div class="layout">
-  <div class="panel">
-    <h3>أحدث الأوامر</h3>
-    <div class="tablewrap"><table><tbody id="recentOrders"></tbody></table></div>
-  </div>
-  <div class="panel">
-    <h3>ملخص العمل والأسطول</h3>
-    <div class="details">
-      <div class="detail">العملاء<strong id="statCustomers">0</strong></div>
-      <div class="detail">السائقون<strong id="statDrivers">0</strong></div>
-      <div class="detail">الخلاطات/الآليات<strong id="statVehicles">0</strong></div>
-    </div>
-    <p class="muted" style="margin-top:15px">النظام يعمل بالكامل محلياً مع ميزة التنبيه الفوري للمعمل.</p>
-  </div>
-</div>
-</section>
-
-<!-- 2. صفحة المعمل (الجديدة) -->
-<section id="plant" class="hidden">
 <div class="panel">
-  <div class="head">
-    <div>
-      <h3>شاشة التشغيل بالمعمل (قسم التجهيز)</h3>
-      <p class="muted" style="margin:2px 0 0 0">متابعة الأوامر الواردة، صب الخرسانة، وإضافة الحمولات المباشرة</p>
-    </div>
-    <span class="badge-status status-ready" style="font-size:13px">المعمل متصل وقيد الاستلام 🟢</span>
-  </div>
+<h3>أحدث الأوامر</h3>
+<div class="tablewrap"><table><tbody id="recentOrders"></tbody></table></div>
 </div>
-<div class="plant-grid" id="plantOrdersCards"></div>
+<div class="panel">
+<h3>ملخص العمل</h3>
+<div class="details">
+<div class="detail">العملاء<strong id="statCustomers">0</strong></div>
+<div class="detail">السائقون<strong id="statDrivers">0</strong></div>
+<div class="detail">الخلاطات<strong id="statVehicles">0</strong></div>
+</div>
+<p class="muted" style="margin-top:10px">النظام يعمل بصلاحيات الدور الحالي.</p>
+</div>
+</div>
 </section>
 
-<!-- 3. أوامر التجهيز -->
 <section id="orders" class="hidden">
 <div class="panel">
 <div class="head">
-  <h3>أوامر التجهيز والحمولات</h3>
-  <button class="btn primary" onclick="openOrder()">＋ إضافة أمر تجهيز</button>
+<h3>أوامر التجهيز والحمولات</h3>
+<button class="btn primary" id="newOrderBtn2" onclick="openOrder()">＋ إضافة أمر</button>
 </div>
 <div class="tablewrap">
 <table>
-<thead><tr><th>رقم</th><th>التاريخ</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>المقاومة</th><th>الكمية (م³)</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>المقاومة</th><th>م³</th><th>الإجراءات</th></tr></thead>
 <tbody id="ordersBody"></tbody>
 </table>
 </div>
 </div>
 </section>
 
-<!-- 4. العملاء -->
 <section id="customers" class="hidden">
 <div class="panel">
-<div class="head"><h3>العملاء</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
-<div class="tablewrap"><table><tbody id="customersBody"></tbody></table></div>
+<div class="head"><h3>العملاء</h3><button class="btn primary" id="newCustomerBtn" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
+<table><tbody id="customersBody"></tbody></table>
 </div>
 </section>
 
-<!-- 5. السائقون -->
 <section id="drivers" class="hidden">
 <div class="panel">
-<div class="head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div>
-<div class="tablewrap"><table><tbody id="driversBody"></tbody></table></div>
+<div class="head"><h3>السائقون</h3><button class="btn primary" id="newDriverBtn" onclick="openSimple('driver')">＋ إضافة سائق</button></div>
+<table><tbody id="driversBody"></tbody></table>
 </div>
 </section>
 
-<!-- 6. الآليات والخلاطات -->
 <section id="vehicles" class="hidden">
 <div class="panel">
-<div class="head"><h3>الآليات والخلاطات</h3><button class="btn primary" onclick="openSimple('vehicle')">＋ إضافة آلية</button></div>
-<div class="tablewrap"><table><tbody id="vehiclesBody"></tbody></table></div>
+<div class="head"><h3>الآليات والخلاطات</h3><button class="btn primary" id="newVehicleBtn" onclick="openSimple('vehicle')">＋ إضافة آلية</button></div>
+<table><tbody id="vehiclesBody"></tbody></table>
 </div>
 </section>
 
-<!-- 7. التقارير -->
 <section id="reports" class="hidden">
 <div class="panel">
-<h3>التقارير الإحصائية والطباعة</h3>
+<h3>التقارير والطباعة</h3>
 <div class="details">
-  <div class="detail">إجمالي الأوامر<strong id="reportOrders">0</strong></div>
-  <div class="detail">عدد الحمولات<strong id="reportLoads">0</strong></div>
-  <div class="detail">إجمالي المجهز<strong id="reportQty">0 م³</strong></div>
-  <div class="detail">الكميات المتبقية<strong id="reportRemaining">0 م³</strong></div>
+<div class="detail">الأوامر<strong id="reportOrders">0</strong></div>
+<div class="detail">الحمولات<strong id="reportLoads">0</strong></div>
+<div class="detail">المجهز<strong id="reportQty">0 م³</strong></div>
+<div class="detail">المتبقي<strong id="reportRemaining">0 م³</strong></div>
 </div>
-<br>
-<button class="btn gold" onclick="window.print()">طباعة تقرير شامل</button>
+<button class="btn" style="margin-top:12px" onclick="print()">طباعة التقرير العام</button>
 </div>
 </section>
 
-<!-- 8. الإعدادات -->
 <section id="settings" class="hidden">
 <div class="panel">
-<h3>الإعدادات والنظام</h3>
-<p class="muted">يمكنك مسح البيانات وإعادة ضبط المصنع في أي وقت.</p>
-<button class="btn danger" onclick="clearData()">مسح البيانات المحلية كلياً</button>
+<h3>الإعدادات</h3>
+<p class="muted">إدارة بيانات النظام المحلي.</p>
+<button class="btn danger" onclick="clearData()">مسح البيانات المحلية</button>
 </div>
 </section>
 
-<p class="muted" style="text-align:center;margin-top:20px">نظام إدارة الخرسانة الجاهزة والمعمل · SADA AL-EMAR CONCRETE v2.0</p>
+<p class="muted" style="text-align:center">نظام إدارة الخرسانة الجاهزة · SADA AL-EMAR CONCRETE</p>
 </main>
 </div>
 
-<!-- Modal النافذة المنبثقة -->
 <div id="modal" class="modal hidden">
 <div class="panel">
 <div class="head">
-  <h3 id="modalTitle">إضافة</h3>
-  <button class="btn danger" onclick="closeModal()">إغلاق ✕</button>
+<h3 id="modalTitle">إضافة</h3>
+<button class="btn danger" onclick="closeModal()">إغلاق</button>
 </div>
 <form id="form" class="formgrid"></form>
 </div>
 </div>
-
-<!-- حاوية التنبيهات -->
-<div id="toastContainer" class="toast-container"></div>
+<div id="toast" class="toast"></div>
 
 <script>
 'use strict';
 
-const KEY = 'sada-concrete-v2';
-const blank = () => ({
-  orders: [],
-  loads: [],
-  customers: [],
-  drivers: [],
-  vehicles: [],
-  nextOrder: 744,
-  nextLoad: 1
+const KEY='sada-concrete-v2';
+let currentRole = localStorage.getItem('sada-role') || 'manager';
+
+const blank=()=>({
+orders:[],loads:[],customers:[],drivers:[],vehicles:[],
+nextOrder:744,nextLoad:1
 });
 
 let data;
-try {
-  data = JSON.parse(localStorage.getItem(KEY)) || blank();
-} catch(e) {
-  data = blank();
+try{
+data=JSON.parse(localStorage.getItem(KEY))||blank();
+}catch(e){
+data=blank();
 }
 
-['orders','loads','customers','drivers','vehicles'].forEach(k => {
-  if(!Array.isArray(data[k])) data[k] = [];
+['orders','loads','customers','drivers','vehicles'].forEach(k=>{
+if(!Array.isArray(data[k]))data[k]=[];
 });
-data.nextOrder = data.nextOrder || 744;
-data.nextLoad = data.nextLoad || 1;
 
-const $ = id => document.getElementById(id);
-const esc = s => String(s??'').replace(/[&<>"']/g, c => ({
-  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+data.nextOrder=data.nextOrder||744;
+data.nextLoad=data.nextLoad||1;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
 }[c]));
-const fmt = n => Number(n||0).toLocaleString('en-US');
+const fmt=n=>Number(n||0).toLocaleString('en-US');
 
-$('today').textContent = new Date().toLocaleDateString('ar-IQ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+$('today').textContent=new Date().toLocaleDateString('ar-IQ');
+$('roleSelect').value = currentRole;
 
-const pages = {
-  dashboard: 'الرئيسية 🏠',
-  plant: 'صفحة المعمل 🏭',
-  orders: 'أوامر التجهيز 📋',
-  customers: 'العملاء 👥',
-  drivers: 'السائقون 🚛',
-  vehicles: 'الآليات والخلاطات 🏗️',
-  reports: 'التقارير 📊',
-  settings: 'الإعدادات ⚙️'
+const pages={
+dashboard:'الرئيسية',
+orders:'أوامر التجهيز',
+customers:'العملاء',
+drivers:'السائقون',
+vehicles:'الآليات والخلاطات',
+reports:'التقارير',
+settings:'الإعدادات'
 };
 
-function renderNav() {
-  const pendingCount = data.orders.filter(o => o.status !== 'مكتمل ومجهز' && o.status !== 'تم القفل').length;
-  
-  $('nav').innerHTML = Object.entries(pages).map(([k, v]) => {
-    let badgeHtml = '';
-    if (k === 'plant' && pendingCount > 0) {
-      badgeHtml = `<span class="badge">${pendingCount}</span>`;
-    }
-    return `<button data-page="${k}" class="${k==='dashboard'?'active':''}">
-      <span>${v}</span> ${badgeHtml}
-    </button>`;
-  }).join('');
-}
-renderNav();
+$('nav').innerHTML=Object.entries(pages).map(([k,v],i)=>
+`<button data-page="${k}" class="${i===0?'active':''}">${v}</button>`
+).join('');
 
-$('nav').onclick = e => {
-  let b = e.target.closest('[data-page]');
-  if(b) navigate(b.dataset.page);
+$('nav').onclick=e=>{
+let b=e.target.closest('[data-page]');
+if(b)navigate(b.dataset.page);
 };
 
 function navigate(p){
-  Object.keys(pages).forEach(k => $(k).classList.toggle('hidden', k !== p));
-  $('pageTitle').textContent = pages[p];
-  document.querySelectorAll('[data-page]').forEach(b =>
-    b.classList.toggle('active', b.dataset.page === p)
-  );
-  render();
+Object.keys(pages).forEach(k=>$(k).classList.toggle('hidden',k!==p));
+$('pageTitle').textContent=pages[p];
+document.querySelectorAll('[data-page]').forEach(b=>
+b.classList.toggle('active',b.dataset.page===p)
+);
+render();
 }
 
-// نظام الصوت والتنبيهات
-function playNotificationSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15); // A5
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.4);
-  } catch(e){ console.log("Audio play blocked by browser policy"); }
+function changeRole(role){
+currentRole = role;
+localStorage.setItem('sada-role', role);
+let titles = {
+manager: 'صفحة المدير - صلاحيات كاملة عدا الحمولات',
+plant: 'صفحة المعمل - متابعة وطباعة A5',
+accountant: 'صفحة المحاسب - تعديل وحذف دون إضافة أوامر'
+};
+$('roleSubTitle').textContent = titles[role];
+render();
+toast('تم الانتقال إلى: ' + $('roleSelect').options[$('roleSelect').selectedIndex].text);
 }
 
-function toast(msg, type = 'success') {
-  const container = $('toastContainer');
-  const el = document.createElement('div');
-  el.className = `toast ${type === 'alert' ? 'alert' : ''}`;
-  el.innerHTML = `<span>${type === 'alert' ? '🔔' : '✅'}</span> <div>${esc(msg)}</div>`;
-  container.appendChild(el);
-  
-  if (type === 'alert') playNotificationSound();
-  
-  setTimeout(() => {
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 300);
-  }, 3500);
+function toast(s){
+$('toast').textContent=s;
+$('toast').style.display='block';
+setTimeout(()=>$('toast').style.display='none',2200);
 }
 
 function save(){
-  localStorage.setItem(KEY, JSON.stringify(data));
-  renderNav();
-  render();
+localStorage.setItem(KEY,JSON.stringify(data));
+render();
 }
 
-function tableRows(a, fn, n = 4){
-  return a.length ? a.map(fn).join('') :
-  `<tr><td colspan="${n}" style="text-align:center;color:#93a7b3;padding:18px">لا توجد بيانات مسجلة حالياً</td></tr>`;
+function tableRows(a,fn,n=4){
+return a.length?a.map(fn).join(''):
+`<tr><td colspan="${n}" style="text-align:center;color:#93a7b3;padding:18px">لا توجد بيانات</td></tr>`;
 }
 
 function render(){
-  let qty = data.loads.reduce((s, x) => s + (+x.qty || 0), 0);
-  let est = data.orders.reduce((s, x) => s + (+x.qty || 0), 0);
-  let pendingOrders = data.orders.filter(x => x.status !== 'مكتمل ومجهز' && x.status !== 'تم القفل');
+// Apply Role UI Restrictions
+let isManager = currentRole === 'manager';
+let isPlant = currentRole === 'plant';
+let isAccountant = currentRole === 'accountant';
 
-  // تحديث الإحصائيات
-  $('statOrders').textContent = data.orders.length;
-  $('statLoads').textContent = data.loads.length;
-  $('statQty').textContent = fmt(qty);
-  $('statPending').textContent = pendingOrders.length;
+// Manager & Accountant & Plant rules for adding orders:
+// Manager: can add orders. Plant: NO. Accountant: NO.
+let canAddOrder = isManager;
+$('newOrderBtn').style.display = canAddOrder ? 'inline-block' : 'none';
+if($('newOrderBtn2')) $('newOrderBtn2').style.display = canAddOrder ? 'inline-block' : 'none';
 
-  $('statCustomers').textContent = data.customers.length;
-  $('statDrivers').textContent = data.drivers.length;
-  $('statVehicles').textContent = data.vehicles.length;
+// Simple entity add buttons:
+// Accountant & Manager can add customers/drivers/vehicles. Plant cannot.
+let canAddSimple = !isPlant;
+if($('newCustomerBtn')) $('newCustomerBtn').style.display = canAddSimple ? 'inline-block' : 'none';
+if($('newDriverBtn')) $('newDriverBtn').style.display = canAddSimple ? 'inline-block' : 'none';
+if($('newVehicleBtn')) $('newVehicleBtn').style.display = canAddSimple ? 'inline-block' : 'none';
 
-  $('reportOrders').textContent = data.orders.length;
-  $('reportLoads').textContent = data.loads.length;
-  $('reportQty').textContent = fmt(qty) + ' م³';
-  $('reportRemaining').textContent = fmt(Math.max(0, est - qty)) + ' م³';
+let qty=data.loads.reduce((s,x)=>s+(+x.qty||0),0);
+let est=data.orders.reduce((s,x)=>s+(+x.qty||0),0);
 
-  // الجدول السريع بالرئيسية
-  $('recentOrders').innerHTML = tableRows(
-    data.orders.slice(-5).reverse(),
-    o => `<tr>
-      <td><b>#${esc(o.no)}</b></td>
-      <td>${esc(o.customer)}</td>
-      <td>${esc(o.pour)}</td>
-      <td><span class="goldtext">${esc(o.qty)} م³</span></td>
-      <td>${getStatusBadge(o.status)}</td>
-    </tr>`,
-    5
-  );
+$('statOrders').textContent=data.orders.length;
+$('statLoads').textContent=data.loads.length;
+$('statQty').textContent=fmt(qty);
+$('statPending').textContent=data.orders.filter(x=>x.status!=='مكتمل').length;
 
-  // جدول أوامر التجهيز الكامل
-  $('ordersBody').innerHTML = tableRows(
-    data.orders.slice().reverse(),
-    o => {
-      let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
-      let isDone = o.status === 'تم القفل' || o.status === 'مكتمل ومجهز';
+$('statCustomers').textContent=data.customers.length;
+$('statDrivers').textContent=data.drivers.length;
+$('statVehicles').textContent=data.vehicles.length;
 
-      return `
-      <tr>
-        <td><b>#${esc(o.no)}</b></td>
-        <td>${esc(o.date)}</td>
-        <td>${esc(o.customer)}</td>
-        <td>${esc(o.site)}</td>
-        <td>${esc(o.pour)}</td>
-        <td>${esc(o.grade)}</td>
-        <td><b>${esc(o.qty)}</b></td>
-        <td>${getStatusBadge(o.status)}</td>
-        <td>
-          <div class="actions">
-            <button class="btn" onclick="openLoad('${esc(o.no)}')" ${isDone ? 'disabled' : ''}>＋ حمولة (${ls.length})</button>
-            <button class="btn success" onclick="toggleStatus('${esc(o.no)}')" title="تغيير حالة الطلب">
-              ${o.status === 'مكتمل ومجهز' ? 'إعادة لقيد التجهيز' : 'تأكيد كـ مجهز ✅'}
-            </button>
-            <button class="btn primary" onclick="closeOrder('${esc(o.no)}')" ${o.status==='تم القفل'?'disabled':''}>قفل النهائي</button>
-            <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">طباعة الأمر</button>
-            <button class="btn danger" onclick="delOrder('${esc(o.no)}')">حذف</button>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="9">
-          <div class="loadbox">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <b class="goldtext">حمولات أمر التجهيز #${esc(o.no)}</b>
-              <small class="muted">إجمالي الحمولات: ${ls.reduce((s,l)=>s+(+l.qty||0),0)} / ${o.qty} م³</small>
-            </div>
-            ${ls.length ? `<table>
-              <thead><tr><th>رقم الحمولة</th><th>السائق</th><th>الآلية</th><th>السعة (م³)</th><th>الوقت</th><th>التحكم</th></tr></thead>
-              <tbody>${ls.map(l => `
-              <tr>
-                <td>حمولة #${esc(l.no)}</td>
-                <td>${esc(l.driver || 'غير محدد')}</td>
-                <td>${esc(l.vehicle || 'غير محدد')}</td>
-                <td><b>${esc(l.qty)} م³</b></td>
-                <td>${esc(l.time || '—')}</td>
-                <td>
-                  <button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة الوصل 📄</button>
-                  <button class="btn danger" onclick="delLoad('${esc(l.no)}')">حذف</button>
-                </td>
-              </tr>`).join('')}</tbody></table>` : '<p class="muted" style="margin:4px 0">لا توجد حمولات مرسلة بعد لهذا الأمر.</p>'}
-          </div>
-        </td>
-      </tr>`;
-    },
-    9
-  );
+$('reportOrders').textContent=data.orders.length;
+$('reportLoads').textContent=data.loads.length;
+$('reportQty').textContent=fmt(qty)+' م³';
+$('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' م³';
 
-  // شاشة المعمل (البطاقات التفاعلية)
-  renderPlantCards();
+$('recentOrders').innerHTML=tableRows(
+data.orders.slice(-5).reverse(),
+o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${esc(o.qty)} م³</td></tr>`,
+4
+);
 
-  // جداول البيانات الأساسية
-  [
-    ['customers', 'customersBody', ['name', 'phone', 'address']],
-    ['drivers', 'driversBody', ['name', 'phone', 'note']],
-    ['vehicles', 'vehiclesBody', ['name', 'capacity', 'kind']]
-  ].forEach(([k, id, fs]) => {
-    $(id).innerHTML = tableRows(data[k], x =>
-      `<tr>${fs.map(f => `<td>${esc(x[f] || '—')}</td>`).join('')}
-      <td><button class="btn danger" onclick="delSimple('${k}','${esc(x.id)}')">حذف</button></td></tr>`,
-      fs.length + 1
-    );
-  });
+$('ordersBody').innerHTML=tableRows(
+data.orders.slice().reverse(),
+o=>{
+let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
+let state=o.status==='تم القفل'?'locked':o.status==='مرحّل للفاتورة'?'invoiced':'open';
+
+return `
+<tr class="order-${state}">
+<td>${esc(o.no)}</td><td>${esc(o.date)}</td>
+<td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
+<td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${esc(o.qty)}</td>
+<td><div class="actions">
+<button class="btn" onclick="openLoad('${esc(o.no)}')" ${isManager || o.status==='تم القفل'||o.status==='مرحّل للفاتورة'?'disabled':''}>
+＋ حمولة (${ls.length})
+</button>
+<button class="btn primary" onclick="closeOrder('${esc(o.no)}')" ${o.status==='تم القفل'||o.status==='مرحّل للفاتورة'?'disabled':''}>
+قفل الأمر
+</button>
+<button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
+<button class="btn" onclick="editOrder('${esc(o.no)}')" ${isPlant?'disabled':''}>تعديل</button>
+<button class="btn danger" onclick="delOrder('${esc(o.no)}')" ${isPlant?'disabled':''}>حذف</button>
+</div></td>
+</tr>
+<tr><td colspan="8"><div class="loadbox">
+<b class="goldtext">حمولات الأمر ${esc(o.no)}</b>
+${ls.length?`<table><tbody>${ls.map(l=>`
+<tr>
+<td>حمولة ${esc(l.no)}</td>
+<td>${esc(l.driver||'—')}</td>
+<td>${esc(l.vehicle||'—')}</td>
+<td>${esc(l.qty)} م³</td>
+<td>
+<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة وصل A5</button>
+<button class="btn" onclick="editLoad('${esc(l.no)}')" ${isManager||isPlant?'':'disabled'}>تعديل</button>
+<button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${isPlant?'disabled':''}>حذف</button>
+</td>
+</tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات بعد.</p>'}
+</div></td></tr>`;
+},8
+);
+
+[
+['customers','customersBody',['name','phone','address']],
+['drivers','driversBody',['name','phone','note']],
+['vehicles','vehiclesBody',['name','capacity','kind']]
+].forEach(([k,id,fs])=>{
+$(id).innerHTML=tableRows(data[k],x=>
+`<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
+<td><button class="btn danger" onclick="delSimple('${k}','${esc(x.id)}')" ${isPlant?'disabled':''}>حذف</button></td></tr>`
+);
+});
 }
 
-// شاشة بطاقات المعمل
-function renderPlantCards() {
-  const container = $('plantOrdersCards');
-  const activeOrders = data.orders.slice().reverse();
+function openForm(title,fields,cb){
+$('modalTitle').textContent=title;
+$('form').innerHTML=fields.map(f=>`
+<div class="field ${f.full?'full':''}">
+<label>${f.label}</label>
+${f.options?
+`<select name="${f.name}">${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
+`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} value="${esc(f.value??'')}">`}
+</div>`).join('')+
+'<div class="full"><button class="btn primary" type="submit">حفظ</button></div>';
 
-  if (activeOrders.length === 0) {
-    container.innerHTML = `<div class="panel full" style="text-align:center;padding:40px;color:var(--muted)">لا توجد أوامر تجهيز واردة للمعمل حتى الآن.</div>`;
-    return;
-  }
-
-  container.innerHTML = activeOrders.map(o => {
-    let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
-    let currentQty = ls.reduce((s, l) => s + (+l.qty || 0), 0);
-    let targetQty = Number(o.qty) || 1;
-    let pct = Math.min(100, Math.round((currentQty / targetQty) * 100));
-    let isFinished = o.status === 'مكتمل ومجهز' || o.status === 'تم القفل';
-
-    return `
-    <div class="plant-card ${o.isNew ? 'new-order' : ''}">
-      <div class="header">
-        <div>
-          <b style="font-size:16px;color:var(--gold)">أمر #${esc(o.no)}</b>
-          <span class="muted" style="font-size:11px;display:block">${esc(o.date)}</span>
-        </div>
-        ${getStatusBadge(o.status)}
-      </div>
-
-      <div class="info-line"><span>العميل:</span><b>${esc(o.customer)}</b></div>
-      <div class="info-line"><span>موقع الصب:</span><b>${esc(o.site)}</b></div>
-      <div class="info-line"><span>نوع الصب والمقاومة:</span><span class="goldtext">${esc(o.pour)} (${esc(o.grade)})</span></div>
-      
-      <div style="margin-top:10px">
-        <div class="info-line">
-          <span>التقدم في الصب:</span>
-          <b>${currentQty} / ${targetQty} م³ (${pct}%)</b>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${pct}%"></div>
-        </div>
-      </div>
-
-      <div class="actions" style="margin-top:12px;gap:6px">
-        <button class="btn primary" style="flex:1" onclick="openLoad('${esc(o.no)}')" ${isFinished ? 'disabled' : ''}>
-          🚚 إضافة وخروج حمولة
-        </button>
-        <button class="btn ${o.status === 'مكتمل ومجهز' ? 'gold' : 'success'}" onclick="toggleStatus('${esc(o.no)}')">
-          ${o.status === 'مكتمل ومجهز' ? 'إعادة للتجهيز' : 'تثبيت كـ مجهز ✅'}
-        </button>
-      </div>
-    </div>`;
-  }).join('');
+$('form').onsubmit=e=>{
+e.preventDefault();
+cb(Object.fromEntries(new FormData(e.currentTarget)));
+};
+$('modal').classList.remove('hidden');
 }
 
-function getStatusBadge(status) {
-  if (status === 'مكتمل ومجهز') {
-    return `<span class="badge-status status-ready">مكتمل ومجهز ✅</span>`;
-  } else if (status === 'تم القفل') {
-    return `<span class="badge-status status-locked">تم القفل 🔒</span>`;
-  }
-  return `<span class="badge-status status-pending">قيد التجهيز ⏳</span>`;
-}
+function closeModal(){$('modal').classList.add('hidden')}
 
-function openForm(title, fields, cb){
-  $('modalTitle').textContent = title;
-  $('form').innerHTML = fields.map(f => `
-  <div class="field ${f.full ? 'full' : ''}">
-    <label>${f.label}</label>
-    ${f.options ?
-      `<select name="${f.name}">${f.options.map(v => `<option ${f.value===v?'selected':''}>${esc(v)}</option>`).join('')}</select>` :
-      `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} value="${esc(f.value??'')}">`}
-  </div>`).join('') +
-  '<div class="full" style="margin-top:10px"><button class="btn primary" type="submit" style="width:100%;justify-content:center;padding:12px">حفظ وتأكيد</button></div>';
-
-  $('form').onsubmit = e => {
-    e.preventDefault();
-    cb(Object.fromEntries(new FormData(e.currentTarget)));
-  };
-  $('modal').classList.remove('hidden');
-}
-
-function closeModal(){ $('modal').classList.add('hidden'); }
-
-// إضافة أمر تجهيز وإرسال تنبيه فوري للمعمل
 function openOrder(){
-  openForm('أمر تجهيز خرسانة جديد (إرسال للمعمل)', [
-    {name:'customer', label:'اسم العميل', required:true, options:['', ...data.customers.map(x=>x.name)]},
-    {name:'phone', label:'رقم الهاتف'},
-    {name:'site', label:'موقع الصب', required:true},
-    {name:'pour', label:'نوع الصب', options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
-    {name:'grade', label:'المقاومة (Grade)', options:['C-25','C-30','C-35','C-40','C-45']},
-    {name:'qty', label:'الكمية المطلوبة (م³)', type:'number', required:true},
-    {name:'price', label:'سعر المتر (د.ع)', type:'number'},
-    {name:'date', label:'تاريخ التجهيز', type:'date', value:new Date().toISOString().slice(0,10)}
-  ], v => {
-    v.no = String(data.nextOrder++).padStart(7,'0');
-    v.status = 'قيد التجهيز';
-    v.isNew = true; // علامة للتنبيه في المعمل
-    data.orders.push(v);
-    
-    save();
-    closeModal();
-    
-    // إرسال تنبيه مخصص للمعمل
-    toast(`تم إرسال أمر التجهيز #${v.no} بنجاح إلى المعمل!`, 'alert');
-  });
+if(currentRole !== 'manager'){
+toast('عذراً، صلاحية المعمل والمحاسب لا تسمح بإضافة أمر جديد');
+return;
 }
-
-// تغيير حالة الطلب بين (قيد التجهيز / مكتمل ومجهز)
-function toggleStatus(no) {
-  let o = data.orders.find(x => String(x.no) === String(no));
-  if (!o) return;
-
-  if (o.status === 'مكتمل ومجهز') {
-    o.status = 'قيد التجهيز';
-    toast(`تم إعادة تغيير حالة أمر التجهيز #${no} إلى (قيد التجهيز)`);
-  } else {
-    o.status = 'مكتمل ومجهز';
-    toast(`تم تحويل حالة أمر التجهيز #${no} إلى (مكتمل ومجهز ✅)`);
-  }
-  save();
+openForm('أمر تجهيز جديد',[
+{name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
+{name:'phone',label:'الهاتف'},
+{name:'site',label:'موقع الصب',required:true},
+{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
+{name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
+{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
+{name:'price',label:'سعر المتر',type:'number'},
+{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
+],v=>{
+v.no=String(data.nextOrder++).padStart(7,'0');
+v.status='قيد التجهيز';
+data.orders.push(v);
+save();closeModal();toast('تم حفظ الأمر');
+});
 }
 
 function closeOrder(no){
-  let o = data.orders.find(x => String(x.no) === String(no));
-  if(!o || o.status === 'تم القفل') return;
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o || o.status==='تم القفل'||o.status==='مرحّل للفاتورة') return;
 
-  let delivered = data.loads
-    .filter(x => String(x.orderNo) === String(no))
-    .reduce((s, x) => s + (Number(x.qty) || 0), 0);
+let delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((s,x)=>s+(Number(x.qty)||0),0);
 
-  openForm('تسجيل الكمية الفعلية وقفل الأمر #' + no, [
-    { name:'actualQty', label:'الكمية الفعلية المجهزة النهائي (م³)', type:'number', required:true, value:delivered },
-    { name:'lockNote', label:'ملاحظات الإقفال النهائية', full:true }
-  ], v => {
-    let q = Number(v.actualQty);
-    if(!Number.isFinite(q) || q < 0){
-      toast('يرجى إدخال كمية فعلية صحيحة', 'alert');
-      return;
-    }
-    o.actualQty = q;
-    o.lockNote = v.lockNote || '';
-    o.status = 'تم القفل';
-    o.lockedAt = new Date().toISOString();
-
-    save();
-    closeModal();
-    toast('تم قفل أمر التجهيز وتسجيل الحصيلة النهائية');
-  });
+openForm('تسجيل الكمية الفعلية وقفل الأمر '+no,[
+{name:'actualQty',label:'الكمية الفعلية المجهزة م³',type:'number',required:true,value:delivered},
+{name:'lockNote',label:'ملاحظات الإقفال',full:true}
+],v=>{
+let q=Number(v.actualQty);
+if(!Number.isFinite(q)||q<0){toast('أدخل كمية فعلية صحيحة');return;}
+o.actualQty=q;
+o.lockNote=v.lockNote||'';
+o.status='تم القفل';
+o.lockedAt=new Date().toISOString();
+save();closeModal();toast('تم قفل الأمر بنجاح');
+});
 }
 
 function openLoad(no){
-  let o = data.orders.find(x => String(x.no) === String(no));
-  if(!o) return;
-  
-  openForm('إضافة وخروج حمولة خرسانة للأمر #' + no, [
-    {name:'driver', label:'السائق / السائقون', options:['غير محدد', ...data.drivers.map(x=>x.name)]},
-    {name:'vehicle', label:'رقم الآلية / الخلاطة', options:['غير محدد', ...data.vehicles.map(x=>x.name)]},
-    {name:'qty', label:'كمية الخرسانة للحمولة (م³)', type:'number', required:true, value:Math.min(9, +o.qty || 9)},
-    {name:'time', label:'وقت خروج الخلاطة من المعمل', type:'time', value:new Date().toTimeString().slice(0,5)},
-    {name:'pump', label:'رقم المضخة (البامب)'}
-  ], v => {
-    v.orderNo = o.no;
-    v.no = String(data.nextLoad++).padStart(7,'0');
-    v.date = new Date().toISOString().slice(0,10);
-    data.loads.push(v);
-    
-    // التحقق التلقائي إذا اكتملت الكمية
-    let currentTotal = data.loads.filter(l => String(l.orderNo) === String(o.no)).reduce((s,l)=>s+(+l.qty||0), 0);
-    if (currentTotal >= Number(o.qty)) {
-      o.status = 'مكتمل ومجهز';
-    }
-
-    save();
-    closeModal();
-    toast(`تم تسجيل وتجهيز الحمولة #${v.no} للأمر #${o.no}`);
-  });
+if(currentRole === 'manager'){
+toast('المدير لا يمتلك صلاحية إضافة حمولة');
+return;
+}
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('إضافة حمولة للأمر '+no,[
+{name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},
+{name:'vehicle',label:'رقم الآلية',options:['غير محدد',...data.vehicles.map(x=>x.name)]},
+{name:'qty',label:'الكمية م³',type:'number',required:true,value:Math.min(9,+o.qty||9)},
+{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},
+{name:'pump',label:'رقم المضخة'},
+{name:'status',label:'الحالة',options:['تم التسجيل','في الطريق','تم التسليم']}
+],v=>{
+v.orderNo=o.no;
+v.no=String(data.nextLoad++).padStart(7,'0');
+v.date=new Date().toISOString().slice(0,10);
+data.loads.push(v);
+save();closeModal();toast('تم حفظ الحمولة');
+});
 }
 
 function openSimple(t){
-  let c = {
-    customer: ['العملاء', 'customers', [['name','اسم العميل'], ['phone','رقم الهاتف'], ['address','العنوان / المقر']]],
-    driver: ['السائقون', 'drivers', [['name','اسم السائق'], ['phone','رقم الهاتف'], ['note','ملاحظات / الرخصة']]],
-    vehicle: ['الآليات والخلاطات', 'vehicles', [['name','رقم الآلية/الخلاطة'], ['capacity','السعة (م³)'], ['kind','النوع / الموديل']]]
-  }[t];
+if(currentRole === 'plant'){toast('المعمل لا يمتلك صلاحية الإضافة هنا');return;}
+let c={
+customer:['العملاء','customers',[['name','اسم العميل'],['phone','الهاتف'],['address','العنوان']]],
+driver:['السائقون','drivers',[['name','اسم السائق'],['phone','الهاتف'],['note','ملاحظات']]],
+vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity','السعة م³'],['kind','النوع']]]
+}[t];
 
-  openForm('إضافة ' + c[0], c[2].map(([name, label]) => ({
-    name, label, required: name === 'name'
-  })), v => {
-    v.id = Date.now();
-    data[c[1]].push(v);
-    save();
-    closeModal();
-    toast('تم حفظ البيانات بنجاح');
-  });
+openForm('إضافة '+c[0],c[2].map(([name,label])=>({name,label,required:name==='name'})),v=>{
+v.id=Date.now();
+data[c[1]].push(v);
+save();closeModal();toast('تم الحفظ');
+});
+}
+
+function editOrder(no){
+if(currentRole === 'plant'){toast('المعمل غير مسموح له بالتعديل');return;}
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('تعديل أمر '+no,
+['customer','phone','site','pour','grade','qty','price','date'].map(k=>({
+name:k,label:k,value:o[k]||'',required:k==='customer'||k==='site'
+})),
+v=>{Object.assign(o,v);save();closeModal();toast('تم التعديل');}
+);
+}
+
+function editLoad(no){
+if(currentRole === 'accountant'){toast('المحاسب غير مسموح له بتعديل الحمولات');return;}
+let l=data.loads.find(x=>String(x.no)===String(no));
+if(!l)return;
+openForm('تعديل حمولة '+no,
+['driver','vehicle','qty','time','pump','status'].map(k=>({
+name:k,label:k,value:l[k]||''
+})),
+v=>{Object.assign(l,v);save();closeModal();toast('تم تعديل الحمولة');}
+);
 }
 
 function delOrder(no){
-  if(confirm('هل أنت تأكد من حذف هذا الأمر وجميع الحمولات التابعة له؟')){
-    data.orders = data.orders.filter(x => String(x.no) !== no);
-    data.loads = data.loads.filter(x => String(x.orderNo) !== no);
-    save();
-    toast('تم حذف الأمر وحمولاته');
-  }
+if(currentRole === 'plant'){toast('المعمل لا يمتلك صلاحية الحذف');return;}
+if(confirm('حذف الأمر وحمولاته؟')){
+data.orders=data.orders.filter(x=>String(x.no)!==no);
+data.loads=data.loads.filter(x=>String(x.orderNo)!==no);
+save();toast('تم الحذف');
+}
 }
 
 function delLoad(no){
-  if(confirm('هل أنت متاكد من حذف هذه الحمولة؟')){
-    data.loads = data.loads.filter(x => String(x.no) !== no);
-    save();
-    toast('تم حذف الحمولة');
-  }
+if(currentRole === 'manager' || currentRole === 'plant'){
+if(currentRole === 'manager'){toast('المدير لا يمكنه حذف الحمولات');return;}
+}
+if(currentRole === 'plant'){toast('المعمل لا يمكنه حذف الحمولات');return;}
+if(confirm('حذف الحمولة؟')){
+data.loads=data.loads.filter(x=>String(x.no)!==no);
+save();toast('تم حذف الحمولة');
+}
 }
 
-function delSimple(k, id){
-  if(confirm('هل تريد حذف هذا السجل؟')){
-    data[k] = data[k].filter(x => String(x.id) !== id);
-    save();
-    toast('تم الحذف بنجاح');
-  }
+function delSimple(k,id){
+if(currentRole === 'plant'){toast('المعمل غير مسموح له بالحذف');return;}
+if(confirm('حذف السجل؟')){
+data[k]=data[k].filter(x=>String(x.id)!==id);
+save();toast('تم الحذف');
+}
 }
 
-function printDoc(title, content){
-  let w = window.open('', '_blank');
-  if(!w){ toast('يرجى السماح بالنوافذ المنبثقة للطباعة', 'alert'); return; }
-  w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${title}</title></head><body>${content}<script>onload=()=>setTimeout(()=>print(),250)<\/script></body></html>`);
-  w.document.close();
+function printDocA5(title,content){
+let w=window.open('','_blank','width=700,height=900');
+if(!w){toast('اسمح بالنوافذ المنبثقة');return}
+w.document.write(`<!doctype html><html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>${title}</title>
+<style>
+@page{size:A5 portrait;margin:6mm;}
+*{box-sizing:border-box}
+body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:12px;}
+.r{border:2px double #b28a29;padding:10mm;max-height:185mm;overflow:hidden;}
+.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6px;margin-bottom:8px;}
+.head h2{color:#a47b20;margin:0 0 4px 0;font-size:16px;}
+.en{font-size:9px;color:#555;}
+.title{text-align:center;background:#171717;color:#e7c36b;border:1px solid #b28a29;padding:6px;margin:8px 0;font-size:15px;font-weight:bold;}
+.top{display:flex;gap:6px;margin-bottom:8px;}
+.top div{border:1px solid #777;flex:1;text-align:center;padding:5px;font-weight:bold;font-size:11px;}
+.no{color:#a51d20;font-size:16px;}
+.data{width:100%;border-collapse:collapse;margin-bottom:8px;}
+.data td{border:1px solid #777;padding:5px 7px;font-size:11px;}
+.data td:first-child{background:#eee;font-weight:bold;width:32%;}
+.section{text-align:center;background:#171717;color:#e7c36b;padding:5px;border:1px solid #b28a29;font-size:11px;font-weight:bold;margin-bottom:6px;}
+.big{display:flex;gap:6px;border:1px solid #b28a29;padding:5px;margin-bottom:8px;}
+.big div{flex:1;border:1px solid #777;text-align:center;}
+.big b{display:block;background:#eee;padding:4px;font-size:10px;}
+.big strong{display:block;font-size:22px;padding:6px;color:#111;}
+.sign{display:flex;gap:8px;margin-top:10px;}
+.sign div{border:1px solid #777;flex:1;text-align:center;padding:10px 5px 20px;font-weight:bold;font-size:11px;}
+.foot{text-align:center;border-top:1px solid #b28a29;margin-top:8px;padding-top:4px;font-size:9px;color:#555;}
+</style>
+</head>
+<body>
+${content}
+<script>
+window.onload=function(){
+setTimeout(function(){window.print();window.close();},300);
+};
+<\/script>
+</body>
+</html>`);
+w.document.close();
 }
 
 function receiptOrder(no){
-  let o = data.orders.find(x => String(x.no) === no);
-  if(!o) return;
-  printDoc('وصل امر تجهيز', `
-  <style>
-    body{font-family:Tahoma,sans-serif;padding:25px;background:#fff;color:#111}
-    .r{border:3px double #b28a29;padding:20px;border-radius:10px}
-    h2,h3{text-align:center;margin:5px 0}
-    p{border-bottom:1px solid #ddd;padding:10px 0;margin:0;font-size:14px}
-    .flex{display:flex;justify-content:space-between;margin-top:30px}
-  </style>
-  <div class="r">
-    <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
-    <h4 style="text-align:center;color:#666">SADA AL-EMAR READY MIX CONCRETE</h4>
-    <hr style="border:1px solid #b28a29">
-    <h3>وصل امر تجهيز خرسانة رقم #${esc(o.no)}</h3>
-    <p><b>التاريخ:</b> ${esc(o.date)}</p>
-    <p><b>اسم العميل:</b> ${esc(o.customer)}</p>
-    <p><b>رقم الهاتف:</b> ${esc(o.phone || '—')}</p>
-    <p><b>موقع الصب:</b> ${esc(o.site)}</p>
-    <p><b>تفاصيل الصب:</b> ${esc(o.pour)} — <b>المقاومة:</b> ${esc(o.grade)}</p>
-    <p><b>الكمية المطلوبة:</b> ${esc(o.qty)} م³</p>
-    <p><b>حالة الطلب:</b> ${esc(o.status)}</p>
-    <div class="flex">
-      <div>توقيع المستلم / العميل: ____________</div>
-      <div>توقيع وتختيم المعمل: ____________</div>
-    </div>
-  </div>`);
+let o=data.orders.find(x=>String(x.no)===no);
+if(!o)return;
+printDocA5('وصل أمر تجهيز',`
+<div class="r">
+<div class="head">
+<h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+<div class="en">SADA AL-EMAR CONCRETE</div>
+</div>
+<div class="title">وصل أمر تجهيز رقم ${esc(o.no)}</div>
+<div class="top">
+<div>التاريخ<br>${esc(o.date)}</div>
+<div>رقم الأمر<br><span class="no">${esc(o.no)}</span></div>
+</div>
+<table class="data">
+<tr><td>اسم العميل</td><td>${esc(o.customer)}</td></tr>
+<tr><td>الهاتف</td><td>${esc(o.phone||'—')}</td></tr>
+<tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
+<tr><td>نوع الصب</td><td>${esc(o.pour)}</td></tr>
+<tr><td>المقاومة</td><td>${esc(o.grade)}</td></tr>
+<tr><td>الكمية التقديرية</td><td>${esc(o.qty)} م³</td></tr>
+</table>
+<div class="sign">
+<div>توقيع الزبون<br><br>________________</div>
+<div>توقيع الإدارة<br><br>________________</div>
+</div>
+<div class="foot">صدى الإعمار للكونكريت الجاهز — وصل رسمي متناسق A5</div>
+</div>`);
 }
 
 function receiptLoad(no){
-  let l = data.loads.find(x => String(x.no) === no);
-  let o = l && data.orders.find(x => String(x.no) === String(l.orderNo));
-  if(!l || !o) return toast('بيانات الحمولة غير متوفرة', 'alert');
+let l=data.loads.find(x=>String(x.no)===no);
+let o=l&&data.orders.find(x=>String(x.no)===String(l.orderNo));
+if(!l||!o)return toast('الحمولة أو أمرها غير موجود');
+let d=l.date||o.date||'—';
 
-  let d = l.date || o.date || '—';
-
-  printDoc('وصل تجهيز خرسانة', `
-  <style>
-    @page{size:A5 portrait;margin:5mm}
-    *{box-sizing:border-box}
-    body{font-family:Tahoma,sans-serif;color:#111;margin:0;background:#fff}
-    .r{border:3px double #b28a29;padding:6mm;min-height:190mm}
-    .head{text-align:center;border-bottom:3px solid #b28a29;padding-bottom:8px}
-    .head h2{color:#a47b20;margin:2px 0 0 0;font-size:20px}
-    .en{font-size:10px;color:#444}
-    .title{text-align:center;background:#171717;color:#e7c36b;border:2px solid #b28a29;padding:6px;margin:8px 0;font-size:18px;font-weight:bold}
-    .top{display:flex;gap:8px;margin-bottom:8px}
-    .top div{border:1px solid #777;flex:1;text-align:center;padding:6px;font-weight:bold;font-size:12px}
-    .no{color:#a51d20;font-size:18px}
-    .data{width:100%;border-collapse:collapse;margin:8px 0}
-    .data td{border:1px solid #777;padding:6px 8px;font-size:12px}
-    .data td:first-child{background:#f0f0f0;font-weight:bold;width:32%}
-    .big{display:flex;gap:8px;border:2px solid #b28a29;padding:6px;margin-top:8px}
-    .big div{flex:1;border:1px solid #777;text-align:center}
-    .big b{display:block;background:#eee;padding:4px;font-size:11px}
-    .big strong{display:block;font-size:32px;padding:6px 0;color:#111}
-    .sign{display:flex;gap:10px;margin-top:15px}
-    .sign div{border:1px solid #777;flex:1;text-align:center;padding:12px 5px 25px;font-weight:bold;font-size:11px}
-    .foot{text-align:center;border-top:2px solid #b28a29;margin-top:10px;padding-top:6px;font-size:10px;color:#555}
-  </style>
-  <div class="r">
-    <div class="head">
-      <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
-      <div class="en">SADA AL-EMAR CONCRETE - BUILDING A BETTER TOMORROW</div>
-    </div>
-    <div class="title">بطاقة خروج حمولة خرسانة</div>
-    <div class="top">
-      <div>التاريخ والخروج<br>${esc(d)} | ${esc(l.time||'')}</div>
-      <div>رقم الوصل / الحمولة<br><span class="no">#${esc(l.no)}</span></div>
-    </div>
-    <table class="data">
-      <tr><td>اسم الزبون / الشركة</td><td>${esc(o.customer)}</td></tr>
-      <tr><td>رقم الأمر الرئيسي</td><td>#${esc(o.no)}</td></tr>
-      <tr><td>موقع الصب والتفريغ</td><td>${esc(o.site)}</td></tr>
-      <tr><td>نوع الصب / المنشأة</td><td>${esc(o.pour)}</td></tr>
-      <tr><td>مواصفة الخرسانة (Grade)</td><td>${esc(o.grade)}</td></tr>
-      <tr><td>رقم الخلاطة / سائق الآلية</td><td>${esc(l.vehicle||'—')} (${esc(l.driver||'—')})</td></tr>
-      <tr><td>رقم المضخة (البامب)</td><td>${esc(l.pump||'—')}</td></tr>
-    </table>
-    <div class="big">
-      <div><b>رقم الحمولة</b><strong>${esc(l.no)}</strong></div>
-      <div><b>كمية الخرسانة بالحمل (م³)</b><strong>${esc(l.qty)}</strong></div>
-    </div>
-    <div class="sign">
-      <div>توقيع واستلام الزبون بالموقع<br><br>____________</div>
-      <div>توقيع مسئول خروج المعمل<br><br>____________</div>
-    </div>
-    <div class="foot">
-      <b>صدى الإعمار للكونكريت الجاهز</b> - وصل تجهيز رسمي صادرة من شاشة تشغيل المعمل
-    </div>
-  </div>`);
+printDocA5('وصل تجهيز خرسانة (A5)',`
+<div class="r">
+<div class="head">
+<h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+<div class="en">SADA AL-EMAR CONCRETE</div>
+</div>
+<div class="title">وصل تجهيز خرسانة (حمولة)</div>
+<div class="top">
+<div>التاريخ<br>${esc(d)}</div>
+<div>رقم الحمولة<br><span class="no">${esc(l.no)}</span></div>
+</div>
+<table class="data">
+<tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
+<tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
+<tr><td>نوع الصب / المقاومة</td><td>${esc(o.pour)} — ${esc(o.grade)}</td></tr>
+<tr><td>رقم الآلية / السائق</td><td>${esc(l.vehicle||'—')} (${esc(l.driver||'—')})</td></tr>
+<tr><td>رقم المضخة</td><td>${esc(l.pump||'—')}</td></tr>
+</table>
+<div class="section">الكمية المجهزة</div>
+<div class="big">
+<div><b>رقم الحمولة</b><strong>${esc(l.no)}</strong></div>
+<div><b>الكمية المجهزة م³</b><strong>${esc(l.qty)}</strong></div>
+</div>
+<div class="sign">
+<div>توقيع الزبون / المستلم<br><br>________________</div>
+<div>توقيع المعمل / الوزن<br><br>________________</div>
+</div>
+<div class="foot">صدى الإعمار للكونكريت الجاهز — وصل تجهيز رسمي A5 متناسق</div>
+</div>`);
 }
 
 function clearData(){
-  if(confirm('هل أنت تأكد من رغبتك في مسح كافة البيانات المسجلة محلياً؟')){
-    localStorage.removeItem(KEY);
-    data = blank();
-    save();
-    toast('تم إعادة ضبط النظام كلياً');
-  }
+if(confirm('حذف كل البيانات المحلية؟')){
+localStorage.removeItem(KEY);
+data=blank();
+save();
+toast('تم مسح البيانات');
+}
 }
 
-// البدء الأولي
 render();
 </script>
 </body>
