@@ -1,932 +1,558 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>صدى الإعمار | إدارة الخرسانة الجاهزة</title>
 <style>
-:root{--bg:#090d12;--panel:#111a22;--panel2:#17232d;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--red:#ff5365;--muted:#93a7b3;--white:#f3f7fa}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:Tahoma,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:270px 1fr;min-height:100vh}.side{background:#0d151c;border-left:1px solid var(--line);padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}.brand{padding:18px 12px;margin-bottom:20px;border:1px solid var(--line);border-radius:18px;text-align:center;background:linear-gradient(145deg,#172a32,#101820)}.logo{width:54px;height:54px;border-radius:15px;background:#1aa98b;display:grid;place-items:center;margin:0 auto 10px;font-size:25px}.brand h2{margin:6px 0;font-size:19px}.brand small{color:var(--cyan)}.nav{display:grid;gap:7px}.nav button{background:transparent;color:#b9c8d0;border:1px solid transparent;padding:13px 12px;text-align:right;border-radius:11px}.nav button:hover,.nav button.active{background:#12232c;border-color:#287d89;color:var(--cyan)}.user{margin-top:30px;border-top:1px solid var(--line);padding:20px 8px;color:var(--muted);font-size:13px}.main{min-width:0;padding:22px;max-width:1600px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}.top h1{font-size:23px;margin:0 0 6px}.sub{color:var(--muted);font-size:13px}.tag{border:1px solid var(--line);border-radius:10px;padding:10px 13px;color:var(--cyan)}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px}.stat .label{color:var(--muted);font-size:13px}.stat strong{display:block;font-size:25px;margin-top:12px;color:var(--cyan)}.stat:nth-child(2) strong{color:var(--gold)}.stat:nth-child(3) strong{color:#6de0a6}.stat:nth-child(4) strong{color:var(--red)}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:14px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.panel h3{font-size:16px;margin:0}.btn{border:1px solid #287d89;background:#102b34;color:var(--cyan);border-radius:9px;padding:10px 13px}.btn.primary{background:#147d77;color:white;border-color:#1aa99b}.btn.gold{background:#352c18;color:#f1cc71;border-color:#6f5924}.btn.danger{background:#351a22;color:#ff8791;border-color:#71313d}.actions{display:flex;gap:8px;flex-wrap:wrap}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:570px}th,td{text-align:right;padding:12px 10px;border-bottom:1px solid #233540;font-size:13px}th{color:var(--muted);font-weight:500}td .num{color:var(--cyan)}.pill{border-radius:20px;background:#17392f;color:#6de0a6;padding:5px 9px;font-size:12px}.muted{color:var(--muted)}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:grid;gap:6px}.field label{font-size:13px;color:#b9c8d0}.field input,.field select,.field textarea{width:100%;background:#0a1117;color:var(--white);border:1px solid var(--line);border-radius:9px;padding:11px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--cyan)}.full{grid-column:1/-1}.empty{text-align:center;color:var(--muted);padding:24px}.hidden{display:none!important}.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail{padding:13px;border-radius:10px;background:#0c141b;border:1px solid #20323c}.detail span{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}.detail strong{color:var(--cyan)}.toast{position:fixed;bottom:18px;left:18px;background:#17392f;border:1px solid #2a755b;padding:12px 18px;border-radius:10px;display:none}.foot{color:#617581;font-size:12px;text-align:center;margin-top:20px}
-@media(max-width:950px){.app{grid-template-columns:1fr}.side{position:relative;height:auto;padding:10px}.brand{display:flex;align-items:center;gap:12px;text-align:right;padding:10px;margin-bottom:10px}.logo{margin:0;width:42px;height:42px;flex-shrink:0}.brand h2{font-size:16px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;padding:10px}.user{display:none}.main{padding:13px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}}
-@media(max-width:480px){.top h1{font-size:19px}.stat{padding:12px}.stat strong{font-size:21px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.details{grid-template-columns:1fr}}
-@media print{.side,.top .actions,.no-print,button{display:none!important}.app{display:block}.main{padding:0}.panel,.stat{break-inside:avoid;background:white;color:black;border:1px solid #bbb}.tablewrap{overflow:visible}table{min-width:0}th,td{color:black}}
+:root{--bg:#090d12;--p:#111a22;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--muted:#93a7b3;--white:#f3f7fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Tahoma,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.side{background:#0d151c;padding:14px;border-left:1px solid var(--line)}
+.brand,.panel,.stat{background:var(--p);border:1px solid var(--line);border-radius:13px;padding:14px}
+.brand{text-align:center;margin-bottom:12px}
+.brand h3{margin:5px}
+.brand small{color:var(--cyan)}
+.nav{display:grid;gap:6px}
+.nav button,.btn{background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:8px;padding:10px;text-align:right}
+.nav button.active{background:#173b45}
+.main{padding:18px;min-width:0}
+.top,.head,.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.top{margin-bottom:15px}
+.muted,.sub{color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.stat strong{display:block;color:var(--cyan);font-size:23px;margin-top:8px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:10px}
+.panel{margin-bottom:12px}
+.btn.primary{background:#147d77;color:white}
+.btn.gold{background:#352c18;color:#f1cc71;border-color:#6f5924}
+.btn.danger{background:#351a22;color:#ff8791;border-color:#71313d}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+td,th{padding:9px 7px;border-bottom:1px solid #293943;text-align:right;font-size:12px}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:#000c;display:grid;place-items:center;padding:12px;z-index:5;overflow:auto}
+.modal .panel{width:min(650px,100%);max-height:95vh;overflow:auto}
+.formgrid,.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.field{display:grid;gap:5px}
+.field label{font-size:12px;color:#b9c8d0}
+.field input,.field select{background:#080f15;color:white;border:1px solid var(--line);border-radius:7px;padding:10px;min-width:0}
+.full{grid-column:1/-1}
+.detail{background:#0b141b;padding:12px;border:1px solid var(--line);border-radius:8px}
+.detail span{display:block;color:var(--muted);font-size:11px}
+.detail strong{color:var(--cyan)}
+.toast{display:none;position:fixed;bottom:15px;left:15px;background:#17392f;padding:12px;border-radius:8px;z-index:9}
+.loadbox{background:#0b131a;padding:10px;border-radius:8px}
+.goldtext{color:var(--gold)}
+@media(max-width:800px){
+.app{grid-template-columns:1fr}
+.side{padding:8px}
+.brand{display:flex;align-items:center;gap:10px;text-align:right}
+.nav{display:flex;overflow:auto}
+.nav button{white-space:nowrap}
+.main{padding:10px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.layout{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+.formgrid,.details{grid-template-columns:1fr}
+.full{grid-column:auto}
+}
 </style>
 </head>
 <body>
 
-
 <div class="app">
 <aside class="side">
- <div class="brand"><div class="logo">▦</div><div><h2>صدى الإعمار للكونكريت الجاهز</h2><small>SADA AL-EMAR CONCRETE</small></div></div>
- 
-<nav class="nav" id="nav"></nav>
-
-<div class="user">
-  نوع الحساب
-  <select id="roleSelect" style="width:100%;margin:8px 0;padding:10px;border-radius:8px;background:#17232d;color:#f3f7fa;border:1px solid #29404d">
-    <option value="manager">مدير النظام</option>
-    <option value="accountant">المحاسب</option>
-    <option value="lab">مشغل المعمل</option>
-  </select>
-  <small id="roleNote">صلاحيات المدير</small>
+<div class="brand">
+<div style="font-size:25px;color:#e4b84f">▦</div>
+<h3>صدى الإعمار للكونكريت الجاهز</h3>
+<small>SADA AL-EMAR CONCRETE</small>
 </div>
-
-<div class="user">نسخة تجريبية محلية<br><b>مدير النظام</b></div>
+<nav class="nav" id="nav"></nav>
 </aside>
 
 <main class="main">
- <header class="top"><div><h1 id="pageTitle">لوحة التحكم</h1><div class="sub" id="pageSub">متابعة أوامر التجهيز والحمولات اليومية</div></div><div class="actions"><span class="tag" id="today"></span><button class="btn primary" onclick="openOrder()">＋ أمر تجهيز جديد</button></div></header>
- <section id="dashboard">
-  <div class="stats"><div class="stat"><div class="label">أوامر التجهيز</div><strong id="statOrders">0</strong></div><div class="stat"><div class="label">الحمولات المسجلة</div><strong id="statLoads">0</strong></div><div class="stat"><div class="label">الكمية المجهزة (م³)</div><strong id="statQty">0</strong></div><div class="stat"><div class="label">الأوامر قيد التجهيز</div><strong id="statPending">0</strong></div></div>
-  <div class="layout"><section class="panel"><div class="panel-head"><h3>أحدث أوامر التجهيز</h3><button class="btn" onclick="navigate('orders')">عرض الكل</button></div><div class="tablewrap"><table><thead><tr><th>رقم الأمر</th><th>العميل</th><th>نوع الصب</th><th>الكمية</th><th>الحالة</th></tr></thead><tbody id="recentOrders"></tbody></table></div></section>
-  <section class="panel"><div class="panel-head"><h3>ملخص العمل</h3></div><div class="details"><div class="detail"><span>عدد العملاء</span><strong id="statCustomers">0</strong></div><div class="detail"><span>عدد السائقين</span><strong id="statDrivers">0</strong></div><div class="detail"><span>عدد الخلاطات</span><strong id="statVehicles">0</strong></div><div class="detail"><span>العملة</span><strong>دينار عراقي</strong></div></div><p class="muted">تُحفظ البيانات في هذا المتصفح على الجهاز الحالي.</p></section></div>
- </section>
- <section id="orders" class="hidden"><div class="panel"><div class="panel-head"><h3>سجل أوامر التجهيز</h3><div class="actions"><button class="btn primary" onclick="openOrder()">＋ إضافة أمر</button><button class="btn" onclick="window.print()">طباعة</button></div></div><div class="tablewrap"><table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>العميل</th><th>موقع الصب</th><th>نوع الصب</th><th>المقاومة</th><th>الكمية م³</th><th>الإجراءات</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div></section>
- 
- <section id="customers" class="hidden"><div class="panel"><div class="panel-head"><h3>العملاء</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div><div class="tablewrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>إجراء</th></tr></thead><tbody id="customersBody"></tbody></table></div></div></section>
- <section id="drivers" class="hidden"><div class="panel"><div class="panel-head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div><div class="tablewrap"><table><thead><tr><th>اسم السائق</th><th>الهاتف</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="driversBody"></tbody></table></div></div></section>
- 
-<section id="vehicles" class="hidden">
-  <div class="panel">
-    <div class="panel-head">
-      <h3>الآليات والخلاطات</h3>
-      <button class="btn primary" onclick="openSimple('vehicle')">
-        ＋ إضافة خلاطة
-      </button>
-    </div>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>رقم الآلية</th>
-            <th>السعة م³</th>
-            <th>النوع</th>
-            <th>إجراء</th>
-          </tr>
-        </thead>
-        <tbody id="vehiclesBody"></tbody>
-      </table>
-    </div>
-  </div>
+<header class="top">
+<div>
+<h2 id="pageTitle">لوحة التحكم</h2>
+<div class="sub">متابعة أوامر التجهيز والحمولات</div>
+</div>
+<div class="actions">
+<span id="today" class="muted"></span>
+<button class="btn primary" onclick="openOrder()">＋ أمر تجهيز جديد</button>
+</div>
+</header>
+
+<section id="dashboard">
+<div class="stats">
+<div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
+<div class="stat">الحمولات<strong id="statLoads">0</strong></div>
+<div class="stat">المجهز م³<strong id="statQty">0</strong></div>
+<div class="stat">قيد التجهيز<strong id="statPending">0</strong></div>
+</div>
+<div class="layout">
+<div class="panel">
+<h3>أحدث الأوامر</h3>
+<div class="tablewrap"><table><tbody id="recentOrders"></tbody></table></div>
+</div>
+<div class="panel">
+<h3>ملخص العمل</h3>
+<div class="details">
+<div class="detail">العملاء<strong id="statCustomers">0</strong></div>
+<div class="detail">السائقون<strong id="statDrivers">0</strong></div>
+<div class="detail">الخلاطات<strong id="statVehicles">0</strong></div>
+</div>
+<p class="muted">التخزين محلي على هذا الجهاز.</p>
+</div>
+</div>
 </section>
 
- <section id="reports" class="hidden"><div class="panel"><div class="panel-head"><h3>التقارير والطباعة</h3><button class="btn primary" onclick="window.print()">طباعة التقرير / حفظ PDF</button></div><div class="details"><div class="detail"><span>إجمالي الأوامر</span><strong id="reportOrders">0</strong></div><div class="detail"><span>إجمالي الحمولات</span><strong id="reportLoads">0</strong></div><div class="detail"><span>إجمالي الكميات المسجلة</span><strong id="reportQty">0 م³</strong></div><div class="detail"><span>الكمية المتبقية</span><strong id="reportRemaining">0 م³</strong></div></div><p class="muted">من نافذة الطباعة في الهاتف أو الحاسوب اختر «حفظ بصيغة PDF» إذا كان الخيار متاحاً.</p></div></section>
- <section id="settings" class="hidden"><div class="panel"><h3>إعدادات المنشأة</h3><p class="muted">صدى الإعمار للكونكريت الجاهز</p><div class="details"><div class="detail"><span>اسم النظام</span><strong>SADA AL-EMAR</strong></div><div class="detail"><span>الواجهة</span><strong>العربية RTL</strong></div><div class="detail"><span>التخزين الحالي</span><strong>محلي على هذا الجهاز</strong></div></div><p class="muted">هذه النسخة واجهة أولية تعمل محلياً. تسجيل الدخول متعدد المستخدمين ومزامنة قاعدة البيانات تحتاج إعداد Supabase ونشر متصل بالإنترنت.</p><button class="btn danger" onclick="if(confirm('حذف كل بيانات هذا المتصفح؟')){localStorage.removeItem(KEY);data=blank();render();toast('تم مسح البيانات المحلية')}">مسح البيانات المحلية</button></div></section>
- <div class="foot">نظام إدارة الخرسانة الجاهزة · SADA AL-EMAR CONCRETE</div>
-</main></div>
-<div id="modal" class="hidden" style="position:fixed;inset:0;background:#000b;z-index:10;overflow:auto;padding:20px;display:grid;place-items:center"><div class="panel" style="width:min(700px,100%);max-height:95vh;overflow:auto"><div class="panel-head"><h3 id="modalTitle">إضافة</h3><button class="btn danger" onclick="closeModal()">إغلاق ✕</button></div><form id="form" class="formgrid"></form></div></div><div id="toast" class="toast"></div>
+<section id="orders" class="hidden">
+<div class="panel">
+<div class="head">
+<h3>أوامر التجهيز والحمولات</h3>
+<button class="btn primary" onclick="openOrder()">＋ إضافة أمر</button>
+</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>المقاومة</th><th>م³</th><th>الإجراءات</th></tr></thead>
+<tbody id="ordersBody"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="customers" class="hidden">
+<div class="panel">
+<div class="head"><h3>العملاء</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
+<table><tbody id="customersBody"></tbody></table>
+</div>
+</section>
+
+<section id="drivers" class="hidden">
+<div class="panel">
+<div class="head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div>
+<table><tbody id="driversBody"></tbody></table>
+</div>
+</section>
+
+<section id="vehicles" class="hidden">
+<div class="panel">
+<div class="head"><h3>الآليات والخلاطات</h3><button class="btn primary" onclick="openSimple('vehicle')">＋ إضافة آلية</button></div>
+<table><tbody id="vehiclesBody"></tbody></table>
+</div>
+</section>
+
+<section id="reports" class="hidden">
+<div class="panel">
+<h3>التقارير والطباعة</h3>
+<div class="details">
+<div class="detail">الأوامر<strong id="reportOrders">0</strong></div>
+<div class="detail">الحمولات<strong id="reportLoads">0</strong></div>
+<div class="detail">المجهز<strong id="reportQty">0 م³</strong></div>
+<div class="detail">المتبقي<strong id="reportRemaining">0 م³</strong></div>
+</div>
+<button class="btn" onclick="print()">طباعة التقرير</button>
+</div>
+</section>
+
+<section id="settings" class="hidden">
+<div class="panel">
+<h3>الإعدادات</h3>
+<p class="muted">نسخة محلية. لا توجد مزامنة Supabase في هذا الملف.</p>
+<button class="btn danger" onclick="clearData()">مسح البيانات المحلية</button>
+</div>
+</section>
+
+<p class="muted" style="text-align:center">نظام إدارة الخرسانة الجاهزة · SADA AL-EMAR CONCRETE</p>
+</main>
+</div>
+
+<div id="modal" class="modal hidden">
+<div class="panel">
+<div class="head">
+<h3 id="modalTitle">إضافة</h3>
+<button class="btn danger" onclick="closeModal()">إغلاق</button>
+</div>
+<form id="form" class="formgrid"></form>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+
 <script>
-const KEY='sada-concrete-v1';const blank=()=>({orders:[],loads:[],customers:[],drivers:[],vehicles:[],nextOrder:744,nextLoad:1});let data;try{data=JSON.parse(localStorage.getItem(KEY))||blank()}catch{data=blank()}
-const $=id=>document.getElementById(id);const save=()=>{localStorage.setItem(KEY,JSON.stringify(data));render()};const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const fmt=n=>Number(n||0).toLocaleString('en-US');const today=()=>new Date().toLocaleDateString('ar-IQ');$('today').textContent=today();
-const pageNames={
- dashboard:['لوحة التحكم','متابعة العمل اليومي'],
- orders:['أوامر التجهيز','إدارة طلبات الخرسانة'],
- customers:['العملاء','بيانات العملاء'],
- labs:['المعامل','إدارة المعامل'],
- drivers:['السائقون','إدارة السائقين'],
- vehicles:['الآليات والخلاطات','إدارة الأسطول'],
- inventory:['المخزون','إدارة المخزون'],
- accounts:['الحسابات','الحسابات المالية'],
- invoices:['الفواتير','إدارة الفواتير'],
- receipts:['القبض','سجلات القبض'],
- expenses:['المصروفات','سجلات المصروفات'],
- employees:['الموظفون','إدارة الموظفين'],
- archive:['المتابعة والأرشفة','متابعة وأرشفة السجلات'],
- reports:['التقارير والطباعة','تقارير العمل'],
- users:['المستخدمون والصلاحيات','إدارة صلاحيات المستخدمين'],
- settings:['الإعدادات','إعدادات النظام']
+'use strict';
+
+const KEY='sada-concrete-v1';
+const blank=()=>({
+orders:[],loads:[],customers:[],drivers:[],vehicles:[],
+nextOrder:744,nextLoad:1
+});
+
+let data;
+try{
+data=JSON.parse(localStorage.getItem(KEY))||blank();
+}catch(e){
+data=blank();
+}
+
+['orders','loads','customers','drivers','vehicles'].forEach(k=>{
+if(!Array.isArray(data[k]))data[k]=[];
+});
+
+data.nextOrder=data.nextOrder||744;
+data.nextLoad=data.nextLoad||1;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+
+$('today').textContent=new Date().toLocaleDateString('ar-IQ');
+
+const pages={
+dashboard:'الرئيسية',
+orders:'أوامر التجهيز',
+customers:'العملاء',
+drivers:'السائقون',
+vehicles:'الآليات والخلاطات',
+reports:'التقارير',
+settings:'الإعدادات'
 };
 
-function navigate(page) {
-  if (!pageNames[page] || !$(page)) return;
+$('nav').innerHTML=Object.entries(pages).map(([k,v],i)=>
+`<button data-page="${k}" class="${i===0?'active':''}">${v}</button>`
+).join('');
 
-  document.querySelectorAll('.nav button').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === page);
-  });
+$('nav').onclick=e=>{
+let b=e.target.closest('[data-page]');
+if(b)navigate(b.dataset.page);
+};
 
-  Object.keys(pageNames).forEach(p => {
-    if ($(p)) $(p).classList.toggle('hidden', p !== page);
-  });
-
-  $('pageTitle').textContent = pageNames[page][0];
-  $('pageSub').textContent = pageNames[page][1];
-
-  render();
+function navigate(p){
+Object.keys(pages).forEach(k=>$(k).classList.toggle('hidden',k!==p));
+$('pageTitle').textContent=pages[p];
+document.querySelectorAll('[data-page]').forEach(b=>
+b.classList.toggle('active',b.dataset.page===p)
+);
+render();
 }
 
-$('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-page]');if(b)navigate(b.dataset.page)});
-function toast(msg){$('toast').textContent=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)}
-function rows(items,fn,empty='لا توجد بيانات بعد'){return items.length?items.map(fn).join(''):`<tr><td colspan="9" class="empty">${empty}</td></tr>`}
-function render(){let total=data.orders.reduce((s,o)=>s+Number(o.qty||0),0),loaded=data.loads.reduce((s,l)=>s+Number(l.qty||0),0);$('statOrders').textContent=fmt(data.orders.length);$('statLoads').textContent=fmt(data.loads.length);$('statQty').textContent=fmt(loaded);$('statPending').textContent=fmt(data.orders.filter(o=>o.status!=='مكتمل').length);$('statCustomers').textContent=data.customers.length;$('statDrivers').textContent=data.drivers.length;$('statVehicles').textContent=data.vehicles.length;$('reportOrders').textContent=data.orders.length;$('reportLoads').textContent=data.loads.length;$('reportQty').textContent=fmt(loaded)+' م³';$('reportRemaining').textContent=fmt(Math.max(0,total-loaded))+' م³';
-$('recentOrders').innerHTML=rows(data.orders.slice(-5).reverse(),o=>`<tr><td class="num">${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${fmt(o.qty)} م³</td><td><span class="pill">${esc(o.status||'قيد التجهيز')}</span></td></tr>`);
-function renderOrdersWithLoads() {
-  $('ordersBody').innerHTML = rows(
-    data.orders.slice().reverse(),
-    o => {
-      const orderLoads = data.loads.filter(
-        l => String(l.orderNo) === String(o.no)
-      );
-
-      return `
-        <tr>
-          <td class="num">${esc(o.no)}</td>
-          <td>${esc(o.date)}</td>
-          <td>${esc(o.customer)}</td>
-          <td>${esc(o.site)}</td>
-          <td>${esc(o.pour)}</td>
-          <td>${esc(o.grade)}</td>
-          <td>${fmt(o.qty)}</td>
-          <td>
-            <div class="actions">
-              <button class="btn"
-                onclick="openLoad('${esc(o.no)}')">
-                ＋ حمولة (${orderLoads.length})
-              </button>
-              <button class="btn gold"
-                onclick="receiptOrder('${esc(o.no)}')">
-                وصل الأمر
-              </button>
-              <button class="btn danger"
-                onclick="del('orders','${esc(o.no)}','no')">
-                حذف
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td colspan="8"
-              style="padding:12px;background:#0b131a">
-            <strong style="color:var(--gold)">
-              حمولات أمر التجهيز ${esc(o.no)}
-            </strong>
-
-            ${
-              orderLoads.length
-                ? `
-                  <div class="tablewrap" style="margin-top:10px">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>رقم الحمولة</th>
-                          <th>السائق</th>
-                          <th>الخلاطة</th>
-                          <th>الكمية م³</th>
-                          <th>وقت الخروج</th>
-                          <th>الحالة</th>
-                          <th>الإجراءات</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${orderLoads.map(l => `
-                          <tr>
-                            <td class="num">${esc(l.no)}</td>
-                            <td>${esc(l.driver || '—')}</td>
-                            <td>${esc(l.vehicle || '—')}</td>
-                            <td>${fmt(l.qty)}</td>
-                            <td>${esc(l.time || '—')}</td>
-                            <td>${esc(l.status || 'تم التسجيل')}</td>
-                            <td>
-                              <div class="actions">
-                                <button class="btn gold"
-                                  onclick="receiptLoad('${esc(l.no)}')">
-                                  طباعة الوصل
-                                </button>
-                                <button class="btn"
-                                  onclick="editLoad('${esc(l.no)}')">
-                                  تعديل
-                                </button>
-                                <button class="btn danger"
-                                  onclick="del('loads','${esc(l.no)}','no')">
-                                  حذف
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        `).join('')}
-                      </tbody>
-                    </table>
-                  </div>
-                `
-                : `<p class="muted">لا توجد حمولات لهذا الأمر بعد.</p>`
-            }
-          </td>
-        </tr>
-      `;
-    }
-  renderOrdersWithLoads();
-for(const [type,el,fields] of [['customers','customersBody',['name','phone','address']],['drivers','driversBody',['name','phone','note']],['vehicles','vehiclesBody',['name','capacity','kind']]])$(el).innerHTML=rows(data[type],x=>`<tr>${fields.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}<td><button class="btn danger" onclick="del('${type}','${esc(x.id)}','id')">حذف</button></td></tr>`)
+function toast(s){
+$('toast').textContent=s;
+$('toast').style.display='block';
+setTimeout(()=>$('toast').style.display='none',2200);
 }
+
+function save(){
+localStorage.setItem(KEY,JSON.stringify(data));
+render();
+}
+
+function tableRows(a,fn,n=4){
+return a.length?a.map(fn).join(''):
+`<tr><td colspan="${n}" style="text-align:center;color:#93a7b3;padding:18px">لا توجد بيانات</td></tr>`;
+}
+
+function render(){
+let qty=data.loads.reduce((s,x)=>s+(+x.qty||0),0);
+let est=data.orders.reduce((s,x)=>s+(+x.qty||0),0);
+
+$('statOrders').textContent=data.orders.length;
+$('statLoads').textContent=data.loads.length;
+$('statQty').textContent=fmt(qty);
+$('statPending').textContent=data.orders.filter(x=>x.status!=='مكتمل').length;
+
+$('statCustomers').textContent=data.customers.length;
+$('statDrivers').textContent=data.drivers.length;
+$('statVehicles').textContent=data.vehicles.length;
+
+$('reportOrders').textContent=data.orders.length;
+$('reportLoads').textContent=data.loads.length;
+$('reportQty').textContent=fmt(qty)+' م³';
+$('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' م³';
+
+$('recentOrders').innerHTML=tableRows(
+data.orders.slice(-5).reverse(),
+o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${esc(o.qty)} م³</td></tr>`,
+4
+);
+
+$('ordersBody').innerHTML=tableRows(
+data.orders.slice().reverse(),
+o=>{
+let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
+return `
+<tr>
+<td>${esc(o.no)}</td><td>${esc(o.date)}</td>
+<td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
+<td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${esc(o.qty)}</td>
+<td><div class="actions">
+<button class="btn" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>
+<button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
+<button class="btn" onclick="editOrder('${esc(o.no)}')">تعديل</button>
+<button class="btn danger" onclick="delOrder('${esc(o.no)}')">حذف</button>
+</div></td>
+</tr>
+<tr><td colspan="8"><div class="loadbox">
+<b class="goldtext">حمولات الأمر ${esc(o.no)}</b>
+${ls.length?`<table><tbody>${ls.map(l=>`
+<tr>
+<td>حمولة ${esc(l.no)}</td>
+<td>${esc(l.driver||'—')}</td>
+<td>${esc(l.vehicle||'—')}</td>
+<td>${esc(l.qty)} م³</td>
+<td>
+<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة الوصل</button>
+<button class="btn" onclick="editLoad('${esc(l.no)}')">تعديل</button>
+<button class="btn danger" onclick="delLoad('${esc(l.no)}')">حذف</button>
+</td>
+</tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات بعد.</p>'}
+</div></td></tr>`;
+},8
+);
+
+[
+['customers','customersBody',['name','phone','address']],
+['drivers','driversBody',['name','phone','note']],
+['vehicles','vehiclesBody',['name','capacity','kind']]
+].forEach(([k,id,fs])=>{
+$(id).innerHTML=tableRows(data[k],x=>
+`<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
+<td><button class="btn danger" onclick="delSimple('${k}','${esc(x.id)}')">حذف</button></td></tr>`
+);
+});
+}
+
+function openForm(title,fields,cb){
+$('modalTitle').textContent=title;
+$('form').innerHTML=fields.map(f=>`
+<div class="field ${f.full?'full':''}">
+<label>${f.label}</label>
+${f.options?
+`<select name="${f.name}">${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
+`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} value="${esc(f.value??'')}">`}
+</div>`).join('')+
+'<div class="full"><button class="btn primary" type="submit">حفظ</button></div>';
+
+$('form').onsubmit=e=>{
+e.preventDefault();
+cb(Object.fromEntries(new FormData(e.currentTarget)));
+};
+$('modal').classList.remove('hidden');
+}
+
 function closeModal(){$('modal').classList.add('hidden')}
-function showForm(title,fields,submit){$('modalTitle').textContent=title;$('form').innerHTML=fields.map(f=>`<div class="field ${f.full?'full':''}"><label>${f.label}</label>${f.options?`<select name="${f.name}" ${f.required?'required':''}>${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.value!==undefined?`value="${esc(f.value)}"`:''} placeholder="${esc(f.placeholder||'')}">`}</div>`).join('')+`<div class="actions full"><button class="btn primary" type="submit">حفظ البيانات</button></div>`;$('form').onsubmit=e=>{e.preventDefault();submit(Object.fromEntries(new FormData(e.target)));closeModal()};$('modal').classList.remove('hidden')}
- 
+
+function openOrder(){
+openForm('أمر تجهيز جديد',[
+{name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
+{name:'phone',label:'الهاتف'},
+{name:'site',label:'موقع الصب',required:true},
+{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
+{name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
+{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
+{name:'price',label:'سعر المتر',type:'number'},
+{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
+],v=>{
+v.no=String(data.nextOrder++).padStart(7,'0');
+v.status='قيد التجهيز';
+data.orders.push(v);
+save();closeModal();toast('تم حفظ الأمر');
+});
+}
+
+function openLoad(no){
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('إضافة حمولة للأمر '+no,[
+{name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},
+{name:'vehicle',label:'رقم الآلية',options:['غير محدد',...data.vehicles.map(x=>x.name)]},
+{name:'qty',label:'الكمية م³',type:'number',required:true,value:Math.min(9,+o.qty||9)},
+{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},
+{name:'pump',label:'رقم المضخة'},
+{name:'status',label:'الحالة',options:['تم التسجيل','في الطريق','تم التسليم']}
+],v=>{
+v.orderNo=o.no;
+v.no=String(data.nextLoad++).padStart(7,'0');
+v.date=new Date().toISOString().slice(0,10);
+data.loads.push(v);
+save();closeModal();toast('تم حفظ الحمولة');
+});
+}
+
+function openSimple(t){
+let c={
+customer:['العملاء','customers',[['name','اسم العميل'],['phone','الهاتف'],['address','العنوان']]],
+driver:['السائقون','drivers',[['name','اسم السائق'],['phone','الهاتف'],['note','ملاحظات']]],
+vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity','السعة م³'],['kind','النوع']]]
+}[t];
+
+openForm('إضافة '+c[0],c[2].map(([name,label])=>({
+name,label,required:name==='name'
+})),v=>{
+v.id=Date.now();
+data[c[1]].push(v);
+save();closeModal();toast('تم الحفظ');
+});
+}
+
 function editOrder(no){
-  const o = data.orders.find(x => x.no === no);
-  if (!o) return;
-
-  showForm('تعديل وصل أمر التجهيز رقم ' + o.no, [
-    {name:'customer',label:'اسم العميل',required:true,value:o.customer},
-    {name:'phone',label:'رقم الهاتف',value:o.phone},
-    {name:'site',label:'موقع الصب',required:true,value:o.site},
-    {name:'pour',label:'نوع الصب',value:o.pour},
-    {name:'grade',label:'مقاومة الخرسانة',value:o.grade},
-    {name:'qty',label:'الكمية م³',type:'number',required:true,value:o.qty},
-    {name:'price',label:'سعر المتر',type:'number',value:o.price},
-    {name:'date',label:'التاريخ',type:'date',value:o.date},
-    {name:'note',label:'ملاحظات',full:true,value:o.note}
-  ], v => {
-    Object.assign(o, v);
-    save();
-    toast('تم تعديل الوصل رقم ' + o.no);
-  });
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('تعديل أمر '+no,
+['customer','phone','site','pour','grade','qty','price','date'].map(k=>({
+name:k,label:k,value:o[k]||'',required:k==='customer'||k==='site'
+})),
+v=>{Object.assign(o,v);save();closeModal();}
+);
 }
-function openOrder(){showForm('تسجيل أمر تجهيز',[{name:'customer',label:'اسم العميل',required:true,options:['اختر العميل',...data.customers.map(c=>c.name)]},{name:'phone',label:'رقم الهاتف'},{name:'site',label:'عنوان / موقع الصب',required:true},{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},{name:'grade',label:'مقاومة الخرسانة',options:['C-25','C-30','C-35','C-40','C-45']},{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},{name:'price',label:'سعر المتر بالدينار',type:'number'},{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)},{name:'note',label:'ملاحظات',full:true}],v=>{if(v.customer==='اختر العميل')v.customer='';v.no=String(data.nextOrder++).padStart(7,'0');v.status='قيد التجهيز';data.orders.push(v);save();toast('تم تسجيل أمر التجهيز '+v.no)})}
-function openLoad(orderNo) {
-  if (!data.orders.length) {
-    toast('سجّل أمر التجهيز أولاً');
-    return;
-  }
 
-  if (!orderNo) {
-    toast('افتح أمر التجهيز المطلوب ثم اضغط إضافة حمولة');
-    return;
-  }
-
-  const order = data.orders.find(
-    o => String(o.no) === String(orderNo)
-  );
-
-  if (!order) {
-    toast('أمر التجهيز غير موجود');
-    return;
-  }
-
-  showForm('تسجيل حمولة لأمر ' + order.no, [
-    {
-      name: 'orderNo',
-      label: 'رقم أمر التجهيز',
-      value: order.no,
-      required: true
-    },
-    {
-      name: 'driver',
-      label: 'السائق',
-      options: [
-        'غير محدد',
-        ...data.drivers.map(x => x.name)
-      ]
-    },
-    {
-      name: 'vehicle',
-      label: 'رقم الخلاطة',
-      options: [
-        'غير محدد',
-        ...data.vehicles.map(x => x.name)
-      ]
-    },
-    {
-      name: 'qty',
-      label: 'الكمية م³',
-      type: 'number',
-      required: true,
-      value: Math.min(9, Number(order.qty) || 9)
-    },
-    {
-      name: 'time',
-      label: 'وقت الخروج',
-      type: 'time',
-      value: new Date().toTimeString().slice(0, 5)
-    },
-    {
-      name: 'status',
-      label: 'الحالة',
-      options: ['تم التسجيل', 'في الطريق', 'تم التسليم']
-    },
-    {
-      name: 'pump',
-      label: 'رقم المضخة'
-    }
-  ], v => {
-    v.orderNo = order.no;
-    v.no = String(data.nextLoad++).padStart(7, '0');
-
-    data.loads.push(v);
-    save();
-
-    toast('تم تسجيل الحمولة ' + v.no +
-          ' ضمن الأمر ' + order.no);
-  });
+function editLoad(no){
+let l=data.loads.find(x=>String(x.no)===String(no));
+if(!l)return;
+openForm('تعديل حمولة '+no,
+['driver','vehicle','qty','time','pump','status'].map(k=>({
+name:k,label:k,value:l[k]||''
+})),
+v=>{Object.assign(l,v);save();closeModal();}
+);
 }
-function openSimple(type){let cfg={customer:{title:'إضافة عميل',key:'customers',fields:[{name:'name',label:'اسم العميل',required:true},{name:'phone',label:'رقم الهاتف'},{name:'address',label:'العنوان'}]},driver:{title:'إضافة سائق',key:'drivers',fields:[{name:'name',label:'اسم السائق',required:true},{name:'phone',label:'رقم الهاتف'},{name:'note',label:'ملاحظات'}]},vehicle:{title:'إضافة خلاطة',key:'vehicles',fields:[{name:'name',label:'رقم الآلية',required:true},{name:'capacity',label:'السعة م³',type:'number'},{name:'kind',label:'النوع',options:['خلاطة','مضخة','آلية أخرى']}]}}[type];showForm(cfg.title,cfg.fields,v=>{v.id=Date.now().toString();data[cfg.key].push(v);save();toast('تم الحفظ')})}
-function del(type,id,key){if(confirm('هل تريد حذف هذا السجل؟')){data[type]=data[type].filter(x=>String(x[key])!==String(id));save();toast('تم الحذف')}}
-function receiptOrder(no){let o=data.orders.find(x=>x.no===no);if(!o)return;printDoc('وصل أمر تجهيز',`<h2>صدى الإعمار للكونكريت الجاهز</h2><h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3><p>العميل: ${esc(o.customer)}</p><p>الهاتف: ${esc(o.phone)}</p><p>موقع الصب: ${esc(o.site)}</p><p>نوع الصب: ${esc(o.pour)}　 |　 المقاومة: ${esc(o.grade)}</p><p>الكمية التقديرية: ${esc(o.qty)} م³</p><p>السعر للمتر: ${esc(o.price||'—')}</p><p>التاريخ: ${esc(o.date)}</p><br><p>توقيع العميل: __________　 توقيع المسؤول: __________</p>`)}
+
+function delOrder(no){
+if(confirm('حذف الأمر وحمولاته؟')){
+data.orders=data.orders.filter(x=>String(x.no)!==no);
+data.loads=data.loads.filter(x=>String(x.orderNo)!==no);
+save();
+}
+}
+
+function delLoad(no){
+if(confirm('حذف الحمولة؟')){
+data.loads=data.loads.filter(x=>String(x.no)!==no);
+save();
+}
+}
+
+function delSimple(k,id){
+if(confirm('حذف السجل؟')){
+data[k]=data[k].filter(x=>String(x.id)!==id);
+save();
+}
+}
+
+function printDoc(title,content){
+let w=window.open('','_blank');
+if(!w){toast('اسمح بالنوافذ المنبثقة');return}
+w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><body>${content}<script>onload=()=>setTimeout(()=>print(),250)<\/script></body></html>`);
+w.document.close();
+}
+
+function receiptOrder(no){
+let o=data.orders.find(x=>String(x.no)===no);
+if(!o)return;
+printDoc('وصل أمر',`
+<style>
+body{font-family:Tahoma;padding:20px}
+.r{border:3px double #b28a29;padding:20px}
+h2,h3{text-align:center}
+p{border-bottom:1px solid #ddd;padding:8px}
+</style>
+<div class="r">
+<h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+<h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3>
+<p>التاريخ: ${esc(o.date)}</p>
+<p>العميل: ${esc(o.customer)}</p>
+<p>الهاتف: ${esc(o.phone)}</p>
+<p>موقع الصب: ${esc(o.site)}</p>
+<p>نوع الصب: ${esc(o.pour)} — المقاومة: ${esc(o.grade)}</p>
+<p>الكمية التقديرية: ${esc(o.qty)} م³</p>
+<p>توقيع الزبون: __________　 توقيع المسؤول: __________</p>
+</div>`);
+}
 
 function receiptLoad(no){
-  let l=data.loads.find(x=>String(x.no)===String(no));
-  if(!l)return alert('لم يتم العثور على الحمولة');
-
-  let o=data.orders.find(x=>String(x.no)===String(l.orderNo));
-
-  printDoc('وصل تجهيز حمولة',`
-  <style>
-    @page{size:A5 portrait;margin:8mm}
-    body{font-family:Arial,sans-serif;direction:rtl;color:#17212b}
-    .receipt{
-      border:3px double #b99745;
-      padding:18px;
-      min-height:175mm;
-      box-sizing:border-box;
-      position:relative
-    }
-    .company{
-      text-align:center;
-      color:#172b45;
-      font-size:22px;
-      font-weight:bold;
-      margin-bottom:5px
-    }
-    .english{
-      text-align:center;
-      color:#a78636;
-      font-size:11px;
-      letter-spacing:1px
-    }
-    .heading{
-      text-align:center;
-      border-top:1px solid #b99745;
-      border-bottom:1px solid #b99745;
-      margin:12px 0;
-      padding:9px;
-      font-size:19px
-    }
-    .number{
-      text-align:center;
-      background:#172b45;
-      color:white;
-      padding:12px;
-      font-size:22px;
-      font-weight:bold;
-      margin:12px 0
-    }
-    .row{
-      padding:9px 3px;
-      border-bottom:1px solid #ddd;
-      font-size:14px
-    }
-    .signatures{
-      display:flex;
-      justify-content:space-between;
-      margin-top:35px;
-      text-align:center;
-      gap:12px
-    }
-    .signatures div{width:50%;line-height:2}
-    .footer{
-      text-align:center;
-      margin-top:22px;
-      color:#8b7133;
-      font-size:11px
-    }
-  </style>
-
-  <div class="receipt">
-    <div class="company">صدى الإعمار</div>
-    <div class="english">SADA AL-EMAR CONCRETE</div>
-    <div style="text-align:center;font-size:13px;margin-top:5px">
-      للكونكريت الجاهز
-    </div>
-
-    <div class="heading">وصل تجهيز خرسانة</div>
-
-    <div class="row">
-      <b>رقم الوصل:</b> ${esc(l.no)}
-      &nbsp;&nbsp;
-      <b>التاريخ:</b> ${esc(l.date||l.time||'—')}
-    </div>
-
-    <div class="number">رقم الحمولة: ${esc(l.no)}</div>
-
-    <div class="row"><b>رقم أمر التجهيز:</b> ${esc(l.orderNo||'—')}</div>
-    <div class="row"><b>اسم العميل:</b> ${esc(o?.customer||'—')}</div>
-    <div class="row"><b>موقع الصب:</b> ${esc(o?.site||'—')}</div>
-    <div class="row"><b>نوع الصب:</b> ${esc(o?.pour||'—')}</div>
-    <div class="row"><b>مقاومة الخرسانة:</b> ${esc(o?.grade||'—')}</div>
-    <div class="row"><b>اسم السائق:</b> ${esc(l.driver||'—')}</div>
-    <div class="row"><b>رقم الخلاطة:</b> ${esc(l.vehicle||'—')}</div>
-    <div class="row"><b>رقم المضخة:</b> ${esc(l.pump||'—')}</div>
-
-function receiptLoad(no) {
-  const l = data.loads.find(x => String(x.no) === String(no));
-  if (!l) return alert('لم يتم العثور على الحمولة');
-
-  const o = data.orders.find(
-    x => String(x.no) === String(l.orderNo)
-  );
-
-  if (!o) return alert('أمر التجهيز المرتبط بهذه الحمولة غير موجود');
-
-  const receiptDate = l.date || o.date ||
-    new Date().toISOString().slice(0, 10);
-
-  printDoc('وصل تجهيز خرسانة', `
-    <style>
-      @page {
-        size: A5 portrait;
-        margin: 5mm;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white;
-        color: #111;
-        font-family: Tahoma, Arial, sans-serif;
-        direction: rtl;
-      }
-
-      .receipt {
-        width: 100%;
-        min-height: 190mm;
-        border: 3px double #b28a29;
-        padding: 5mm;
-        position: relative;
-        background: #fff;
-      }
-
-      .header {
-        display: grid;
-        grid-template-columns: 1fr 1.7fr 1fr;
-        align-items: center;
-        gap: 5px;
-        text-align: center;
-        border-bottom: 3px solid #b28a29;
-        padding-bottom: 10px;
-      }
-
-      .logo {
-        font-size: 25px;
-        font-weight: bold;
-        color: #b28a29;
-        line-height: 1.4;
-      }
-
-      .logo small {
-        display: block;
-        font-size: 9px;
-        color: #111;
-        letter-spacing: 1px;
-      }
-
-      .company-name {
-        font-size: 20px;
-        font-weight: bold;
-        color: #a47b20;
-        margin-bottom: 5px;
-      }
-
-      .company-desc {
-        font-size: 14px;
-        font-weight: bold;
-      }
-
-      .english {
-        font-size: 10px;
-        font-weight: bold;
-        letter-spacing: 1px;
-        margin-top: 5px;
-      }
-
-      .slogan {
-        font-size: 10px;
-        color: #8b6b26;
-        margin-top: 5px;
-      }
-
-      .heading {
-        margin: 9px 0;
-        padding: 8px;
-        text-align: center;
-        background: #171717;
-        color: #e7c36b;
-        border: 3px solid #b28a29;
-        border-radius: 8px;
-        font-size: 21px;
-        font-weight: bold;
-      }
-
-      .heading-en {
-        text-align: center;
-        font-size: 11px;
-        font-weight: bold;
-        margin-top: -4px;
-        margin-bottom: 10px;
-      }
-
-      .top-info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-bottom: 10px;
-      }
-
-      .info-box {
-        border: 1px solid #555;
-        border-radius: 7px;
-        text-align: center;
-        overflow: hidden;
-      }
-
-      .info-label {
-        background: #e5e5e5;
-        padding: 5px;
-        font-weight: bold;
-        font-size: 13px;
-      }
-
-      .info-value {
-        padding: 7px;
-        font-size: 19px;
-        font-weight: bold;
-      }
-
-      .receipt-no {
-        color: #a51d20;
-        font-size: 22px;
-      }
-
-      .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-      }
-
-      .data-table td {
-        border: 1px solid #777;
-        padding: 9px 7px;
-        font-size: 13px;
-      }
-
-      .data-table td:first-child {
-        width: 28%;
-        background: #e4e4e4;
-        font-weight: bold;
-        text-align: center;
-      }
-
-      .data-table td:last-child {
-        text-align: right;
-        font-weight: bold;
-      }
-
-      .section-title {
-        background: #171717;
-        color: #e7c36b;
-        border: 3px solid #b28a29;
-        border-radius: 8px 8px 0 0;
-        padding: 7px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-      }
-
-      .load-details {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 7px;
-        border: 2px solid #b28a29;
-        border-top: 0;
-        padding: 8px;
-        border-radius: 0 0 8px 8px;
-      }
-
-      .load-box {
-        border: 1px solid #777;
-        border-radius: 7px;
-        text-align: center;
-        min-height: 48mm;
-        overflow: hidden;
-      }
-
-      .load-label {
-        background: #e5e5e5;
-        padding: 8px 3px;
-        font-weight: bold;
-        font-size: 14px;
-      }
-
-      .load-number {
-        font-size: 52px;
-        font-weight: bold;
-        padding: 12px 2px;
-        color: #111;
-      }
-
-      .load-quantity {
-        font-size: 34px;
-        font-weight: bold;
-        padding: 20px 2px;
-        color: #111;
-      }
-
-      .truck {
-        font-size: 38px;
-        padding-top: 8px;
-      }
-
-      .truck-caption {
-        font-size: 11px;
-        font-weight: bold;
-        padding: 5px;
-      }
-
-      .signatures {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 10px;
-      }
-
-      .signature {
-        border: 1px solid #777;
-        border-radius: 7px;
-        min-height: 25mm;
-        text-align: center;
-        padding: 8px;
-        font-weight: bold;
-        font-size: 14px;
-      }
-
-      .signature-line {
-        margin-top: 22px;
-        border-bottom: 1px dotted #333;
-      }
-
-      .footer {
-        border-top: 2px solid #b28a29;
-        margin-top: 10px;
-        padding-top: 7px;
-        text-align: center;
-        font-size: 10px;
-        line-height: 1.8;
-      }
-
-      .footer strong {
-        color: #9a741e;
-      }
-
-      @media print {
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-
-        .receipt {
-          min-height: 190mm;
-        }
-      }
-    </style>
-
-    <div class="receipt">
-
-      <div class="header">
-        <div class="logo">
-          صدى الإعمار
-          <small>SADA ALAAMAR</small>
-          <small>READY MIX CONCRETE</small>
-        </div>
-
-        <div>
-          <div class="company-name">شركة صدى الإعمار</div>
-          <div class="company-desc">للخرسانة والكونكريت الجاهز</div>
-          <div class="english">SADA ALAAMAR COMPANY</div>
-          <div class="english">FOR READY MIX CONCRETE</div>
-          <div class="slogan">معاً نبني المستقبل · BUILDING A BETTER TOMORROW</div>
-        </div>
-
-        <div class="logo">
-          🏗️
-          <small>خرسانة أقوى</small>
-          <small>مستقبل أعمر</small>
-        </div>
-      </div>
-
-      <div class="heading">وصل تجهيز خرسانة</div>
-      <div class="heading-en">CONCRETE DELIVERY RECEIPT</div>
-
-      <div class="top-info">
-        <div class="info-box">
-          <div class="info-label">التاريخ</div>
-          <div class="info-value">${esc(receiptDate)}</div>
-        </div>
-
-        <div class="info-box">
-          <div class="info-label">رقم الوصل</div>
-          <div class="info-value receipt-no">${esc(l.no)}</div>
-        </div>
-      </div>
-
-      <table class="data-table">
-        <tr>
-          <td>اسم الزبون</td>
-          <td>${esc(o.customer || '—')}</td>
-        </tr>
-        <tr>
-          <td>موقع الصب</td>
-          <td>${esc(o.site || '—')}</td>
-        </tr>
-        <tr>
-          <td>نوع الصب</td>
-          <td>${esc(o.pour || '—')}</td>
-        </tr>
-        <tr>
-          <td>المواصفة</td>
-          <td>${esc(o.grade || '—')}</td>
-        </tr>
-        <tr>
-          <td>رقم الآلية</td>
-          <td>${esc(l.vehicle || '—')}</td>
-        </tr>
-        <tr>
-          <td>رقم المضخة</td>
-          <td>${esc(l.pump || '—')}</td>
-        </tr>
-        <tr>
-          <td>الكمية (م³)</td>
-          <td>${esc(l.qty ?? '—')} متر مكعب</td>
-        </tr>
-      </table>
-
-      <div class="section-title">تفاصيل التجهيز</div>
-
-      <div class="load-details">
-
-        <div class="load-box">
-          <div class="load-label">رقم الحمولة</div>
-          <div class="load-number">${esc(l.no)}</div>
-          <div class="truck-caption">رقم الحمولة المسجل</div>
-        </div>
-
-        <div class="load-box">
-          <div class="load-label">الكمية المجهزة (م³)</div>
-          <div class="load-quantity">${esc(l.qty ?? '—')}</div>
-          <div class="truck-caption">الكمية لهذه الحمولة</div>
-        </div>
-
-      </div>
-
-      <div class="signatures">
-        <div class="signature">
-          توقيع الزبون
-          <div class="signature-line"></div>
-        </div>
-
-        <div class="signature">
-          توقيع المعمل
-          <div class="signature-line"></div>
-        </div>
-      </div>
-
-      <div class="footer">
-        <strong>صدى الإعمار للكونكريت الجاهز</strong><br>
-        0770 123 4567 - 0780 123 4567<br>
-        www.sada-alaamar.com<br>
-        معاً نبني مستقبل أعمر · BUILDING A BETTER TOMORROW
-      </div>
-
-    </div>
-  `);
-      }
-
- 
-function editLoad(no){
-  const l = data.loads.find(x => x.no === no);
-  if (!l) return;
-
-  showForm('تعديل وصل الحمولة رقم ' + l.no, [
-    {name:'orderNo',label:'رقم أمر التجهيز',required:true,value:l.orderNo},
-    {name:'driver',label:'السائق',value:l.driver},
-    {name:'vehicle',label:'رقم الخلاطة',value:l.vehicle},
-    {name:'qty',label:'الكمية م³',type:'number',required:true,value:l.qty},
-    {name:'time',label:'وقت الخروج',type:'time',value:l.time},
-    {name:'status',label:'الحالة',value:l.status},
-    {name:'pump',label:'رقم المضخة',value:l.pump}
-  ], v => {
-    Object.assign(l, v);
-    save();
-    toast('تم تعديل وصل الحمولة رقم ' + l.no);
-  });
+let l=data.loads.find(x=>String(x.no)===no);
+let o=l&&data.orders.find(x=>String(x.no)===String(l.orderNo));
+if(!l||!o)return toast('الحمولة أو أمرها غير موجود');
+
+let d=l.date||o.date||'—';
+
+printDoc('وصل تجهيز خرسانة',`
+<style>
+@page{size:A5 portrait;margin:6mm}
+*{box-sizing:border-box}
+body{font-family:Tahoma;color:#111;margin:0}
+.r{border:3px double #b28a29;padding:5mm;min-height:185mm}
+.head{text-align:center;border-bottom:3px solid #b28a29;padding-bottom:9px}
+.head h2{color:#a47b20;margin:4px}
+.en{font-size:10px}
+.title{text-align:center;background:#171717;color:#e7c36b;border:2px solid #b28a29;padding:9px;margin:10px 0;font-size:20px;font-weight:bold}
+.top{display:flex;gap:8px}
+.top div{border:1px solid #777;flex:1;text-align:center;padding:8px;font-weight:bold}
+.no{color:#a51d20;font-size:21px}
+.data{width:100%;border-collapse:collapse;margin:9px 0}
+.data td{border:1px solid #777;padding:8px;font-size:13px}
+.data td:first-child{background:#eee;font-weight:bold;width:30%}
+.section{text-align:center;background:#171717;color:#e7c36b;padding:8px;border:2px solid #b28a29}
+.big{display:flex;gap:8px;border:2px solid #b28a29;padding:8px}
+.big div{flex:1;border:1px solid #777;text-align:center;min-height:42mm}
+.big b{display:block;background:#eee;padding:8px}
+.big strong{display:block;font-size:42px;padding:12px}
+.sign{display:flex;gap:10px;margin-top:12px}
+.sign div{border:1px solid #777;flex:1;text-align:center;padding:18px 5px 28px;font-weight:bold}
+.foot{text-align:center;border-top:2px solid #b28a29;margin-top:12px;padding-top:7px;font-size:10px}
+</style>
+<div class="r">
+<div class="head">
+<h2>شركة صدى الإعمار</h2>
+<b>للخرسانة والكونكريت الجاهز</b>
+<div class="en">SADA AL-EMAR CONCRETE</div>
+<div class="en">BUILDING A BETTER TOMORROW</div>
+</div>
+<div class="title">وصل تجهيز خرسانة</div>
+<div class="top">
+<div>التاريخ<br>${esc(d)}</div>
+<div>رقم الوصل<br><span class="no">${esc(l.no)}</span></div>
+</div>
+<table class="data">
+<tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
+<tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
+<tr><td>نوع الصب</td><td>${esc(o.pour)}</td></tr>
+<tr><td>المواصفة</td><td>${esc(o.grade)}</td></tr>
+<tr><td>رقم الآلية</td><td>${esc(l.vehicle||'—')}</td></tr>
+<tr><td>رقم المضخة</td><td>${esc(l.pump||'—')}</td></tr>
+<tr><td>الكمية م³</td><td>${esc(l.qty)}</td></tr>
+</table>
+<div class="section">تفاصيل التجهيز</div>
+<div class="big">
+<div><b>رقم الحمولة</b><strong>${esc(l.no)}</strong></div>
+<div><b>الكمية المجهزة م³</b><strong>${esc(l.qty)}</strong></div>
+</div>
+<div class="sign">
+<div>توقيع الزبون<br><br>____________</div>
+<div>توقيع المعمل<br><br>____________</div>
+</div>
+<div class="foot">
+<b>صدى الإعمار للكونكريت الجاهز</b><br>
+وصل تجهيز رسمي — www.sada-alaamar.com
+</div>
+</div>`);
 }
 
-function printDoc(title,body){let w=window.open('','_blank');if(!w){toast('اسمح بفتح النوافذ للطباعة');return}w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><style>body{font-family:Tahoma,Arial;padding:24px;color:#111}h2,h3{text-align:center}p{border-bottom:1px solid #ddd;padding:10px}@media print{button{display:none}}</style><body>${body}<button onclick="print()">طباعة</button></body></html>`);w.document.close()}
+function clearData(){
+if(confirm('حذف كل البيانات المحلية؟')){
+localStorage.removeItem(KEY);
+data=blank();
+save();
+}
+}
+
 render();
-// تشغيل النظام بواجهة المدير
-const roleMenus = {
-  manager: [
-    ['dashboard','⌂ الرئيسية'],
-    ['orders','أوامر التجهيز'],
-    ['customers','العملاء'],
-    ['drivers','السائقون'],
-    ['vehicles','الآليات والخلاطات'],
-    ['reports','التقارير'],
-    ['settings','الإعدادات']
-  ]
-};
-
-let currentRole = 'manager';
-
-function buildMenu() {
-  $('nav').innerHTML = roleMenus.manager.map(
-    ([page, label], index) =>
-      `<button class="${index === 0 ? 'active' : ''}"
-       data-page="${page}">${label}</button>`
-  ).join('');
-
-  const roleBox = $('roleSelect')?.closest('.user');
-  if (roleBox) roleBox.style.display = 'none';
-}
-
-buildMenu();
-navigate('dashboard');
-render();
-
-let currentRole = localStorage.getItem('sada-role') || 'manager';
-
-function buildMenu() {
-  const menu = roleMenus[currentRole] || roleMenus.manager;
-
-  document.getElementById('nav').innerHTML = menu.map(
-    ([page, label], index) =>
-      `<button class="${index === 0 ? 'active' : ''}"
-       data-page="${page}">${label}</button>`
-  ).join('');
-
-  document.getElementById('roleSelect').value = currentRole;
-
-  document.getElementById('roleNote').textContent =
-    currentRole === 'manager' ? 'صلاحيات المدير' :
-    currentRole === 'accountant' ? 'عرض وطباعة الأوامر والحمولات' :
-    'واجهة مشغل المعمل';
-}
-
-document.getElementById('roleSelect').addEventListener('change', e => {
-  currentRole = e.target.value;
-  localStorage.setItem('sada-role', currentRole);
-  buildMenu();
-  navigate('dashboard');
-});
-const loginAccounts = {
-  raed1: { password: '20021', role: 'manager' },
-  raed2: { password: '20022', role: 'accountant' },
-  raed:  { password: '2002', role: 'lab' }
-};
-
-const loginForm = document.getElementById('loginForm');
-
-loginForm.addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const username = document.getElementById('loginUser').value.trim();
-  const password = document.getElementById('loginPass').value;
-  const error = document.getElementById('loginError');
-  const account = loginAccounts[username];
-
-  if (!account || account.password !== password) {
-    error.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-    return;
-  }
-
-  try {
-    sessionStorage.setItem('sada-login-user', username);
-    sessionStorage.setItem('sada-login-role', account.role);
-    localStorage.setItem('sada-role', account.role);
-  } catch (err) {
-    error.textContent = 'تعذر حفظ جلسة الدخول. افتح الموقع في المتصفح مباشرة.';
-    return;
-  }
-
-  currentRole = account.role;
-  buildMenu();
-  navigate('dashboard');
-
-  document.getElementById('loginScreen').style.display = 'none';
-});
-
-const savedUser = sessionStorage.getItem('sada-login-user');
-const savedRole = sessionStorage.getItem('sada-login-role');
-
-if (
-  savedUser &&
-  savedRole &&
-  loginAccounts[savedUser] &&
-  loginAccounts[savedUser].role === savedRole
-) {
-  currentRole = savedRole;
-  buildMenu();
-  navigate('dashboard');
-  document.getElementById('loginScreen').style.display = 'none';
-} else {
-  document.getElementById('loginScreen').style.display = 'flex';
-}
+</script>
+</body>
+</html>
