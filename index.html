@@ -46,7 +46,35 @@ td,th{padding:9px 7px;border-bottom:1px solid #293943;text-align:right;font-size
 .detail strong{color:var(--cyan)}
 .toast{display:none;position:fixed;bottom:15px;left:15px;background:#17392f;padding:12px;border-radius:8px;z-index:9}
 .loadbox{background:#0b131a;padding:10px;border-radius:8px}
-.goldtext{color:var(--gold)}.goldtext{color:var(--gold)}
+.goldtext{color:var(--gold)}..order-open{
+  background:#fff!important;
+  color:#202020!important;
+}
+
+.order-locked{
+  background:#fff0b8!important;
+  color:#493b12!important;
+}
+
+.order-invoiced{
+  background:#d9f2df!important;
+  color:#174b2b!important;
+}
+
+.order-open td,
+.order-locked td,
+.order-invoiced td{
+  color:inherit;
+}
+
+.status-pill{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:6px;
+  font-weight:bold;
+  border:1px solid #999;
+  margin-bottom:6px;
+} 
 @media(max-width:800px){
 .app{grid-template-columns:1fr}
 .side{padding:8px}
