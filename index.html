@@ -822,14 +822,14 @@ function editLoad(no){
 
 function printDoc(title,body){let w=window.open('','_blank');if(!w){toast('اسمح بفتح النوافذ للطباعة');return}w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><style>body{font-family:Tahoma,Arial;padding:24px;color:#111}h2,h3{text-align:center}p{border-bottom:1px solid #ddd;padding:10px}@media print{button{display:none}}</style><body>${body}<button onclick="print()">طباعة</button></body></html>`);w.document.close()}
 render();
-// تشغيل النظام مباشرة بواجهة المدير
+// تشغيل النظام بواجهة المدير
 const roleMenus = {
   manager: [
     ['dashboard','⌂ الرئيسية'],
     ['orders','أوامر التجهيز'],
     ['customers','العملاء'],
     ['drivers','السائقون'],
-    ['vehicles','الآليات / الخلاطات'],
+    ['vehicles','الآليات والخلاطات'],
     ['reports','التقارير'],
     ['settings','الإعدادات']
   ]
@@ -838,9 +838,7 @@ const roleMenus = {
 let currentRole = 'manager';
 
 function buildMenu() {
-  const menu = roleMenus.manager;
-
-  $('nav').innerHTML = menu.map(
+  $('nav').innerHTML = roleMenus.manager.map(
     ([page, label], index) =>
       `<button class="${index === 0 ? 'active' : ''}"
        data-page="${page}">${label}</button>`
