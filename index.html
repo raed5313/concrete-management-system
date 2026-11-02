@@ -416,21 +416,391 @@ function receiptLoad(no){
     <div class="row"><b>رقم الخلاطة:</b> ${esc(l.vehicle||'—')}</div>
     <div class="row"><b>رقم المضخة:</b> ${esc(l.pump||'—')}</div>
 
-    <div class="number">الكمية المجهزة: ${esc(l.qty??'—')} م³</div>
+function receiptLoad(no) {
+  const l = data.loads.find(x => String(x.no) === String(no));
+  if (!l) return alert('لم يتم العثور على الحمولة');
 
-    <div class="row"><b>وقت الخروج:</b> ${esc(l.time||'—')}</div>
+  const o = data.orders.find(
+    x => String(x.no) === String(l.orderNo)
+  );
 
-    <div class="signatures">
-      <div>توقيع المختبر<br>________________</div>
-      <div>توقيع العميل<br>________________</div>
+  if (!o) return alert('أمر التجهيز المرتبط بهذه الحمولة غير موجود');
+
+  const receiptDate = l.date || o.date ||
+    new Date().toISOString().slice(0, 10);
+
+  printDoc('وصل تجهيز خرسانة', `
+    <style>
+      @page {
+        size: A5 portrait;
+        margin: 5mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white;
+        color: #111;
+        font-family: Tahoma, Arial, sans-serif;
+        direction: rtl;
+      }
+
+      .receipt {
+        width: 100%;
+        min-height: 190mm;
+        border: 3px double #b28a29;
+        padding: 5mm;
+        position: relative;
+        background: #fff;
+      }
+
+      .header {
+        display: grid;
+        grid-template-columns: 1fr 1.7fr 1fr;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+        border-bottom: 3px solid #b28a29;
+        padding-bottom: 10px;
+      }
+
+      .logo {
+        font-size: 25px;
+        font-weight: bold;
+        color: #b28a29;
+        line-height: 1.4;
+      }
+
+      .logo small {
+        display: block;
+        font-size: 9px;
+        color: #111;
+        letter-spacing: 1px;
+      }
+
+      .company-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #a47b20;
+        margin-bottom: 5px;
+      }
+
+      .company-desc {
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .english {
+        font-size: 10px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-top: 5px;
+      }
+
+      .slogan {
+        font-size: 10px;
+        color: #8b6b26;
+        margin-top: 5px;
+      }
+
+      .heading {
+        margin: 9px 0;
+        padding: 8px;
+        text-align: center;
+        background: #171717;
+        color: #e7c36b;
+        border: 3px solid #b28a29;
+        border-radius: 8px;
+        font-size: 21px;
+        font-weight: bold;
+      }
+
+      .heading-en {
+        text-align: center;
+        font-size: 11px;
+        font-weight: bold;
+        margin-top: -4px;
+        margin-bottom: 10px;
+      }
+
+      .top-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .info-box {
+        border: 1px solid #555;
+        border-radius: 7px;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .info-label {
+        background: #e5e5e5;
+        padding: 5px;
+        font-weight: bold;
+        font-size: 13px;
+      }
+
+      .info-value {
+        padding: 7px;
+        font-size: 19px;
+        font-weight: bold;
+      }
+
+      .receipt-no {
+        color: #a51d20;
+        font-size: 22px;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
+
+      .data-table td {
+        border: 1px solid #777;
+        padding: 9px 7px;
+        font-size: 13px;
+      }
+
+      .data-table td:first-child {
+        width: 28%;
+        background: #e4e4e4;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .data-table td:last-child {
+        text-align: right;
+        font-weight: bold;
+      }
+
+      .section-title {
+        background: #171717;
+        color: #e7c36b;
+        border: 3px solid #b28a29;
+        border-radius: 8px 8px 0 0;
+        padding: 7px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .load-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        border: 2px solid #b28a29;
+        border-top: 0;
+        padding: 8px;
+        border-radius: 0 0 8px 8px;
+      }
+
+      .load-box {
+        border: 1px solid #777;
+        border-radius: 7px;
+        text-align: center;
+        min-height: 48mm;
+        overflow: hidden;
+      }
+
+      .load-label {
+        background: #e5e5e5;
+        padding: 8px 3px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .load-number {
+        font-size: 52px;
+        font-weight: bold;
+        padding: 12px 2px;
+        color: #111;
+      }
+
+      .load-quantity {
+        font-size: 34px;
+        font-weight: bold;
+        padding: 20px 2px;
+        color: #111;
+      }
+
+      .truck {
+        font-size: 38px;
+        padding-top: 8px;
+      }
+
+      .truck-caption {
+        font-size: 11px;
+        font-weight: bold;
+        padding: 5px;
+      }
+
+      .signatures {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .signature {
+        border: 1px solid #777;
+        border-radius: 7px;
+        min-height: 25mm;
+        text-align: center;
+        padding: 8px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .signature-line {
+        margin-top: 22px;
+        border-bottom: 1px dotted #333;
+      }
+
+      .footer {
+        border-top: 2px solid #b28a29;
+        margin-top: 10px;
+        padding-top: 7px;
+        text-align: center;
+        font-size: 10px;
+        line-height: 1.8;
+      }
+
+      .footer strong {
+        color: #9a741e;
+      }
+
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .receipt {
+          min-height: 190mm;
+        }
+      }
+    </style>
+
+    <div class="receipt">
+
+      <div class="header">
+        <div class="logo">
+          صدى الإعمار
+          <small>SADA ALAAMAR</small>
+          <small>READY MIX CONCRETE</small>
+        </div>
+
+        <div>
+          <div class="company-name">شركة صدى الإعمار</div>
+          <div class="company-desc">للخرسانة والكونكريت الجاهز</div>
+          <div class="english">SADA ALAAMAR COMPANY</div>
+          <div class="english">FOR READY MIX CONCRETE</div>
+          <div class="slogan">معاً نبني المستقبل · BUILDING A BETTER TOMORROW</div>
+        </div>
+
+        <div class="logo">
+          🏗️
+          <small>خرسانة أقوى</small>
+          <small>مستقبل أعمر</small>
+        </div>
+      </div>
+
+      <div class="heading">وصل تجهيز خرسانة</div>
+      <div class="heading-en">CONCRETE DELIVERY RECEIPT</div>
+
+      <div class="top-info">
+        <div class="info-box">
+          <div class="info-label">التاريخ</div>
+          <div class="info-value">${esc(receiptDate)}</div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-label">رقم الوصل</div>
+          <div class="info-value receipt-no">${esc(l.no)}</div>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <tr>
+          <td>اسم الزبون</td>
+          <td>${esc(o.customer || '—')}</td>
+        </tr>
+        <tr>
+          <td>موقع الصب</td>
+          <td>${esc(o.site || '—')}</td>
+        </tr>
+        <tr>
+          <td>نوع الصب</td>
+          <td>${esc(o.pour || '—')}</td>
+        </tr>
+        <tr>
+          <td>المواصفة</td>
+          <td>${esc(o.grade || '—')}</td>
+        </tr>
+        <tr>
+          <td>رقم الآلية</td>
+          <td>${esc(l.vehicle || '—')}</td>
+        </tr>
+        <tr>
+          <td>رقم المضخة</td>
+          <td>${esc(l.pump || '—')}</td>
+        </tr>
+        <tr>
+          <td>الكمية (م³)</td>
+          <td>${esc(l.qty ?? '—')} متر مكعب</td>
+        </tr>
+      </table>
+
+      <div class="section-title">تفاصيل التجهيز</div>
+
+      <div class="load-details">
+
+        <div class="load-box">
+          <div class="load-label">رقم الحمولة</div>
+          <div class="load-number">${esc(l.no)}</div>
+          <div class="truck-caption">رقم الحمولة المسجل</div>
+        </div>
+
+        <div class="load-box">
+          <div class="load-label">الكمية المجهزة (م³)</div>
+          <div class="load-quantity">${esc(l.qty ?? '—')}</div>
+          <div class="truck-caption">الكمية لهذه الحمولة</div>
+        </div>
+
+      </div>
+
+      <div class="signatures">
+        <div class="signature">
+          توقيع الزبون
+          <div class="signature-line"></div>
+        </div>
+
+        <div class="signature">
+          توقيع المعمل
+          <div class="signature-line"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <strong>صدى الإعمار للكونكريت الجاهز</strong><br>
+        0770 123 4567 - 0780 123 4567<br>
+        www.sada-alaamar.com<br>
+        معاً نبني مستقبل أعمر · BUILDING A BETTER TOMORROW
+      </div>
+
     </div>
-
-    <div class="footer">
-      صدى الإعمار للكونكريت الجاهز — وصل تجهيز رسمي
-    </div>
-  </div>
   `);
-}
+      }
 
  
 function editLoad(no){
