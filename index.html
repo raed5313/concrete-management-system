@@ -16,16 +16,17 @@
 --text-white: #f3f7fa;
 --text-muted: #93a7b3;
 }
- { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
+￼ { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
 body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; overflow-x: hidden; }
 /* Login Screen */
 .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #111a22 0%, #090d12 100%); }
-.login-card { background: var(--panel-bg); border: 2px solid var(--border-gold); border-radius: 16px; padding: 30px; width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
+.login-card { background: var(--panel-bg); border: 2px solid var(--border-gold); border-radius: 16px; padding: 30px; width: 100%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
 .login-card h2 { color: var(--primary-gold); margin-bottom: 5px; font-size: 22px; }
 .login-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
 .form-group { text-align: right; margin-bottom: 15px; }
 .form-group label { display: block; font-size: 12px; margin-bottom: 6px; color: #b9c8d0; }
-.form-group input, .form-group select { width: 100%; padding: 10px; background: #080f15; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 13px; }
+.form-group input { width: 100%; padding: 11px; background: #080f15; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
+.form-group input:focus { border-color: var(--primary-gold); }
 .btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #c69214, #e6b800); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
 /* App Layout */
 .app-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
@@ -34,9 +35,9 @@ body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; 
 .brand h3 { color: var(--primary-gold); font-size: 16px; margin-top: 5px; }
 .brand small { color: var(--primary-cyan); font-size: 10px; }
 .user-badge { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: right; font-size: 11px; }
-.user-badge span { color: var(--primary-gold); font-weight: bold; display: block; font-size: 12px; }
+.user-badge span { color: var(--primary-gold); font-weight: bold; display: block; font-size: 13px; }
 .nav-links { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.nav-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 12px; border-radius: 8px; text-align: right; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+.nav-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 12px; border-radius: 8px; text-align: right; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; width: 100%; }
 .nav-btn.active, .nav-btn:hover { background: #173b45; color: var(--primary-cyan); border-color: #287d89; }
 .btn-logout { background: #351a22; color: #ff8791; border: 1px solid #71313d; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 13px; width: 100%; text-align: center; }
 /* Main Content */
@@ -70,7 +71,7 @@ th { background: #080f15; color: var(--primary-cyan); }
 <form onsubmit="handleLogin(event)">
 <div class="form-group">
 <label>اسم المستخدم</label>
-<input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+<input type="text" id="username" placeholder="أدخل اسم المستخدم" required autocomplete="off">
 </div>
 <div class="form-group">
 <label>كلمة المرور</label>
@@ -78,14 +79,14 @@ th { background: #080f15; color: var(--primary-cyan); }
 </div>
 <button type="submit" class="btn-login">تسجيل الدخول</button>
 </form>
-<div id="loginError" style="color: #ff8791; font-size: 12px; margin-top: 15px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-<div style="margin-top: 20px; text-align: right; background: #080f15; padding: 10px; border-radius: 8px; font-size: 11px; color: var(--text-muted);">
-<strong style="color: var(--primary-gold); font-size: 12px; display:block; margin-bottom: 4px;">بيانات الدخول المعتمدة:</strong>
-• صفحة المدير: <b>A</b> / <b>1234</b>
+<div id="loginError" style="color: #ff8791; font-size: 12px; margin-top: 15px; display: none; font-weight: bold;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+<div style="margin-top: 20px; text-align: right; background: #080f15; padding: 12px; border-radius: 8px; font-size: 11px; color: var(--text-muted); border: 1px solid #1c2b36;">
+<strong style="color: var(--primary-gold); font-size: 12px; display:block; margin-bottom: 6px;">حسابات الدخول المعتمدة:</strong>
+• <b>صفحة المدير:</b> المستخدم <code>raed</code> / كلمة المرور <code>2002</code>
 
-• صفحة مشغل معمل: <b>B</b> / <b>12345</b>
+• <b>صفحة المشغل:</b> المستخدم <code>raed1</code> / كلمة المرور <code>20021</code>
 
-• صفحة المحاسب: <b>C</b> / <b>123456</b>
+• <b>صفحة المحاسب:</b> المستخدم <code>raed 2</code> / كلمة المرور <code>20022</code>
 </div>
 </div>
 </div>
@@ -98,8 +99,8 @@ th { background: #080f15; color: var(--primary-cyan); }
 <small>SADA AL-EMAR CONCRETE</small>
 </div>
 <div class="user-badge">
-مرحباً: <span id="displayUser">-</span>
-الصلاحية: <small id="displayRole" style="color: var(--primary-cyan); display:block;">-</small>
+المستخدم: <span id="displayUser">-</span>
+الصفحة: <small id="displayRole" style="color: var(--primary-cyan); display:block; margin-top:2px;">-</small>
 </div>
 <nav class="nav-links" id="sidebarNav"></nav>
 <button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
@@ -121,9 +122,9 @@ th { background: #080f15; color: var(--primary-cyan); }
 </div>
 <script>
 const USERS = {
-'A': { pass: '1234', role: 'admin', name: 'المدير العام' },
-'B': { pass: '12345', role: 'operator', name: 'مشغّل المعمل' },
-'C': { pass: '123456', role: 'accountant', name: 'المحاسب' }
+'raed': { pass: '2002', role: 'admin', name: 'المدير العام', title: 'صفحة المدير العام (كامل الصلاحيات)' },
+'raed1': { pass: '20021', role: 'operator', name: 'مشغّل المعمل', title: 'صفحة مشغّل المعمل (إدخال وإتمام والتجهيز)' },
+'raed 2': { pass: '20022', role: 'accountant', name: 'المحاسب', title: 'صفحة المحاسب (عرض، فواتير، أرشفة وتقارير)' }
 };
 const NAV_ITEMS = [
 { id: 'dashboard', label: 'الرئيسية', icon: 'fa-home', roles: ['admin', 'operator', 'accountant'] },
@@ -152,7 +153,7 @@ employees: [], archive: [], permissions: [], settings: {},
 nextOrderNo: 129, nextReceiptNo: 1
 };
 try {
-const saved = localStorage.getItem('sada_app_data_v10');
+const saved = localStorage.getItem('sada_app_data_v11');
 if (saved) {
 store = JSON.parse(saved);
 }
@@ -161,7 +162,7 @@ console.warn("Storage reset due to parse error");
 }
 function saveStore() {
 try {
-localStorage.setItem('sada_app_data_v10', JSON.stringify(store));
+localStorage.setItem('sada_app_data_v11', JSON.stringify(store));
 } catch(e) {}
 render();
 }
@@ -176,7 +177,7 @@ err.style.display = 'none';
 document.getElementById('loginScreen').classList.add('hidden');
 document.getElementById('appLayout').classList.remove('hidden');
 document.getElementById('displayUser').innerText = currentUser.name;
-document.getElementById('displayRole').innerText = getRoleLabel(currentUser.role);
+document.getElementById('displayRole').innerText = currentUser.title;
 buildSidebarNav();
 switchTab('dashboard');
 } else {
@@ -185,13 +186,10 @@ err.style.display = 'block';
 }
 function handleLogout() {
 currentUser = null;
+document.getElementById('username').value = '';
+document.getElementById('password').value = '';
 document.getElementById('appLayout').classList.add('hidden');
 document.getElementById('loginScreen').classList.remove('hidden');
-}
-function getRoleLabel(role) {
-if (role === 'admin') return 'مدير النظام (كامل الصلاحيات)';
-if (role === 'operator') return 'مشغّل المعمل';
-if (role === 'accountant') return 'المحاسب';
 }
 function buildSidebarNav() {
 const nav = document.getElementById('sidebarNav');
@@ -218,10 +216,10 @@ actionArea.innerHTML = '';
 if (activeTab === 'dashboard') {
 let totalQty = 0;
 store.loads.forEach(l => totalQty += Number(l.qty || 0));
-container.innerHTML = ⁠<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;"> <div class="card">أوامر التجهيز<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.orders.length}</strong></div> <div class="card">إجمالي الحمولات<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.loads.length}</strong></div> <div class="card">المجهز (م³)<strong style="display:block; font-size:24px; color:var(--primary-gold); margin-top:8px;">${totalQty} م³</strong></div> </div> <div class="card"> <h3>أحدث أوامر التجهيز</h3> <table> <thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون</th><th>الحالة</th><th>الكمية</th></tr></thead> <tbody> ${store.orders.slice(-5).reverse().map(o =>⁠<tr><td>\bm{{o.no}</td><td>}{o.date}</td><td>\bm{{o.customer}</td><td>}{getStatusBadge(o.status)}</td><td>${o.qty} م³</td></tr>⁠).join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات</td></tr>'} </tbody> </table> </div> ⁠;
+container.innerHTML = ⁠<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;"> <div class="card">أوامر التجهيز<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.orders.length}</strong></div> <div class="card">إجمالي الحمولات<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.loads.length}</strong></div> <div class="card">المجهز (م³)<strong style="display:block; font-size:24px; color:var(--primary-gold); margin-top:8px;">${totalQty} م³</strong></div> </div> <div class="card"> <h3>أحدث أوامر التجهيز المنشأة</h3> <table> <thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون</th><th>الحالة</th><th>الكمية</th></tr></thead> <tbody> ${store.orders.slice(-5).reverse().map(o =>⁠<tr><td>￼{o.date}</td><td>￼{getStatusBadge(o.status)}</td><td>${o.qty} م³</td></tr>⁠).join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات مسجلة</td></tr>'} </tbody> </table> </div> ⁠;
 } else if (activeTab === 'orders') {
 if (currentUser.role === 'admin') {
-actionArea.innerHTML = ⁠<button class="btn-action" onclick="openNewOrderModal()"><i class="fas fa-plus"></i> إضافة أمر تجهيز جديد</button>⁠;
+actionArea.innerHTML = ⁠<button class="btn-action" onclick="openNewOrderModal()"><i class="fas fa-plus"></i> إنشاء أمر تجهيز جديد</button>⁠;
 }
 renderOrdersTable(container);
 } else if (activeTab === 'reports') {
@@ -265,13 +263,13 @@ if (o.status !== 'تم القفل' && o.status !== 'مرحّل الفاتوره'
 actionsHTML += ⁠<button class="btn-action" style="padding: 4px 10px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ إضافة حمولة (${orderLoads.length})</button> ⁠;
 actionsHTML += ⁠<button class="btn-action btn-gold" style="padding: 4px 10px; font-size:11px;" onclick="openFinalizeOrderModal('${o.no}')">⏹ الكمية الفعلية والقفل</button>⁠;
 } else {
-actionsHTML += ⁠<span style="color:#eab308; font-weight:bold; font-size:11px;">تم قفل الأمر</span>⁠;
+actionsHTML += ⁠<span style="color:#eab308; font-weight:bold; font-size:11px;">تم قفل الأمر من قبل المشغل</span>⁠;
 }
 }
 if (currentUser.role === 'accountant') {
-actionsHTML += ⁠<span style="font-size:11px; color:var(--text-muted);">👁️ عرض وطباعة</span>⁠;
+actionsHTML += ⁠<span style="font-size:11px; color:var(--text-muted); margin-left:5px;">👁️ عرض وتدقيق</span>⁠;
 if(o.status === 'تم القفل') {
-actionsHTML += ⁠ <button class="btn-action btn-blue" style="padding:3px 6px; font-size:10px;" onclick="updateOrderStatus('${o.no}', 'مرحّل الفاتوره')">ترحيل الفاتورة</button>⁠;
+actionsHTML += ⁠<button class="btn-action btn-blue" style="padding:3px 8px; font-size:11px;" onclick="updateOrderStatus('${o.no}', 'مرحّل الفاتوره')">ترحيل الفاتورة</button>⁠;
 }
 }
 let loadsHTML = '';
@@ -285,7 +283,7 @@ loadsHTML += ⁠<tr style="background: #080f15;"> <td>حمولة رقم: <b styl
 ordersRows += ⁠<tr> <td><b>${o.no}</b></td> <td>${o.date}</td> <td>${o.customer}</td> <td>${o.site}</td> <td>${o.pour}</td> <td>${getStatusBadge(o.status)}</td> <td>${o.qty} م³ <br><small style="color:var(--primary-cyan)">فعلية: ${o.actualQty || deliveredSum} م³</small></td> <td>${actionsHTML}</td> </tr> ${loadsHTML}⁠;
 });
 }
-container.innerHTML = ⁠<div class="card"> <h3>جدول أوامر التجهيز والحمولات والكميات الفعلية</h3> <div style="overflow-x:auto;"> <table> <thead> <tr> <th>رقم الأمر</th> <th>التاريخ</th> <th>اسم الزبون</th> <th>موقع الصب</th> <th>نوع الصب</th> <th>الحالة (الدلالة)</th> <th>الكمية المطلوبة / الفعلية</th> <th>الإجراءات المتاحة</th> </tr> </thead> <tbody>${ordersRows}</tbody> </table> </div> </div>⁠;
+container.innerHTML = ⁠<div class="card"> <h3>جدول أوامر التجهيز والحمولات والكميات الفعلية (${currentUser.title})</h3> <div style="overflow-x:auto;"> <table> <thead> <tr> <th>رقم الأمر</th> <th>التاريخ</th> <th>اسم الزبون</th> <th>موقع الصب</th> <th>نوع الصب</th> <th>الحالة (الدلالة)</th> <th>الكمية المطلوبة / الفعلية</th> <th>الإجراءات المتاحة</th> </tr> </thead> <tbody>${ordersRows}</tbody> </table> </div> </div>⁠;
 }
 function renderGenericTable(container, tabKey) {
 const items = store[tabKey] || [];
@@ -307,7 +305,7 @@ rows += ⁠<tr> <td><b>#${index + 1}</b></td> <td>${item.name || item.title || i
 container.innerHTML = ⁠<div class="card"> <h3>جدول سجلات: ${NAV_ITEMS.find(i=>i.id===tabKey).label}</h3> <div style="overflow-x:auto;"> <table> <thead> <tr> <th>#</th> <th>البيان / الاسم</th> <th>التفاصيل / القيمة</th> <th>الإجراءات المتاحة</th> </tr> </thead> <tbody>${rows}</tbody> </table> </div> </div>⁠;
 }
 function openNewOrderModal() {
-document.getElementById('modalTitle').innerText = 'أمر تجهيز جديد';
+document.getElementById('modalTitle').innerText = 'أمر تجهيز جديد (خاص بالمدير العام)';
 const form = document.getElementById('dynamicForm');
 form.innerHTML = ⁠<input type="hidden" name="formType" value="newOrder"> <div class="form-group"><label>اسم الزبون</label><input type="text" name="customer" value="شركة النور للمقاولات" required></div> <div class="form-group"><label>موقع الصب</label><input type="text" name="site" value="كربلاء - حي الحسين" required></div> <div class="form-group"><label>نوع الصب</label><input type="text" name="pour" value="سقوف" required></div> <div class="form-group"><label>المواصفة (رتبة الخرسانة)</label><input type="text" name="grade" value="C25" required></div> <div class="form-group"><label>الكمية التقديرية (م³)</label><input type="number" name="qty" value="50" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action" style="flex:1;">حفظ الأمر</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
 document.getElementById('modalOverlay').classList.remove('hidden');
@@ -333,7 +331,7 @@ const order = store.orders.find(o => o.no === orderNo);
 const orderLoads = store.loads.filter(l => l.orderNo === orderNo);
 let currentDelivered = 0;
 orderLoads.forEach(l => currentDelivered += Number(l.qty || 0));
-document.getElementById('modalTitle').innerText = 'إدخال الكمية الفعلية وقفل الأمر ' + orderNo;
+document.getElementById('modalTitle').innerText = 'إدخال الكمية الفعلية وقفل الأمر ' + orderNo + ' (خاص بالمشغّل)';
 const form = document.getElementById('dynamicForm');
 form.innerHTML = ⁠<input type="hidden" name="formType" value="finalizeOrder"> <input type="hidden" name="orderNo" value="${orderNo}"> <div class="form-group"><label>الكمية التقديرية المطلوبة</label><input type="text" value="${order.qty} م³" readonly style="background:#080f15;"></div> <div class="form-group"><label>إجمالي المجهز بالحمولات فعلياً</label><input type="text" value="${currentDelivered} م³" readonly style="background:#080f15;"></div> <div class="form-group"><label>الكمية الفعلية النهائية المعتمدة (م³)</label><input type="number" name="actualQty" value="${currentDelivered || order.qty}" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action btn-gold" style="flex:1;">اعتماد وقفل الأمر (أصفر فاتح)</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
 document.getElementById('modalOverlay').classList.remove('hidden');
@@ -497,8 +495,8 @@ container.innerHTML = `
 </div>
 </div>
 <div style="display:flex; justify-content:space-between; background:#e2e8f0; padding:10px 15px; border-radius:8px; font-weight:bold; font-size:13px; margin-bottom:15px;">
-<div>عدد الطلبات: <span style="color:#dc2626;">\bm{{filteredOrders.length}</span></div>}
-\bm{<div>إجمالي الكمية المطلوبة: <span style="color:#0f172a;">}{totalRequestedQty.toFixed(2)} م³</span></div>
+<div>عدد الطلبات: <span style="color:#dc2626;">￼
+￼{totalRequestedQty.toFixed(2)} م³</span></div>
 <div>إجمالي المجهز فعلياً: <span style="color:#16a34a;">${totalDeliveredQty.toFixed(2)} م³</span></div>
 </div>
 <table style="width:100%; border-collapse:collapse; background:#fff; color:#000;">
@@ -517,7 +515,7 @@ ${ordersReportRows}
 </tbody>
 </table>
 <div style="margin-top:20px; text-align:left; font-weight:bold; font-size:13px; border-top:2px solid #cbd5e1; padding-top:10px;">
-المجموع النهائي للفترة: <span style="color:#16a34a;">\bm{{totalDeliveredQty.toFixed(2)} م³</span> من أصل <span style="color:#0f172a;">}{totalRequestedQty.toFixed(2)} م³</span>
+المجموع النهائي للفترة: <span style="color:#16a34a;">￼{totalRequestedQty.toFixed(2)} م³</span>
 </div>
 </div>
 `;
@@ -615,23 +613,23 @@ body { background: #fff; color: #0f172a; direction: rtl; }
 <div class="meta-boxes">
 <div class="meta-box doc-no">
 <div class="title">رقم الوصل</div>
-<div class="value">\bm{{load.receiptNo}</div>}
-\bm{</div>}
-\bm{<div style="width: 32%;"></div>}
-\bm{<div class="meta-box">}
-\bm{<div class="title">التاريخ</div>}
-\bm{<div class="value">}{load.date || '2026-11-01'}</div>
+<div class="value">￼
+￼
+￼
+￼
+￼
+￼{load.date || '2026-11-01'}</div>
 </div>
 </div>
 <table class="details-table">
-<tr><td class="label-col">اسم الزبون</td><td class="val-col">\bm{{order.customer}</td></tr>}
-\bm{<tr><td class="label-col">موقع الصب</td><td class="val-col">}{order.site}</td></tr>
-<tr><td class="label-col">نوع الصب</td><td class="val-col">\bm{{order.pour}</td></tr>}
-\bm{<tr><td class="label-col">المواصفة</td><td class="val-col">}{order.grade}</td></tr>
-<tr><td class="label-col">رقم الآلية</td><td class="val-col">\bm{{load.vehicle}</td></tr>}
-\bm{<tr><td class="label-col">رقم المضخة</td><td class="val-col">}{load.pump || 'P-01'}</td></tr>
-<tr><td class="label-col">اسم السائق</td><td class="val-col">\bm{{load.driver || 'علي حسين'}</td></tr>}
-\bm{<tr><td class="label-col">الكمية (م³)</td><td class="val-col">}{load.qty}</td></tr>
+<tr><td class="label-col">اسم الزبون</td><td class="val-col">￼
+￼{order.site}</td></tr>
+<tr><td class="label-col">نوع الصب</td><td class="val-col">￼
+￼{order.grade}</td></tr>
+<tr><td class="label-col">رقم الآلية</td><td class="val-col">￼
+￼{load.pump || 'P-01'}</td></tr>
+<tr><td class="label-col">اسم السائق</td><td class="val-col">￼
+￼{load.qty}</td></tr>
 </table>
 <div class="dispatch-section">
 <div class="dispatch-header">تفاصيل التجهيز</div>
@@ -642,11 +640,11 @@ body { background: #fff; color: #0f172a; direction: rtl; }
 </div>
 <div class="dispatch-card">
 <div class="head">رقم الحمولة</div>
-<div class="body-val">\bm{{load.loadIndex}</div>}
-\bm{</div>}
-\bm{<div class="dispatch-card">}
-\bm{<div class="head">الكمية المجهزة (م³)</div>}
-\bm{<div class="body-val">}{load.qty}</div>
+<div class="body-val">￼
+￼
+￼
+￼
+￼{load.qty}</div>
 </div>
 </div>
 </div>
