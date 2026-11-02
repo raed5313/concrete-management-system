@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>صدى الإعمار | تسجيل الدخول</title>
+<title>صدى الإعمار | نظام إدارة الخرسانة الجاهزة</title>
 <style>
 :root{--bg:#090d12;--p:#111a22;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--muted:#93a7b3;--white:#f3f7fa}
 *{box-sizing:border-box}
@@ -19,7 +19,6 @@ button{cursor:pointer}
 .login-card label{font-size:12px;color:var(--muted)}
 .login-card input{background:#080f15;color:white;border:1px solid var(--line);border-radius:8px;padding:12px;width:100%}
 .login-card button{width:100%;background:#147d77;color:white;border:none;border-radius:8px;padding:12px;font-weight:bold;margin-top:10px}
-.login-card button:hover{background:#116964}
 .login-error{color:#ff8791;font-size:12px;text-align:center;margin-top:10px}
 
 /* التطبيق الرئيسي */
@@ -62,15 +61,16 @@ th{color:var(--gold)}
 .detail{background:#0b141b;padding:12px;border:1px solid var(--line);border-radius:8px}
 .detail span{display:block;color:var(--muted);font-size:11px}
 .detail strong{color:var(--cyan)}
-.toast{display:none;position:fixed;bottom:15px;left:15px;background:#17392f;padding:12px;border-radius:8px;z-index:9;font-size:13px}
+.toast{display:none;position:fixed;bottom:20px;left:20px;background:#351a22;border:2px solid #ff8791;color:#fff;padding:18px;border-radius:12px;z-index:9999;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,0.8);max-width:400px}
 .loadbox{background:#0b131a;padding:10px;border-radius:8px}
 .goldtext{color:var(--gold)}
 .alert-box{background:#351a22;border:1px solid #71313d;color:#ff8791;padding:10px;border-radius:8px;margin-bottom:10px;font-size:12px}
+.badge-alert{background:#a51d20;color:white;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:bold;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
 
 .order-open{background:#fff!important;color:#202020!important;}
 .order-locked{background:#fff0b8!important;color:#493b12!important;}
 .order-invoiced{background:#d9f2df!important;color:#174b2b!important;}
-.order-open td,.order-locked td,.order-invoiced td{color:inherit;}
 
 @media(max-width:800px){
 .app{grid-template-columns:1fr}
@@ -109,7 +109,7 @@ th{color:var(--gold)}
 </div>
 </div>
 
-<!-- التطبيق الرئيسي (مخفي حتى يتم تسجيل الدخول) -->
+<!-- التطبيق الرئيسي -->
 <div class="app hidden" id="mainApp">
 <aside class="side">
 <div class="brand">
@@ -140,6 +140,7 @@ th{color:var(--gold)}
 
 <div id="inventoryAlerts"></div>
 
+<!-- 1. الرئيسية -->
 <section id="dashboard">
 <div class="stats">
 <div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
@@ -164,6 +165,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 2. أوامر التجهيز -->
 <section id="orders" class="hidden">
 <div class="panel">
 <div class="head">
@@ -172,16 +174,17 @@ th{color:var(--gold)}
 </div>
 <div class="tablewrap">
 <table>
-<thead><tr><th>رقم</th><th>التاريخ</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>المقاومة</th><th>م³</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>م³</th><th>الإجراءات</th></tr></thead>
 <tbody id="ordersBody"></tbody>
 </table>
 </div>
 </div>
 </section>
 
+<!-- 3. العملاء وحساباتهم -->
 <section id="customers" class="hidden">
 <div class="panel">
-<div class="head"><h3>العملاء والحسابات</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
+<div class="head"><h3>العملاء والحسابات</h3><button class="btn primary" id="addCustBtn" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
 <table>
 <thead><tr><th>اسم العميل</th><th>الهاتف</th><th>العنوان</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead>
 <tbody id="customersBody"></tbody>
@@ -189,6 +192,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 4. المعامل والتشغيل اليومي -->
 <section id="plants" class="hidden">
 <div class="panel">
 <div class="head">
@@ -208,6 +212,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 5. السائقون -->
 <section id="drivers" class="hidden">
 <div class="panel">
 <div class="head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div>
@@ -215,6 +220,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 6. الآليات -->
 <section id="vehicles" class="hidden">
 <div class="panel">
 <div class="head"><h3>الآليات والخلاطات</h3><button class="btn primary" onclick="openSimple('vehicle')">＋ إضافة آلية</button></div>
@@ -222,16 +228,18 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 7. المخزون -->
 <section id="inventory" class="hidden">
 <div class="panel">
 <div class="head"><h3>إدارة المخزون والمواد</h3><button class="btn primary" onclick="openInventoryModal()">＋ إضافة مادة</button></div>
 <table>
-<thead><tr><th>المادة</th><th>الوحدة</th><th>الرصيد الحالي</th><th>الحد الأدنى</th><th>التنبيه</th><th>إجراءات</th></tr></thead>
+<thead><tr><th>المادة</th><th>الوحدة</th><th>الرصيد الحالي</th><th>الحد الأدنى</th><th>إجراءات</th></tr></thead>
 <tbody id="inventoryBody"></tbody>
 </table>
 </div>
 </section>
 
+<!-- 8. الحسابات -->
 <section id="accounts" class="hidden">
 <div class="panel">
 <h3>الحسابات العامة والأرصدة</h3>
@@ -244,6 +252,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 9. الفواتير -->
 <section id="invoices" class="hidden">
 <div class="panel">
 <div class="head"><h3>الفواتير (تنسيق A4)</h3><button class="btn primary" onclick="openInvoiceModal()">＋ إصدار فاتورة</button></div>
@@ -254,6 +263,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 10. سندات القبض -->
 <section id="receipts" class="hidden">
 <div class="panel">
 <div class="head"><h3>سندات القبض</h3><button class="btn primary" onclick="openReceiptModal()">＋ سند قبض جديد</button></div>
@@ -264,6 +274,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 11. المصروفات -->
 <section id="expenses" class="hidden">
 <div class="panel">
 <div class="head"><h3>المصروفات التشغيلية</h3><button class="btn primary" onclick="openExpenseModal()">＋ تسجيل مصروف</button></div>
@@ -274,6 +285,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 12. الموظفون -->
 <section id="employees" class="hidden">
 <div class="panel">
 <div class="head"><h3>شؤون الموظفين</h3><button class="btn primary" onclick="openEmployeeModal()">＋ إضافة موظف</button></div>
@@ -284,6 +296,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 13. المتابعة والأرشفة -->
 <section id="audit" class="hidden">
 <div class="panel">
 <h3>سجل النشاطات والأرشفة (Audit Log)</h3>
@@ -296,6 +309,7 @@ th{color:var(--gold)}
 </div>
 </section>
 
+<!-- 14. التقارير -->
 <section id="reports" class="hidden">
 <div class="panel">
 <h3>التقارير الشاملة والطباعة</h3>
@@ -337,14 +351,14 @@ th{color:var(--gold)}
 <script>
 'use strict';
 
-const KEY='sada-concrete-v4';
+const KEY='sada-concrete-v6';
 let currentRole = localStorage.getItem('sada-logged-role') || '';
 let currentUserName = localStorage.getItem('sada-logged-user') || '';
 
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
 inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],
-nextOrder:744,nextLoad:1,nextInv:1,nextInvNo:101,nextRecNo:501
+nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 });
 
 let data;
@@ -360,7 +374,6 @@ if(!Array.isArray(data[k]))data[k]=[];
 
 data.nextOrder=data.nextOrder||744;
 data.nextLoad=data.nextLoad||1;
-data.nextInv=data.nextInv||1;
 data.nextInvNo=data.nextInvNo||101;
 data.nextRecNo=data.nextRecNo||501;
 
@@ -370,7 +383,6 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
 }[c]));
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 
-// قائمة الحسابات المسموح لها بالدخول
 const usersDB = {
   "مدير": { pass: "1", role: "manager", title: "المدير العام" },
   "معمل": { pass: "2", role: "plant", title: "مشغّل المعمل" },
@@ -402,9 +414,8 @@ function logout(){
   location.reload();
 }
 
-// التحقق من حالة الدخول عند تحميل الصفحة
 window.onload = function(){
-  if(currentRole && currentUserName && usersDB[currentRole === 'manager' ? 'مدير' : currentRole === 'plant' ? 'معمل' : 'محاسب'] || usersDB[Object.keys(usersDB).find(k => usersDB[k].role === currentRole)]){
+  if(currentRole && currentUserName){
     $('loginScreen').classList.add('hidden');
     $('mainApp').classList.remove('hidden');
     initSystem();
@@ -414,6 +425,7 @@ window.onload = function(){
   }
 };
 
+// تحديد عناصر القائمة بدقة لكل صفحة
 const roleMenus = {
 manager: [
 ['dashboard','الرئيسية'],
@@ -433,10 +445,9 @@ manager: [
 ['settings','الإعدادات']
 ],
 plant: [
-['dashboard','الرئيسية'],
-['orders','أوامر التجهيز 👁'],
-['plants','المعامل والتشغيل'],
-['reports','التقارير']
+['dashboard','🏠 الرئيسية'],
+['orders','📋 أوامر التجهيز'],
+['reports','📊 التقارير']
 ],
 accountant: [
 ['dashboard','الرئيسية'],
@@ -462,6 +473,11 @@ function initSystem(){
   $('currentUserName').textContent = currentUserName;
   renderNav();
   navigate('dashboard');
+  
+  // فحص الأوامر الجديدة للمعمل كل 3 ثوانٍ
+  if(currentRole === 'plant'){
+    setInterval(checkNewOrdersForPlant, 3000);
+  }
 }
 
 function renderNav(){
@@ -479,13 +495,11 @@ if(b) navigate(b.dataset.page);
 function navigate(p){
 let menuList = roleMenus[currentRole] || roleMenus.manager;
 if(!menuList.some(x=>x[0]===p)){
-toast('عذراً، هذا القسم غير متاح لصلاحيتك');
+toast('عذراً، هذا القسم غير متاح لصلاحيتك الحالية');
 return;
 }
-let allPages = Object.keys(roleMenus).reduce((acc, r)=>{
-roleMenus[r].forEach(item=>acc.add(item[0]));
-return acc;
-}, new Set());
+let allPages = new Set();
+Object.values(roleMenus).forEach(m => m.forEach(item => allPages.add(item[0])));
 
 allPages.forEach(k=>{
 let el = $(k);
@@ -493,11 +507,53 @@ if(el) el.classList.toggle('hidden', k!==p);
 });
 
 let foundItem = menuList.find(x=>x[0]===p);
-$('pageTitle').textContent = foundItem ? foundItem.v.replace(' 👁','') : 'لوحة التحكم';
+$('pageTitle').textContent = foundItem ? foundItem.v.replace(/^[^\w\u0600-\u06FF]+/,'').trim() : 'لوحة التحكم';
 document.querySelectorAll('[data-page]').forEach(b=>
 b.classList.toggle('active', b.dataset.page===p)
 );
 render();
+}
+
+function triggerPlantAlert(order){
+  // تشغيل الصوت المخصص عبر SpeechSynthesis
+  if('speechSynthesis' in window){
+    let utterance = new SpeechSynthesisUtterance("حبيبي اجاك اوردو جهزه");
+    utterance.lang = 'ar-SA';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.2;
+    window.speechSynthesis.speak(utterance);
+  }
+  
+  // إشعار مرئي عريض ومميز للمعمل
+  let toastEl = $('toast');
+  toastEl.innerHTML = `
+    <div style="font-size:16px;color:#ff8791;margin-bottom:6px">🚨 <b>أمر تجهيز جديد للمعمل!</b></div>
+    <div><b>رقم الأمر:</b> ${order.no}</div>
+    <div><b>العميل:</b> ${order.customer}</div>
+    <div><b>الكمية:</b> ${order.qty} م³ | <b>نوع الصب:</b> ${order.pour}</div>
+    <div><b>الموقع:</b> ${order.site}</div>
+  `;
+  toastEl.style.display = 'block';
+  setTimeout(()=> toastEl.style.display = 'none', 8000);
+}
+
+function checkNewOrdersForPlant(){
+  if(data.orders.length === 0) return;
+  let latestOrder = data.orders[data.orders.length - 1];
+  let latestId = Number(latestOrder.no);
+  
+  if(data.lastSeenOrder === undefined) {
+    data.lastSeenOrder = latestId;
+    save();
+    return;
+  }
+  
+  if(latestId > data.lastSeenOrder){
+    data.lastSeenOrder = latestId;
+    save();
+    triggerPlantAlert(latestOrder);
+    render();
+  }
 }
 
 function logAction(user, action, details){
@@ -513,7 +569,7 @@ if(data.audit.length > 100) data.audit.pop();
 function toast(s){
 $('toast').textContent=s;
 $('toast').style.display='block';
-setTimeout(()=>$('toast').style.display='none',2400);
+setTimeout(()=>$('toast').style.display='none',2500);
 }
 
 function save(){
@@ -531,8 +587,10 @@ let isManager = currentRole === 'manager';
 let isPlant = currentRole === 'plant';
 let isAccountant = currentRole === 'accountant';
 
-$('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
+// إظهار زر الإضافة فقط للمدير
+if($('globalAddOrderBtn')) $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
+if($('addCustBtn')) $('addCustBtn').style.display = !isPlant ? 'inline-block' : 'none';
 
 let lowInv = data.inventory.filter(i => Number(i.current) <= Number(i.min));
 if(lowInv.length > 0 && $('inventoryAlerts')){
@@ -546,10 +604,10 @@ $('inventoryAlerts').innerHTML = '';
 let qty=data.loads.reduce((s,x)=>s+(+x.qty||0),0);
 let est=data.orders.reduce((s,x)=>s+(+x.qty||0),0);
 
-$('statOrders').textContent=data.orders.length;
-$('statLoads').textContent=data.loads.length;
-$('statQty').textContent=fmt(qty);
-$('statPending').textContent=data.orders.filter(x=>x.status!=='مكتمل').length;
+if($('statOrders')) $('statOrders').textContent=data.orders.length;
+if($('statLoads')) $('statLoads').textContent=data.loads.length;
+if($('statQty')) $('statQty').textContent=fmt(qty);
+if($('statPending')) $('statPending').textContent=data.orders.filter(x=>x.status!=='مكتمل ومجهز').length;
 
 if($('statCustomers')) $('statCustomers').textContent=data.customers.length;
 if($('statDrivers')) $('statDrivers').textContent=data.drivers.length;
@@ -577,31 +635,29 @@ o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><
 );
 }
 
+// جدول الأوامر
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
 o=>{
 let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
-let state=o.status==='تم القفل'?'locked':o.status==='مرحّل للفاتورة'?'invoiced':'open';
+let stateClass = o.status==='قيد التجهيز' ? 'order-open' : o.status==='قيد العمل' ? 'order-locked' : 'order-invoiced';
 
-let canModifyOrders = isManager;
-let canAddLoad = isPlant || isManager;
+let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
+                  o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري التجهيز</span>' :
+                  `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
 
 return `
-<tr class="order-${state}">
-<td>${esc(o.no)}</td><td>${esc(o.date)}</td>
+<tr class="${stateClass}">
+<td>${esc(o.no)}</td><td>${esc(o.date)}</td><td>${statusBadge}</td>
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
-<td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${esc(o.qty)}</td>
+<td>${esc(o.pour)}</td><td>${esc(o.qty)}</td>
 <td><div class="actions">
-<button class="btn" onclick="openLoad('${esc(o.no)}')" ${!canAddLoad || o.status==='تم القفل'?'disabled':''}>
-＋ حمولة (${ls.length})
-</button>
-<button class="btn primary" onclick="closeOrder('${esc(o.no)}')" ${!canModifyOrders || o.status==='تم القفل'?'disabled':''}>
-قفل الأمر
-</button>
+<button class="btn gold" onclick="startProcessing('${esc(o.no)}')">بدء التجهيز</button>
+<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ إضافة حمولة (${ls.length})</button>
+<button class="btn" onclick="completeOrder('${esc(o.no)}')">إكمال الأمر</button>
 <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
-<button class="btn" onclick="editOrder('${esc(o.no)}')" ${!canModifyOrders?'disabled':''}>تعديل</button>
-<button class="btn danger" onclick="delOrder('${esc(o.no)}')" ${!canModifyOrders?'disabled':''}>حذف</button>
+${isManager ? `<button class="btn danger" onclick="delOrder('${esc(o.no)}')">حذف</button>` : ''}
 </div></td>
 </tr>
 <tr><td colspan="8"><div class="loadbox">
@@ -612,16 +668,14 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 <td>السائق: ${esc(l.driver||'—')}</td>
 <td>الآلية: ${esc(l.vehicle||'—')}</td>
 <td>${esc(l.qty)} م³</td>
-<td>
-<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة وصل A5</button>
-<button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${isAccountant?'disabled':''}>حذف</button>
-</td>
-</tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات بعد.</p>'}
+<td><button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button></td>
+</tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div></td></tr>`;
 },8
 );
 }
 
+// جدول المعمل
 if($('plantLoadsBody')){
 $('plantLoadsBody').innerHTML = tableRows(
 data.loads.slice().reverse(),
@@ -641,6 +695,7 @@ return `<tr>
 );
 }
 
+// جدول العملاء والحسابات
 if($('customersBody')){
 $('customersBody').innerHTML = tableRows(data.customers, c=>{
 let custOrders = data.orders.filter(o=>o.customer===c.name);
@@ -660,6 +715,7 @@ return `<tr>
 }, 7);
 }
 
+// باقي الجداول
 [
 ['drivers','driversBody',['name','phone','note']],
 ['vehicles','vehiclesBody',['name','capacity','kind']],
@@ -675,7 +731,7 @@ $(id).innerHTML=tableRows(data[k],x=>
 `<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
 <td>${k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
-`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`}</td></tr>`
+isManager?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
 );
 }
 });
@@ -687,7 +743,7 @@ $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
 ${f.options?
-`<select name="${f.name}">${f.options.optionsHtml?f.options.optionsHtml:f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
+`<select name="${f.name}">${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
 `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} value="${esc(f.value??'')}">`}
 </div>`).join('')+
@@ -702,6 +758,7 @@ $('modal').classList.remove('hidden');
 
 function closeModal(){$('modal').classList.add('hidden')}
 
+// إضافة أمر تجهيز (المدير فقط)
 function openOrder(){
 if(currentRole !== 'manager'){
 toast('عذراً، إضافة أمر التجهيز مخصصة للمدير فقط');
@@ -720,29 +777,28 @@ openForm('أمر تجهيز جديد',[
 v.no=String(data.nextOrder++).padStart(7,'0');
 v.status='قيد التجهيز';
 data.orders.push(v);
+data.lastSeenOrder = Number(v.no) - 1;
 logAction(currentUserName, 'إنشاء أمر تجهيز', `رقم الأمر: ${v.no} للعميل ${v.customer}`);
-save();closeModal();toast('تم حفظ أمر التجهيز بنجاح');
+save();closeModal();toast('تم حفظ أمر التجهيز وإرساله للمعمل');
 });
 }
 
-function closeOrder(no){
-let o=data.orders.find(x=>String(x.no)===String(no));
-if(!o || o.status==='تم القفل'||o.status==='مرحّل للفاتورة') return;
-let delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((s,x)=>s+(Number(x.qty)||0),0);
+function startProcessing(no){
+let o = data.orders.find(x=>String(x.no)===String(no));
+if(o){
+o.status = 'قيد العمل';
+logAction(currentUserName, 'بدء تجهيز', `الأمر: ${no}`);
+save();toast('تم تحديث حالة الأمر إلى: جاري التجهيز');
+}
+}
 
-openForm('قفل أمر التجهيز رقم '+no,[
-{name:'actualQty',label:'الكمية الفعلية المجهزة م³',type:'number',required:true,value:delivered},
-{name:'lockNote',label:'ملاحظات الإقفال',full:true}
-],v=>{
-let q=Number(v.actualQty);
-if(!Number.isFinite(q)||q<0){toast('أدخل كمية فعلية صحيحة');return;}
-o.actualQty=q;
-o.lockNote=v.lockNote||'';
-o.status='تم القفل';
-o.lockedAt=new Date().toISOString();
-logAction(currentUserName, 'قفل أمر تجهيز', `رقم الأمر: ${no}`);
-save();closeModal();toast('تم قفل الأمر بنجاح');
-});
+function completeOrder(no){
+let o = data.orders.find(x=>String(x.no)===String(no));
+if(o){
+o.status = 'مكتمل ومجهز';
+logAction(currentUserName, 'إكمال أمر', `الأمر: ${no}`);
+save();toast('تم إكمال وتجهيز الأمر بنجاح');
+}
 }
 
 function openLoad(no){
@@ -759,8 +815,9 @@ v.orderNo=o.no;
 v.no=String(data.nextLoad++).padStart(7,'0');
 v.date=new Date().toISOString().slice(0,10);
 data.loads.push(v);
-logAction(currentUserName, 'إضافة حمولة', `رقم الحمولة: ${v.no} للأمر ${no}`);
-save();closeModal();toast('تم إضافة الحمولة بنجاح وإرسالها للمعمل');
+o.status = 'قيد العمل';
+logAction(currentUserName, 'إضافة حمولة', `حمولة: ${v.no} للأمر ${no}`);
+save();closeModal();toast('تم إضافة الحمولة بنجاح');
 });
 }
 
@@ -774,7 +831,7 @@ vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity'
 openForm('إضافة '+c[0],c[2].map(([name,label])=>({name,label,required:name==='name'})),v=>{
 v.id=Date.now();
 data[c[1]].push(v);
-logAction(currentUserName, 'إضافة سجل', `إضافة ${c[0]}: ${v.name}`);
+logAction(currentUserName, 'إضافة سجل', `${c[0]}: ${v.name}`);
 save();closeModal();toast('تم الحفظ بنجاح');
 });
 }
@@ -788,7 +845,7 @@ openForm('إضافة مادة للمخزون',[
 ],v=>{
 v.id=Date.now();
 data.inventory.push(v);
-logAction(currentUserName, 'إضافة مادة مخزون', v.name);
+logAction(currentUserName, 'إضافة مخزون', v.name);
 save();closeModal();toast('تم إضافة المادة');
 });
 }
@@ -853,18 +910,6 @@ save();closeModal();toast('تم إضافة الموظف');
 });
 }
 
-function editOrder(no){
-if(currentRole !== 'manager'){toast('التعديل مخصص للمدير فقط');return;}
-let o=data.orders.find(x=>String(x.no)===String(no));
-if(!o)return;
-openForm('تعديل أمر '+no,
-['customer','phone','site','pour','grade','qty','price','date'].map(k=>({
-name:k,label:k,value:o[k]||'',required:k==='customer'||k==='site'
-})),
-v=>{Object.assign(o,v);save();closeModal();toast('تم التعديل');}
-);
-}
-
 function delOrder(no){
 if(currentRole !== 'manager'){toast('الحذف مخصص للمدير فقط');return;}
 if(confirm('حذف الأمر وحمولاته؟')){
@@ -874,16 +919,7 @@ save();toast('تم الحذف');
 }
 }
 
-function delLoad(no){
-if(currentRole === 'accountant'){toast('المحاسب لا يمكنه حذف الحمولات');return;}
-if(confirm('حذف الحمولة؟')){
-data.loads=data.loads.filter(x=>String(x.no)!==no);
-save();toast('تم حذف الحمولة');
-}
-}
-
 function delSimple(k,id){
-if(currentRole === 'plant'){toast('المعمل غير مسموح له بالحذف');return;}
 if(confirm('حذف السجل؟')){
 data[k]=data[k].filter(x=>String(x.id||x.no)!==String(id));
 save();toast('تم الحذف');
@@ -899,7 +935,7 @@ w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="
 *{box-sizing:border-box}
 body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:12px;}
 .r{border:2px double #b28a29;padding:10mm;max-height:185mm;overflow:hidden;}
-.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6mm;margin-bottom:8px;}
+.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6px;margin-bottom:8px;}
 .head h2{color:#a47b20;margin:0 0 4px 0;font-size:16px;}
 .en{font-size:9px;color:#555;}
 .title{text-align:center;background:#171717;color:#e7c36b;border:1px solid #b28a29;padding:6px;margin:8px 0;font-size:15px;font-weight:bold;}
@@ -938,7 +974,7 @@ printDocA5('وصل أمر تجهيز',`
 <tr><td>نوع الصب / المقاومة</td><td>${esc(o.pour)} — ${esc(o.grade)}</td></tr>
 <tr><td>الكمية التقديرية</td><td>${esc(o.qty)} م³</td></tr>
 </table>
-<div class="sign"><div>توقيع الزبون<br><br>________________</div><div>توقيع الإدارة<br><br>________________</div></div>
+<div class="sign"><div>توقيع الزبون<br><br>________________</div><div>توقيع المعمل<br><br>________________</div></div>
 <div class="foot">صدى الإعمار للكونكريت الجاهز — وصل رسمي متناسق A5</div>
 </div>`);
 }
@@ -977,24 +1013,16 @@ let dayLoads = data.loads.filter(l => l.date === pDate);
 let w=window.open('','_blank','width=800,height=900');
 if(!w){toast('اسمح بالنوافذ المنبثقة');return}
 w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الحمولات اليومية</title>
-<style>
-body{font-family:Tahoma;padding:15px;color:#111}
-h2,h3{text-align:center;margin:5px}
-table{width:100%;border-collapse:collapse;margin-top:15px}
-th,td{border:1px solid #777;padding:7px;text-align:right;font-size:12px}
-th{background:#eee}
-</style></head><body>
+<style>body{font-family:Tahoma;padding:15px;color:#111}h2,h3{text-align:center;margin:5px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #777;padding:7px;text-align:right;font-size:12px}th{background:#eee}</style></head><body>
 <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
 <h3>تقرير الحمولات اليومية لتاريخ: ${esc(pDate)}</h3>
-<table>
-<thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية م³</th><th>الوقت</th></tr></thead>
+<table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية م³</th><th>الوقت</th></tr></thead>
 <tbody>
 ${dayLoads.length ? dayLoads.map(l=>{
 let o = data.orders.find(ord=>String(ord.no)===String(l.orderNo))||{};
 return `<tr><td>${esc(l.no)}</td><td>${esc(l.orderNo)}</td><td>${esc(o.customer||'—')}</td><td>${esc(l.driver||'—')}</td><td>${esc(l.vehicle||'—')}</td><td>${esc(l.qty)}</td><td>${esc(l.time||'—')}</td></tr>`;
 }).join('') : '<tr><td colspan="7" style="text-align:center">لا توجد حمولات مسجلة لهذا التاريخ</td></tr>'}
-</tbody>
-</table>
+</tbody></table>
 <script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);};<\/script>
 </body></html>`);
 w.document.close();
@@ -1022,7 +1050,6 @@ w.document.close();
 
 function printInvoice(no){
 let inv = data.invoices.find(i=>String(i.no)===String(no));
-let o = inv && data.orders.find(ord=>String(ord.no)===String(inv.orderNo));
 if(!inv) return;
 printDocA5('فاتورة مبيعات A4',`
 <div class="r">
@@ -1069,7 +1096,6 @@ printDocA5('التقرير العام للنظام',`
 <tr><td>إجمالي الحمولات</td><td>${data.loads.length}</td></tr>
 <tr><td>إجمالي الكميات المجهزة</td><td>${fmt(data.loads.reduce((s,x)=>s+(+x.qty||0),0))} م³</td></tr>
 <tr><td>عدد العملاء المسجلين</td><td>${data.customers.length}</td></tr>
-<tr><td>إجمالي المبيعات</td><td>${fmt(data.orders.reduce((s,o)=>s + ((+o.qty||0) * (+o.price||0)), 0))}</td></tr>
 </table>
 <div class="foot">تقرير صادر عن نظام صدى الإعمار بتاريخ ${new Date().toLocaleDateString('ar-IQ')}</div>
 </div>`);
