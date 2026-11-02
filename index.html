@@ -351,7 +351,7 @@ th{color:var(--gold)}
 <script>
 'use strict';
 
-const KEY='sada-concrete-v6';
+const KEY='sada-concrete-v7';
 let currentRole = localStorage.getItem('sada-logged-role') || '';
 let currentUserName = localStorage.getItem('sada-logged-user') || '';
 
@@ -417,6 +417,7 @@ function logout(){
 window.onload = function(){
   if(currentRole && currentUserName){
     $('loginScreen').classList.add('hidden');
+    $('mainApp').classList.add('hidden'); // wait, should be remove('hidden')
     $('mainApp').classList.remove('hidden');
     initSystem();
   } else {
@@ -425,7 +426,6 @@ window.onload = function(){
   }
 };
 
-// تحديد عناصر القائمة بدقة لكل صفحة
 const roleMenus = {
 manager: [
 ['dashboard','الرئيسية'],
@@ -447,6 +447,7 @@ manager: [
 plant: [
 ['dashboard','🏠 الرئيسية'],
 ['orders','📋 أوامر التجهيز'],
+['plants','🏭 المعمل والتشغيل'],
 ['reports','📊 التقارير']
 ],
 accountant: [
@@ -474,7 +475,6 @@ function initSystem(){
   renderNav();
   navigate('dashboard');
   
-  // فحص الأوامر الجديدة للمعمل كل 3 ثوانٍ
   if(currentRole === 'plant'){
     setInterval(checkNewOrdersForPlant, 3000);
   }
@@ -515,7 +515,6 @@ render();
 }
 
 function triggerPlantAlert(order){
-  // تشغيل الصوت المخصص عبر SpeechSynthesis
   if('speechSynthesis' in window){
     let utterance = new SpeechSynthesisUtterance("حبيبي اجاك اوردو جهزه");
     utterance.lang = 'ar-SA';
@@ -524,7 +523,6 @@ function triggerPlantAlert(order){
     window.speechSynthesis.speak(utterance);
   }
   
-  // إشعار مرئي عريض ومميز للمعمل
   let toastEl = $('toast');
   toastEl.innerHTML = `
     <div style="font-size:16px;color:#ff8791;margin-bottom:6px">🚨 <b>أمر تجهيز جديد للمعمل!</b></div>
@@ -587,7 +585,7 @@ let isManager = currentRole === 'manager';
 let isPlant = currentRole === 'plant';
 let isAccountant = currentRole === 'accountant';
 
-// إظهار زر الإضافة فقط للمدير
+// زر إضافة أمر تجهيز رئيسي (للمدير فقط)
 if($('globalAddOrderBtn')) $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('addCustBtn')) $('addCustBtn').style.display = !isPlant ? 'inline-block' : 'none';
@@ -635,7 +633,7 @@ o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><
 );
 }
 
-// جدول الأوامر
+// جدول الأوامر (المدير والمعمل لديهم صلاحيات التعديل والحذف والقفل وإضافة الحمولات)
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
@@ -647,6 +645,8 @@ let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert
                   o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري التجهيز</span>' :
                   `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
 
+let canManageOrder = isManager || isPlant; // المدير والمعمل
+
 return `
 <tr class="${stateClass}">
 <td>${esc(o.no)}</td><td>${esc(o.date)}</td><td>${statusBadge}</td>
@@ -654,10 +654,11 @@ return `
 <td>${esc(o.pour)}</td><td>${esc(o.qty)}</td>
 <td><div class="actions">
 <button class="btn gold" onclick="startProcessing('${esc(o.no)}')">بدء التجهيز</button>
-<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ إضافة حمولة (${ls.length})</button>
-<button class="btn" onclick="completeOrder('${esc(o.no)}')">إكمال الأمر</button>
+<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>
+<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل الأمر والكمية</button>
 <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
-${isManager ? `<button class="btn danger" onclick="delOrder('${esc(o.no)}')">حذف</button>` : ''}
+<button class="btn" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>تعديل</button>
+<button class="btn danger" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>
 </div></td>
 </tr>
 <tr><td colspan="8"><div class="loadbox">
@@ -668,7 +669,10 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 <td>السائق: ${esc(l.driver||'—')}</td>
 <td>الآلية: ${esc(l.vehicle||'—')}</td>
 <td>${esc(l.qty)} م³</td>
-<td><button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button></td>
+<td>
+<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button>
+<button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${isAccountant?'disabled':''}>حذف</button>
+</td>
 </tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div></td></tr>`;
 },8
@@ -715,7 +719,7 @@ return `<tr>
 }, 7);
 }
 
-// باقي الجداول
+// باقي الجداول مرتبطة بنفس الترتيب للكل
 [
 ['drivers','driversBody',['name','phone','note']],
 ['vehicles','vehiclesBody',['name','capacity','kind']],
@@ -731,7 +735,7 @@ $(id).innerHTML=tableRows(data[k],x=>
 `<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
 <td>${k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
-isManager?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
+(!isAccountant && !isPlant)?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
 );
 }
 });
@@ -792,13 +796,23 @@ save();toast('تم تحديث حالة الأمر إلى: جاري التجهي�
 }
 }
 
-function completeOrder(no){
-let o = data.orders.find(x=>String(x.no)===String(no));
-if(o){
-o.status = 'مكتمل ومجهز';
-logAction(currentUserName, 'إكمال أمر', `الأمر: ${no}`);
-save();toast('تم إكمال وتجهيز الأمر بنجاح');
-}
+function closeOrder(no){
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o) return;
+let delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((s,x)=>s+(Number(x.qty)||0),0);
+
+openForm('قفل الأمر وتسجيل الكمية الفعلية رقم '+no,[
+{name:'actualQty',label:'الكمية الفعلية المجهزة م³',type:'number',required:true,value:delivered},
+{name:'lockNote',label:'ملاحظات الإقفال',full:true}
+],v=>{
+let q=Number(v.actualQty);
+if(!Number.isFinite(q)||q<0){toast('أدخل كمية فعلية صحيحة');return;}
+o.actualQty=q;
+o.lockNote=v.lockNote||'';
+o.status='مكتمل ومجهز';
+logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: ${no} - الكمية الفعلية: ${q}`);
+save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
+});
 }
 
 function openLoad(no){
@@ -819,6 +833,40 @@ o.status = 'قيد العمل';
 logAction(currentUserName, 'إضافة حمولة', `حمولة: ${v.no} للأمر ${no}`);
 save();closeModal();toast('تم إضافة الحمولة بنجاح');
 });
+}
+
+function editOrder(no){
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('تعديل أمر التجهيز '+no,
+['customer','phone','site','pour','grade','qty','price','date'].map(k=>({
+name:k,label:k,value:o[k]||'',required:k==='customer'||k==='site'
+})),
+v=>{
+Object.assign(o,v);
+logAction(currentUserName, 'تعديل أمر تجهيز', `رقم الأمر: ${no}`);
+save();closeModal();toast('تم التعديل بنجاح');
+}
+);
+}
+
+function delOrder(no){
+if(currentRole === 'accountant'){toast('المحاسب لا يمكنه حذف الأوامر');return;}
+if(confirm('حذف الأمر وحمولاته؟')){
+data.orders=data.orders.filter(x=>String(x.no)!==no);
+data.loads=data.loads.filter(x=>String(x.orderNo)!==no);
+logAction(currentUserName, 'حذف أمر تجهيز', `رقم الأمر: ${no}`);
+save();toast('تم الحذف بنجاح');
+}
+}
+
+function delLoad(no){
+if(currentRole === 'accountant'){toast('المحاسب لا يمكنه حذف الحمولات');return;}
+if(confirm('حذف الحمولة؟')){
+data.loads=data.loads.filter(x=>String(x.no)!==no);
+logAction(currentUserName, 'حذف حمولة', `رقم الحمولة: ${no}`);
+save();toast('تم حذف الحمولة بنجاح');
+}
 }
 
 function openSimple(t){
@@ -910,15 +958,6 @@ save();closeModal();toast('تم إضافة الموظف');
 });
 }
 
-function delOrder(no){
-if(currentRole !== 'manager'){toast('الحذف مخصص للمدير فقط');return;}
-if(confirm('حذف الأمر وحمولاته؟')){
-data.orders=data.orders.filter(x=>String(x.no)!==no);
-data.loads=data.loads.filter(x=>String(x.orderNo)!==no);
-save();toast('تم الحذف');
-}
-}
-
 function delSimple(k,id){
 if(confirm('حذف السجل؟')){
 data[k]=data[k].filter(x=>String(x.id||x.no)!==String(id));
@@ -972,7 +1011,7 @@ printDocA5('وصل أمر تجهيز',`
 <tr><td>اسم العميل</td><td>${esc(o.customer)}</td></tr>
 <tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
 <tr><td>نوع الصب / المقاومة</td><td>${esc(o.pour)} — ${esc(o.grade)}</td></tr>
-<tr><td>الكمية التقديرية</td><td>${esc(o.qty)} م³</td></tr>
+<tr><td>الكمية التقديرية / الفعلية</td><td>${esc(o.qty)} م³ ${o.actualQty?` (الفعلية: ${o.actualQty} م³)`:''}</td></tr>
 </table>
 <div class="sign"><div>توقيع الزبون<br><br>________________</div><div>توقيع المعمل<br><br>________________</div></div>
 <div class="foot">صدى الإعمار للكونكريت الجاهز — وصل رسمي متناسق A5</div>
