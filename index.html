@@ -824,49 +824,37 @@ function editLoad(no){
 
 function printDoc(title,body){let w=window.open('','_blank');if(!w){toast('اسمح بفتح النوافذ للطباعة');return}w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><style>body{font-family:Tahoma,Arial;padding:24px;color:#111}h2,h3{text-align:center}p{border-bottom:1px solid #ddd;padding:10px}@media print{button{display:none}}</style><body>${body}<button onclick="print()">طباعة</button></body></html>`);w.document.close()}
 render();
+// تشغيل النظام مباشرة بواجهة المدير
 const roleMenus = {
   manager: [
     ['dashboard','⌂ الرئيسية'],
     ['orders','أوامر التجهيز'],
     ['customers','العملاء'],
-    ['labs','المعامل'],
     ['drivers','السائقون'],
     ['vehicles','الآليات / الخلاطات'],
-    ['inventory','المخزون'],
-    ['accounts','الحسابات'],
-    ['invoices','الفواتير'],
-    ['receipts','القبض'],
-    ['expenses','المصروفات'],
-    ['employees','الموظفون'],
-    ['archive','المتابعة والأرشفة'],
     ['reports','التقارير'],
-    ['users','المستخدمون والصلاحيات'],
     ['settings','الإعدادات']
-  ],
-
-  accountant: [
-    ['dashboard','الرئيسية'],
-    ['customers','العملاء'],
-    ['orders','أوامر التجهيز 👁️'],
-    ['loads','الحمولات 👁️'],
-    ['invoices','الفواتير'],
-    ['receipts','القبض'],
-    ['expenses','المصروفات'],
-    ['accounts','الحسابات'],
-    ['employees','الموظفون'],
-    ['inventory','المخزون'],
-    ['drivers','السائقون'],
-    ['vehicles','الآليات / الخلاطات'],
-    ['reports','التقارير'],
-    ['archive','المتابعة والأرشفة']
-  ],
-
-  lab: [
-    ['dashboard','الرئيسية'],
-    ['orders','أوامر التجهيز'],
-    ['reports','التقارير']
   ]
 };
+
+let currentRole = 'manager';
+
+function buildMenu() {
+  const menu = roleMenus.manager;
+
+  $('nav').innerHTML = menu.map(
+    ([page, label], index) =>
+      `<button class="${index === 0 ? 'active' : ''}"
+       data-page="${page}">${label}</button>`
+  ).join('');
+
+  const roleBox = $('roleSelect')?.closest('.user');
+  if (roleBox) roleBox.style.display = 'none';
+}
+
+buildMenu();
+navigate('dashboard');
+render();
 
 let currentRole = localStorage.getItem('sada-role') || 'manager';
 
