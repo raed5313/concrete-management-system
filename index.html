@@ -3,23 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>صدى الإعمار | إدارة الخرسانة الجاهزة</title>
+<title>صدى الإعمار | تسجيل الدخول</title>
 <style>
 :root{--bg:#090d12;--p:#111a22;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--muted:#93a7b3;--white:#f3f7fa}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--white);font-family:Tahoma,Arial,sans-serif}
 button,input,select{font:inherit}
 button{cursor:pointer}
+
+/* شاشة تسجيل الدخول */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:9999;padding:15px}
+.login-card{background:var(--p);border:1px solid var(--line);border-radius:15px;padding:30px;width:min(400px,100%);box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.login-card h2{text-align:center;color:var(--gold);margin-top:0}
+.login-card .field{margin-bottom:15px;display:grid;gap:6px}
+.login-card label{font-size:12px;color:var(--muted)}
+.login-card input{background:#080f15;color:white;border:1px solid var(--line);border-radius:8px;padding:12px;width:100%}
+.login-card button{width:100%;background:#147d77;color:white;border:none;border-radius:8px;padding:12px;font-weight:bold;margin-top:10px}
+.login-card button:hover{background:#116964}
+.login-error{color:#ff8791;font-size:12px;text-align:center;margin-top:10px}
+
+/* التطبيق الرئيسي */
 .app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
 .side{background:#0d151c;padding:14px;border-left:1px solid var(--line)}
 .brand,.panel,.stat{background:var(--p);border:1px solid var(--line);border-radius:13px;padding:14px}
 .brand{text-align:center;margin-bottom:12px}
 .brand h3{margin:5px;font-size:16px}
 .brand small{color:var(--cyan);font-size:10px}
-.role-box{background:#080f15;border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:12px}
-.role-box label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
-.role-box select{width:100%;background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:6px;padding:6px;font-size:12px}
-.nav{display:grid;gap:5px;max-height:calc(100vh - 180px);overflow-y:auto}
+.user-info{background:#080f15;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px;text-align:center}
+.user-info span{display:block;color:var(--gold);font-weight:bold;font-size:13px;margin-bottom:6px}
+.user-info button{background:#351a22;color:#ff8791;border:1px solid #71313d;border-radius:6px;padding:5px 10px;font-size:11px;width:100%}
+.nav{display:grid;gap:5px;max-height:calc(100vh - 200px);overflow-y:auto}
 .nav button,.btn{background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:8px;padding:9px 10px;text-align:right;font-size:12px}
 .nav button.active{background:#173b45;font-weight:bold}
 .main{padding:18px;min-width:0}
@@ -69,15 +82,35 @@ th{color:var(--gold)}
 .stats{grid-template-columns:repeat(2,1fr)}
 .layout{grid-template-columns:1fr}
 }
-@media(max-width:480px){
-.formgrid,.details{grid-template-columns:1fr}
-.full{grid-column:auto}
-}
 </style>
 </head>
 <body>
 
-<div class="app">
+<!-- شاشة تسجيل الدخول -->
+<div id="loginScreen">
+<div class="login-card">
+<h2>تسجيل الدخول</h2>
+<p class="muted" style="text-align:center;margin-bottom:20px">نظام صدى الإعمار للكونكريت الجاهز</p>
+<form id="loginForm" onsubmit="handleLogin(event)">
+<div class="field">
+<label>اسم المستخدم</label>
+<input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم">
+</div>
+<div class="field">
+<label>كلمة المرور</label>
+<input type="password" id="loginPass" required placeholder="أدخل كلمة المرور">
+</div>
+<button type="submit">دخول إلى النظام</button>
+<div id="loginError" class="login-error"></div>
+</form>
+<div style="margin-top:15px;font-size:11px;color:var(--muted);text-align:center">
+💡 تجريبي: المدير (مدير / 1) | المعمل (معمل / 2) | المحاسب (محاسب / 3)
+</div>
+</div>
+</div>
+
+<!-- التطبيق الرئيسي (مخفي حتى يتم تسجيل الدخول) -->
+<div class="app hidden" id="mainApp">
 <aside class="side">
 <div class="brand">
 <div style="font-size:22px;color:#e4b84f">▦</div>
@@ -85,13 +118,9 @@ th{color:var(--gold)}
 <small>SADA AL-EMAR CONCRETE</small>
 </div>
 
-<div class="role-box">
-<label>صلاحية المستخدم:</label>
-<select id="roleSelect" onchange="changeRole(this.value)">
-<option value="manager">المدير (إدارة كاملة - إضافة أوامر)</option>
-<option value="plant">مشغّل المعمل (عرض وحمولات وطباعة بـتاريخ)</option>
-<option value="accountant">المحاسب (حسابات، فواتير، قبض، مشاهدة الأوامر)</option>
-</select>
+<div class="user-info">
+<span id="currentUserName">المستخدم</span>
+<button onclick="logout()">تسجيل الخروج</button>
 </div>
 
 <nav class="nav" id="nav"></nav>
@@ -109,10 +138,8 @@ th{color:var(--gold)}
 </div>
 </header>
 
-<!-- قسم تنبيهات المخزون -->
 <div id="inventoryAlerts"></div>
 
-<!-- 1. الرئيسية -->
 <section id="dashboard">
 <div class="stats">
 <div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
@@ -133,12 +160,10 @@ th{color:var(--gold)}
 <div class="detail">الآليات<strong id="statVehicles">0</strong></div>
 <div class="detail">المخزون الناقص<strong id="statLowInv">0</strong></div>
 </div>
-<p class="muted" style="margin-top:10px">النظام يعمل بصلاحيات الدور الحالي بمرونة عالية.</p>
 </div>
 </div>
 </section>
 
-<!-- 2. أوامر التجهيز -->
 <section id="orders" class="hidden">
 <div class="panel">
 <div class="head">
@@ -154,18 +179,16 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 3. العملاء وحساباتهم -->
 <section id="customers" class="hidden">
 <div class="panel">
 <div class="head"><h3>العملاء والحسابات</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
 <table>
-<thead><tr><th>اسم العميل</th><th>الهاتف</th><th>العنوان</th><th>الإجمالي ($/د.ع)</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>اسم العميل</th><th>الهاتف</th><th>العنوان</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead>
 <tbody id="customersBody"></tbody>
 </table>
 </div>
 </section>
 
-<!-- 4. المعامل والتشغيل اليومي -->
 <section id="plants" class="hidden">
 <div class="panel">
 <div class="head">
@@ -176,7 +199,6 @@ th{color:var(--gold)}
 <button class="btn gold" onclick="printDailyPlantReport()">طباعة تقرير الحمولات اليومية</button>
 </div>
 </div>
-<p class="muted">متابعة الحمولات اليومية وتسجيل النقلات وإصدار وصل A5 متناسق للمعمل.</p>
 <div class="tablewrap">
 <table>
 <thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية م³</th><th>الوقت</th><th>طباعة A5</th></tr></thead>
@@ -186,7 +208,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 5. السائقون -->
 <section id="drivers" class="hidden">
 <div class="panel">
 <div class="head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div>
@@ -194,7 +215,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 6. الآليات / الخلاطات -->
 <section id="vehicles" class="hidden">
 <div class="panel">
 <div class="head"><h3>الآليات والخلاطات</h3><button class="btn primary" onclick="openSimple('vehicle')">＋ إضافة آلية</button></div>
@@ -202,7 +222,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 7. المخزون -->
 <section id="inventory" class="hidden">
 <div class="panel">
 <div class="head"><h3>إدارة المخزون والمواد</h3><button class="btn primary" onclick="openInventoryModal()">＋ إضافة مادة</button></div>
@@ -213,7 +232,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 8. الحسابات -->
 <section id="accounts" class="hidden">
 <div class="panel">
 <h3>الحسابات العامة والأرصدة</h3>
@@ -226,7 +244,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 9. الفواتير -->
 <section id="invoices" class="hidden">
 <div class="panel">
 <div class="head"><h3>الفواتير (تنسيق A4)</h3><button class="btn primary" onclick="openInvoiceModal()">＋ إصدار فاتورة</button></div>
@@ -237,7 +254,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 10. سندات القبض -->
 <section id="receipts" class="hidden">
 <div class="panel">
 <div class="head"><h3>سندات القبض</h3><button class="btn primary" onclick="openReceiptModal()">＋ سند قبض جديد</button></div>
@@ -248,7 +264,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 11. المصروفات -->
 <section id="expenses" class="hidden">
 <div class="panel">
 <div class="head"><h3>المصروفات التشغيلية</h3><button class="btn primary" onclick="openExpenseModal()">＋ تسجيل مصروف</button></div>
@@ -259,7 +274,6 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 12. الموظفون -->
 <section id="employees" class="hidden">
 <div class="panel">
 <div class="head"><h3>شؤون الموظفين</h3><button class="btn primary" onclick="openEmployeeModal()">＋ إضافة موظف</button></div>
@@ -270,11 +284,9 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 13. المتابعة والأرشفة -->
 <section id="audit" class="hidden">
 <div class="panel">
 <h3>سجل النشاطات والأرشفة (Audit Log)</h3>
-<p class="muted">متابعة كافة العمليات: من فعل ماذا ومتى؟</p>
 <div class="tablewrap">
 <table>
 <thead><tr><th>التاريخ والوقت</th><th>المستخدم</th><th>العملية</th><th>التفاصيل</th></tr></thead>
@@ -284,12 +296,11 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 14. التقارير -->
 <section id="reports" class="hidden">
 <div class="panel">
 <h3>التقارير الشاملة والطباعة</h3>
 <div class="details">
-<div class="detail">إجمالي الأوامر<strong id="reportOrders">0</strong></div>
+<div class="detail">إجمالي أوامر التجهيز<strong id="reportOrders">0</strong></div>
 <div class="detail">إجمالي الحمولات<strong id="reportLoads">0</strong></div>
 <div class="detail">الكمية المجهزة<strong id="reportQty">0 م³</strong></div>
 <div class="detail">الكمية المتبقية<strong id="reportRemaining">0 م³</strong></div>
@@ -301,11 +312,9 @@ th{color:var(--gold)}
 </div>
 </section>
 
-<!-- 15. الإعدادات -->
 <section id="settings" class="hidden">
 <div class="panel">
 <h3>إعدادات النظام والبيانات</h3>
-<p class="muted">إدارة البيانات المخزنة محلياً على الجهاز.</p>
 <button class="btn danger" onclick="clearData()">مسح كافة البيانات وإعادة الضبط</button>
 </div>
 </section>
@@ -314,7 +323,6 @@ th{color:var(--gold)}
 </main>
 </div>
 
-<!-- Modal عام -->
 <div id="modal" class="modal hidden">
 <div class="panel">
 <div class="head">
@@ -329,8 +337,9 @@ th{color:var(--gold)}
 <script>
 'use strict';
 
-const KEY='sada-concrete-v3';
-let currentRole = localStorage.getItem('sada-role') || 'manager';
+const KEY='sada-concrete-v4';
+let currentRole = localStorage.getItem('sada-logged-role') || '';
+let currentUserName = localStorage.getItem('sada-logged-user') || '';
 
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
@@ -361,11 +370,50 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
 }[c]));
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 
-$('today').textContent=new Date().toLocaleDateString('ar-IQ');
-$('roleSelect').value = currentRole;
-if($('printDateFilter')) $('printDateFilter').value = new Date().toISOString().slice(0,10);
+// قائمة الحسابات المسموح لها بالدخول
+const usersDB = {
+  "مدير": { pass: "1", role: "manager", title: "المدير العام" },
+  "معمل": { pass: "2", role: "plant", title: "مشغّل المعمل" },
+  "محاسب": { pass: "3", role: "accountant", title: "المحاسب" }
+};
 
-// تعريف القوائم بحسب الصلاحيات المطلوبة بدقة
+function handleLogin(e){
+  e.preventDefault();
+  let u = $('loginUser').value.trim();
+  let p = $('loginPass').value.trim();
+  
+  if(usersDB[u] && usersDB[u].pass === p){
+    currentRole = usersDB[u].role;
+    currentUserName = u + ' (' + usersDB[u].title + ')';
+    localStorage.setItem('sada-logged-role', currentRole);
+    localStorage.setItem('sada-logged-user', currentUserName);
+    
+    $('loginScreen').classList.add('hidden');
+    $('mainApp').classList.remove('hidden');
+    initSystem();
+  } else {
+    $('loginError').textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة!';
+  }
+}
+
+function logout(){
+  localStorage.removeItem('sada-logged-role');
+  localStorage.removeItem('sada-logged-user');
+  location.reload();
+}
+
+// التحقق من حالة الدخول عند تحميل الصفحة
+window.onload = function(){
+  if(currentRole && currentUserName && usersDB[currentRole === 'manager' ? 'مدير' : currentRole === 'plant' ? 'معمل' : 'محاسب'] || usersDB[Object.keys(usersDB).find(k => usersDB[k].role === currentRole)]){
+    $('loginScreen').classList.add('hidden');
+    $('mainApp').classList.remove('hidden');
+    initSystem();
+  } else {
+    $('loginScreen').classList.remove('hidden');
+    $('mainApp').classList.add('hidden');
+  }
+};
+
 const roleMenus = {
 manager: [
 ['dashboard','الرئيسية'],
@@ -408,6 +456,14 @@ accountant: [
 ]
 };
 
+function initSystem(){
+  $('today').textContent=new Date().toLocaleDateString('ar-IQ');
+  if($('printDateFilter')) $('printDateFilter').value = new Date().toISOString().slice(0,10);
+  $('currentUserName').textContent = currentUserName;
+  renderNav();
+  navigate('dashboard');
+}
+
 function renderNav(){
 let menuList = roleMenus[currentRole] || roleMenus.manager;
 $('nav').innerHTML = menuList.map(([k,v],i)=>
@@ -421,10 +477,9 @@ if(b) navigate(b.dataset.page);
 };
 
 function navigate(p){
-// التحقق من أن القسم متاح في قائمة الدور الحالي
 let menuList = roleMenus[currentRole] || roleMenus.manager;
 if(!menuList.some(x=>x[0]===p)){
-toast('عذراً، هذا القسم غير متاح لصلاحيتك الحالية');
+toast('عذراً، هذا القسم غير متاح لصلاحيتك');
 return;
 }
 let allPages = Object.keys(roleMenus).reduce((acc, r)=>{
@@ -443,20 +498,6 @@ document.querySelectorAll('[data-page]').forEach(b=>
 b.classList.toggle('active', b.dataset.page===p)
 );
 render();
-}
-
-function changeRole(role){
-currentRole = role;
-localStorage.setItem('sada-role', role);
-let titles = {
-manager: 'المدير - صلاحيات كاملة وإنشاء الأوامر',
-plant: 'مشغّل المعمل - عرض الأوامر، الحمولات وطباعة بـتاريخ',
-accountant: 'المحاسب - حسابات، فواتير، قبض ومشاهدة الأوامر والحمولات'
-};
-$('roleSubTitle').textContent = titles[role];
-renderNav();
-navigate('dashboard');
-toast('تم التبديل إلى دور: ' + $('roleSelect').options[$('roleSelect'].selectedIndex].text);
 }
 
 function logAction(user, action, details){
@@ -490,11 +531,9 @@ let isManager = currentRole === 'manager';
 let isPlant = currentRole === 'plant';
 let isAccountant = currentRole === 'accountant';
 
-// إظهار وإخفاء زر "أمر تجهيز جديد" الرئيسي (فقط للـ Manager)
 $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
 
-// تنبيهات المخزون الأدنى
 let lowInv = data.inventory.filter(i => Number(i.current) <= Number(i.min));
 if(lowInv.length > 0 && $('inventoryAlerts')){
 $('inventoryAlerts').innerHTML = lowInv.map(i=>
@@ -522,7 +561,6 @@ if($('reportLoads')) $('reportLoads').textContent=data.loads.length;
 if($('reportQty')) $('reportQty').textContent=fmt(qty)+' م³';
 if($('reportRemaining')) $('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' م³';
 
-// الحسابات العامة
 let totalSales = data.orders.reduce((s,o)=>s + ((+o.qty||0) * (+o.price||0)), 0);
 let totalRec = data.receipts.reduce((s,r)=>s + (+r.amount||0), 0);
 let totalExp = data.expenses.reduce((s,e)=>s + (+e.amount||0), 0);
@@ -539,7 +577,6 @@ o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><
 );
 }
 
-// جدول الأوامر
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
@@ -547,8 +584,8 @@ o=>{
 let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
 let state=o.status==='تم القفل'?'locked':o.status==='مرحّل للفاتورة'?'invoiced':'open';
 
-let canModifyOrders = isManager; // فقط المدير يمكنه إضافة/تعديل/حذف الأوامر
-let canAddLoad = isPlant || isManager; // المعمل أو المدير يضيف حمولة (في الـ Prompt: المعمل لديه إضافة حمولة)
+let canModifyOrders = isManager;
+let canAddLoad = isPlant || isManager;
 
 return `
 <tr class="order-${state}">
@@ -585,7 +622,6 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 );
 }
 
-// جدول المعمل والحمولات اليومية
 if($('plantLoadsBody')){
 $('plantLoadsBody').innerHTML = tableRows(
 data.loads.slice().reverse(),
@@ -605,7 +641,6 @@ return `<tr>
 );
 }
 
-// جدول العملاء والحسابات المرتبطة
 if($('customersBody')){
 $('customersBody').innerHTML = tableRows(data.customers, c=>{
 let custOrders = data.orders.filter(o=>o.customer===c.name);
@@ -625,7 +660,6 @@ return `<tr>
 }, 7);
 }
 
-// جداول البقية
 [
 ['drivers','driversBody',['name','phone','note']],
 ['vehicles','vehiclesBody',['name','capacity','kind']],
@@ -668,7 +702,6 @@ $('modal').classList.remove('hidden');
 
 function closeModal(){$('modal').classList.add('hidden')}
 
-// إضافة أمر التجهيز (فقط للمدير)
 function openOrder(){
 if(currentRole !== 'manager'){
 toast('عذراً، إضافة أمر التجهيز مخصصة للمدير فقط');
@@ -687,7 +720,7 @@ openForm('أمر تجهيز جديد',[
 v.no=String(data.nextOrder++).padStart(7,'0');
 v.status='قيد التجهيز';
 data.orders.push(v);
-logAction('المدير', 'إنشاء أمر تجهيز', `رقم الأمر: ${v.no} للعميل ${v.customer}`);
+logAction(currentUserName, 'إنشاء أمر تجهيز', `رقم الأمر: ${v.no} للعميل ${v.customer}`);
 save();closeModal();toast('تم حفظ أمر التجهيز بنجاح');
 });
 }
@@ -707,7 +740,7 @@ o.actualQty=q;
 o.lockNote=v.lockNote||'';
 o.status='تم القفل';
 o.lockedAt=new Date().toISOString();
-logAction(currentRole, 'قفل أمر تجهيز', `رقم الأمر: ${no}`);
+logAction(currentUserName, 'قفل أمر تجهيز', `رقم الأمر: ${no}`);
 save();closeModal();toast('تم قفل الأمر بنجاح');
 });
 }
@@ -726,7 +759,7 @@ v.orderNo=o.no;
 v.no=String(data.nextLoad++).padStart(7,'0');
 v.date=new Date().toISOString().slice(0,10);
 data.loads.push(v);
-logAction(currentRole, 'إضافة حمولة', `رقم الحمولة: ${v.no} للأمر ${no}`);
+logAction(currentUserName, 'إضافة حمولة', `رقم الحمولة: ${v.no} للأمر ${no}`);
 save();closeModal();toast('تم إضافة الحمولة بنجاح وإرسالها للمعمل');
 });
 }
@@ -741,7 +774,7 @@ vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity'
 openForm('إضافة '+c[0],c[2].map(([name,label])=>({name,label,required:name==='name'})),v=>{
 v.id=Date.now();
 data[c[1]].push(v);
-logAction(currentRole, 'إضافة سجل', `إضافة ${c[0]}: ${v.name}`);
+logAction(currentUserName, 'إضافة سجل', `إضافة ${c[0]}: ${v.name}`);
 save();closeModal();toast('تم الحفظ بنجاح');
 });
 }
@@ -755,7 +788,7 @@ openForm('إضافة مادة للمخزون',[
 ],v=>{
 v.id=Date.now();
 data.inventory.push(v);
-logAction(currentRole, 'إضافة مادة مخزون', v.name);
+logAction(currentUserName, 'إضافة مادة مخزون', v.name);
 save();closeModal();toast('تم إضافة المادة');
 });
 }
@@ -764,14 +797,14 @@ function openInvoiceModal(){
 openForm('إصدار فاتورة مبيعات',[
 {name:'customer',label:'العميل',options:['',...data.customers.map(x=>x.name)]},
 {name:'orderNo',label:'رقم أمر التجهيز',options:['',...data.orders.map(x=>x.no)]},
-{name:'total',label:'إجمالي المبلغ ($/د.ع)',type:'number',required:true},
+{name:'total',label:'إجمالي المبلغ',type:'number',required:true},
 {name:'paid',label:'المبلغ المدفوع',type:'number',required:true},
 {name:'discount',label:'الخصم',type:'number',value:0}
 ],v=>{
 v.no = data.nextInvNo++;
 v.remaining = Number(v.total) - Number(v.paid) - Number(v.discount||0);
 data.invoices.push(v);
-logAction(currentRole, 'إصدار فاتورة', `رقم الفاتورة: ${v.no}`);
+logAction(currentUserName, 'إصدار فاتورة', `رقم الفاتورة: ${v.no}`);
 save();closeModal();toast('تم إصدار الفاتورة بنجاح');
 });
 }
@@ -786,7 +819,7 @@ openForm('إصدار سند قبض',[
 v.no = data.nextRecNo++;
 v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
-logAction(currentRole, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer}`);
+logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer}`);
 save();closeModal();toast('تم حفظ سند القبض بنجاح');
 });
 }
@@ -800,7 +833,7 @@ openForm('تسجيل مصروف تشغيلي',[
 ],v=>{
 v.id = Date.now();
 data.expenses.push(v);
-logAction(currentRole, 'تسجيل مصروف', `${v.title}: ${v.amount}`);
+logAction(currentUserName, 'تسجيل مصروف', `${v.title}: ${v.amount}`);
 save();closeModal();toast('تم تسجيل المصروف');
 });
 }
@@ -815,7 +848,7 @@ openForm('إضافة موظف جديد',[
 ],v=>{
 v.id = Date.now();
 data.employees.push(v);
-logAction(currentRole, 'إضافة موظف', v.name);
+logAction(currentUserName, 'إضافة موظف', v.name);
 save();closeModal();toast('تم إضافة الموظف');
 });
 }
@@ -866,7 +899,7 @@ w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="
 *{box-sizing:border-box}
 body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:12px;}
 .r{border:2px double #b28a29;padding:10mm;max-height:185mm;overflow:hidden;}
-.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6px;margin-bottom:8px;}
+.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6mm;margin-bottom:8px;}
 .head h2{color:#a47b20;margin:0 0 4px 0;font-size:16px;}
 .en{font-size:9px;color:#555;}
 .title{text-align:center;background:#171717;color:#e7c36b;border:1px solid #b28a29;padding:6px;margin:8px 0;font-size:15px;font-weight:bold;}
@@ -1050,10 +1083,6 @@ save();
 toast('تم مسح وإعادة ضبط النظام بنجاح');
 }
 }
-
-// تهيئة أولية
-renderNav();
-render();
 </script>
 </body>
 </html>
