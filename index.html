@@ -89,7 +89,7 @@ th{color:var(--gold)}
 <!-- شاشة تسجيل الدخول -->
 <div id="loginScreen">
 <div class="login-card">
-<h2>تسجيل الدخول</h2>
+<h2>تسجيل الدخول الموحد</h2>
 <p class="muted" style="text-align:center;margin-bottom:20px">نظام صدى الإعمار للكونكريت الجاهز</p>
 <form id="loginForm" onsubmit="handleLogin(event)">
 <div class="field">
@@ -104,7 +104,7 @@ th{color:var(--gold)}
 <div id="loginError" class="login-error"></div>
 </form>
 <div style="margin-top:15px;font-size:11px;color:var(--muted);text-align:center">
-💡 تجريبي: المدير (مدير / 1) | المعمل (معمل / 2) | المحاسب (محاسب / 3)
+💡 بيانات الدخول: المدير (مدير / 1) | المعمل (معمل / 2) | المحاسب (محاسب / 3)
 </div>
 </div>
 </div>
@@ -150,11 +150,11 @@ th{color:var(--gold)}
 </div>
 <div class="layout">
 <div class="panel">
-<h3>أحدث الأوامر</h3>
+<h3>أحدث الأوامر المضافة</h3>
 <div class="tablewrap"><table><tbody id="recentOrders"></tbody></table></div>
 </div>
 <div class="panel">
-<h3>ملخص النظام</h3>
+<h3>ملخص النظام المترابط</h3>
 <div class="details">
 <div class="detail">العملاء<strong id="statCustomers">0</strong></div>
 <div class="detail">السائقون<strong id="statDrivers">0</strong></div>
@@ -169,12 +169,12 @@ th{color:var(--gold)}
 <section id="orders" class="hidden">
 <div class="panel">
 <div class="head">
-<h3>أوامر التجهيز والحمولات</h3>
+<h3>أوامر التجهيز والحمولات المرتبطة</h3>
 <button class="btn primary" id="orderSecAddBtn" onclick="openOrder()">＋ إضافة أمر</button>
 </div>
 <div class="tablewrap">
 <table>
-<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>م³</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>م³ (تقديري / فعلي)</th><th>الإجراءات</th></tr></thead>
 <tbody id="ordersBody"></tbody>
 </table>
 </div>
@@ -184,7 +184,7 @@ th{color:var(--gold)}
 <!-- 3. العملاء وحساباتهم -->
 <section id="customers" class="hidden">
 <div class="panel">
-<div class="head"><h3>العملاء والحسابات</h3><button class="btn primary" id="addCustBtn" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
+<div class="head"><h3>العملاء والحسابات المرتبطة</h3><button class="btn primary" id="addCustBtn" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
 <table>
 <thead><tr><th>اسم العميل</th><th>الهاتف</th><th>العنوان</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الإجراءات</th></tr></thead>
 <tbody id="customersBody"></tbody>
@@ -351,7 +351,7 @@ th{color:var(--gold)}
 <script>
 'use strict';
 
-const KEY='sada-concrete-v7';
+const KEY='sada-concrete-v8';
 let currentRole = localStorage.getItem('sada-logged-role') || '';
 let currentUserName = localStorage.getItem('sada-logged-user') || '';
 
@@ -417,7 +417,6 @@ function logout(){
 window.onload = function(){
   if(currentRole && currentUserName){
     $('loginScreen').classList.add('hidden');
-    $('mainApp').classList.add('hidden'); // wait, should be remove('hidden')
     $('mainApp').classList.remove('hidden');
     initSystem();
   } else {
@@ -475,6 +474,16 @@ function initSystem(){
   renderNav();
   navigate('dashboard');
   
+  // الاستماع للتحديثات الفورية بين الأجهزة والصفحات
+  window.addEventListener('storage', (e) => {
+    if(e.key === KEY){
+      try {
+        data = JSON.parse(e.newValue) || blank();
+        render();
+      } catch(err){}
+    }
+  });
+
   if(currentRole === 'plant'){
     setInterval(checkNewOrdersForPlant, 3000);
   }
@@ -536,6 +545,14 @@ function triggerPlantAlert(order){
 }
 
 function checkNewOrdersForPlant(){
+  try {
+    let saved = JSON.parse(localStorage.getItem(KEY));
+    if(saved && saved.orders) {
+      data.orders = saved.orders;
+      data.loads = saved.loads || [];
+    }
+  } catch(e){}
+
   if(data.orders.length === 0) return;
   let latestOrder = data.orders[data.orders.length - 1];
   let latestId = Number(latestOrder.no);
@@ -585,7 +602,6 @@ let isManager = currentRole === 'manager';
 let isPlant = currentRole === 'plant';
 let isAccountant = currentRole === 'accountant';
 
-// زر إضافة أمر تجهيز رئيسي (للمدير فقط)
 if($('globalAddOrderBtn')) $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('addCustBtn')) $('addCustBtn').style.display = !isPlant ? 'inline-block' : 'none';
@@ -633,7 +649,7 @@ o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><
 );
 }
 
-// جدول الأوامر (المدير والمعمل لديهم صلاحيات التعديل والحذف والقفل وإضافة الحمولات)
+// جدول الأوامر الموحد لكل الأدوار بنفس الترتيب
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
@@ -642,20 +658,20 @@ let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
 let stateClass = o.status==='قيد التجهيز' ? 'order-open' : o.status==='قيد العمل' ? 'order-locked' : 'order-invoiced';
 
 let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
-                  o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري التجهيز</span>' :
+                  o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري العمل</span>' :
                   `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
 
-let canManageOrder = isManager || isPlant; // المدير والمعمل
+let canManageOrder = isManager || isPlant; // المدير والمعمل يمتلكان الصلاحية الكاملة
 
 return `
 <tr class="${stateClass}">
 <td>${esc(o.no)}</td><td>${esc(o.date)}</td><td>${statusBadge}</td>
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
-<td>${esc(o.pour)}</td><td>${esc(o.qty)}</td>
+<td>${esc(o.pour)}</td><td>${esc(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
 <td><div class="actions">
 <button class="btn gold" onclick="startProcessing('${esc(o.no)}')">بدء التجهيز</button>
 <button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>
-<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل الأمر والكمية</button>
+<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل والكمية</button>
 <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
 <button class="btn" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>تعديل</button>
 <button class="btn danger" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>
@@ -671,7 +687,7 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 <td>${esc(l.qty)} م³</td>
 <td>
 <button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button>
-<button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${isAccountant?'disabled':''}>حذف</button>
+<button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>
 </td>
 </tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div></td></tr>`;
@@ -699,7 +715,7 @@ return `<tr>
 );
 }
 
-// جدول العملاء والحسابات
+// جدول العملاء والحسابات المرتبطة
 if($('customersBody')){
 $('customersBody').innerHTML = tableRows(data.customers, c=>{
 let custOrders = data.orders.filter(o=>o.customer===c.name);
@@ -792,7 +808,7 @@ let o = data.orders.find(x=>String(x.no)===String(no));
 if(o){
 o.status = 'قيد العمل';
 logAction(currentUserName, 'بدء تجهيز', `الأمر: ${no}`);
-save();toast('تم تحديث حالة الأمر إلى: جاري التجهيز');
+save();toast('تم تحديث حالة الأمر إلى: جاري العمل');
 }
 }
 
@@ -876,7 +892,7 @@ driver:['السائقون','drivers',[['name','اسم السائق'],['phone','�
 vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity','السعة م³'],['kind','النوع']]]
 }[t];
 
-openForm('إضافة '+c[0],c[2].map(([name,label])=>({name,label,required:name==='name'})),v=>{
+openForm('إضافة '+c[0],c[2].map(([name,label])=>({name,label,required:name==='name'})) ,v=>{
 v.id=Date.now();
 data[c[1]].push(v);
 logAction(currentUserName, 'إضافة سجل', `${c[0]}: ${v.name}`);
