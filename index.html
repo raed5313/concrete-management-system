@@ -18,6 +18,15 @@
 }
  { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
 body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; overflow-x: hidden; }
+/* Login Screen */
+.login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #111a22 0%, #090d12 100%); }
+.login-card { background: var(--panel-bg); border: 2px solid var(--border-gold); border-radius: 16px; padding: 30px; width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
+.login-card h2 { color: var(--primary-gold); margin-bottom: 5px; font-size: 22px; }
+.login-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+.form-group { text-align: right; margin-bottom: 15px; }
+.form-group label { display: block; font-size: 12px; margin-bottom: 6px; color: #b9c8d0; }
+.form-group input, .form-group select { width: 100%; padding: 10px; background: #080f15; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 13px; }
+.btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #c69214, #e6b800); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
 /* App Layout */
 .app-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 .sidebar { background: #0d151c; padding: 15px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; max-height: 100vh; }
@@ -29,6 +38,7 @@ body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; 
 .nav-links { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .nav-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 12px; border-radius: 8px; text-align: right; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; }
 .nav-btn.active, .nav-btn:hover { background: #173b45; color: var(--primary-cyan); border-color: #287d89; }
+.btn-logout { background: #351a22; color: #ff8791; border: 1px solid #71313d; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 13px; width: 100%; text-align: center; }
 /* Main Content */
 .main-content { padding: 20px; overflow-y: auto; max-height: 100vh; }
 .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
@@ -51,8 +61,36 @@ th { background: #080f15; color: var(--primary-cyan); }
 </style>
 </head>
 <body>
-<!-- MAIN APP INTERFACE (OPEN BY DEFAULT) -->
-<div id="appLayout" class="app-layout">
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen">
+<div class="login-card">
+<i class="fas fa-building-circle-check" style="font-size: 45px; color: var(--primary-gold); margin-bottom: 10px;"></i>
+<h2>شركة صدى الإعمار</h2>
+<p>نظام إدارة الخرسانة الجاهزة والوصولات</p>
+<form onsubmit="handleLogin(event)">
+<div class="form-group">
+<label>اسم المستخدم</label>
+<input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+</div>
+<div class="form-group">
+<label>كلمة المرور</label>
+<input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+</div>
+<button type="submit" class="btn-login">تسجيل الدخول</button>
+</form>
+<div id="loginError" style="color: #ff8791; font-size: 12px; margin-top: 15px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+<div style="margin-top: 20px; text-align: right; background: #080f15; padding: 10px; border-radius: 8px; font-size: 11px; color: var(--text-muted);">
+<strong style="color: var(--primary-gold); font-size: 12px; display:block; margin-bottom: 4px;">بيانات الدخول المعتمدة:</strong>
+• صفحة المدير: <b>A</b> / <b>1234</b>
+
+• صفحة مشغل معمل: <b>B</b> / <b>12345</b>
+
+• صفحة المحاسب: <b>C</b> / <b>123456</b>
+</div>
+</div>
+</div>
+<!-- MAIN APP INTERFACE -->
+<div id="appLayout" class="app-layout hidden">
 <aside class="sidebar">
 <div class="brand">
 <i class="fas fa-truck-monster" style="font-size: 28px; color: var(--primary-gold);"></i>
@@ -60,10 +98,11 @@ th { background: #080f15; color: var(--primary-cyan); }
 <small>SADA AL-EMAR CONCRETE</small>
 </div>
 <div class="user-badge">
-المستخدم الحالي: <span id="displayUser">مدير النظام العام</span>
-الصلاحية: <small id="displayRole" style="color: var(--primary-cyan); display:block;">كامل الصلاحيات (مباشر)</small>
+مرحباً: <span id="displayUser">-</span>
+الصلاحية: <small id="displayRole" style="color: var(--primary-cyan); display:block;">-</small>
 </div>
 <nav class="nav-links" id="sidebarNav"></nav>
+<button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
 </aside>
 <main class="main-content">
 <header class="header-bar">
@@ -81,24 +120,30 @@ th { background: #080f15; color: var(--primary-cyan); }
 </div>
 </div>
 <script>
+const USERS = {
+'A': { pass: '1234', role: 'admin', name: 'المدير العام' },
+'B': { pass: '12345', role: 'operator', name: 'مشغّل المعمل' },
+'C': { pass: '123456', role: 'accountant', name: 'المحاسب' }
+};
 const NAV_ITEMS = [
-{ id: 'dashboard', label: 'الرئيسية', icon: 'fa-home' },
-{ id: 'orders', label: 'أوامر التجهيز', icon: 'fa-file-invoice' },
-{ id: 'customers', label: 'العملاء', icon: 'fa-users' },
-{ id: 'plants', label: 'المعامل', icon: 'fa-industry' },
-{ id: 'drivers', label: 'السائقون', icon: 'fa-user-tie' },
-{ id: 'vehicles', label: 'الآليات / الخلاطات', icon: 'fa-truck-moving' },
-{ id: 'inventory', label: 'المخزون', icon: 'fa-boxes' },
-{ id: 'accounts', label: 'الحسابات', icon: 'fa-calculator' },
-{ id: 'invoices', label: 'الفواتير', icon: 'fa-receipt' },
-{ id: 'receipts', label: 'القبض', icon: 'fa-hand-holding-usd' },
-{ id: 'expenses', label: 'المصروفات', icon: 'fa-wallet' },
-{ id: 'employees', label: 'الموظفون', icon: 'fa-id-card' },
-{ id: 'archive', label: 'المتابعة والأرشفة', icon: 'fa-archive' },
-{ id: 'reports', label: 'التقارير', icon: 'fa-chart-line' },
-{ id: 'permissions', label: 'المستخدمون والصلاحيات', icon: 'fa-user-shield' },
-{ id: 'settings', label: 'الإعدادات', icon: 'fa-cog' }
+{ id: 'dashboard', label: 'الرئيسية', icon: 'fa-home', roles: ['admin', 'operator', 'accountant'] },
+{ id: 'orders', label: 'أوامر التجهيز', icon: 'fa-file-invoice', roles: ['admin', 'operator', 'accountant'] },
+{ id: 'customers', label: 'العملاء', icon: 'fa-users', roles: ['admin', 'accountant'] },
+{ id: 'plants', label: 'المعامل', icon: 'fa-industry', roles: ['admin'] },
+{ id: 'drivers', label: 'السائقون', icon: 'fa-user-tie', roles: ['admin', 'operator'] },
+{ id: 'vehicles', label: 'الآليات / الخلاطات', icon: 'fa-truck-moving', roles: ['admin', 'operator'] },
+{ id: 'inventory', label: 'المخزون', icon: 'fa-boxes', roles: ['admin', 'operator'] },
+{ id: 'accounts', label: 'الحسابات', icon: 'fa-calculator', roles: ['admin', 'accountant'] },
+{ id: 'invoices', label: 'الفواتير', icon: 'fa-receipt', roles: ['admin', 'accountant'] },
+{ id: 'receipts', label: 'القبض', icon: 'fa-hand-holding-usd', roles: ['admin', 'accountant'] },
+{ id: 'expenses', label: 'المصروفات', icon: 'fa-wallet', roles: ['admin', 'accountant'] },
+{ id: 'employees', label: 'الموظفون', icon: 'fa-id-card', roles: ['admin'] },
+{ id: 'archive', label: 'المتابعة والأرشفة', icon: 'fa-archive', roles: ['admin', 'accountant'] },
+{ id: 'reports', label: 'التقارير', icon: 'fa-chart-line', roles: ['admin', 'operator', 'accountant'] },
+{ id: 'permissions', label: 'المستخدمون والصلاحيات', icon: 'fa-user-shield', roles: ['admin'] },
+{ id: 'settings', label: 'الإعدادات', icon: 'fa-cog', roles: ['admin'] }
 ];
+let currentUser = null;
 let activeTab = 'dashboard';
 let store = {
 orders: [], loads: [], customers: [], plants: [], drivers: [], vehicles: [],
@@ -107,7 +152,7 @@ employees: [], archive: [], permissions: [], settings: {},
 nextOrderNo: 129, nextReceiptNo: 1
 };
 try {
-const saved = localStorage.getItem('sada_app_data_v9');
+const saved = localStorage.getItem('sada_app_data_v10');
 if (saved) {
 store = JSON.parse(saved);
 }
@@ -116,19 +161,45 @@ console.warn("Storage reset due to parse error");
 }
 function saveStore() {
 try {
-localStorage.setItem('sada_app_data_v9', JSON.stringify(store));
+localStorage.setItem('sada_app_data_v10', JSON.stringify(store));
 } catch(e) {}
 render();
 }
-window.onload = function() {
+function handleLogin(e) {
+e.preventDefault();
+const u = document.getElementById('username').value.trim();
+const p = document.getElementById('password').value.trim();
+const err = document.getElementById('loginError');
+if (USERS[u] && USERS[u].pass === p) {
+currentUser = USERS[u];
+err.style.display = 'none';
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('appLayout').classList.remove('hidden');
+document.getElementById('displayUser').innerText = currentUser.name;
+document.getElementById('displayRole').innerText = getRoleLabel(currentUser.role);
 buildSidebarNav();
 switchTab('dashboard');
-};
+} else {
+err.style.display = 'block';
+}
+}
+function handleLogout() {
+currentUser = null;
+document.getElementById('appLayout').classList.add('hidden');
+document.getElementById('loginScreen').classList.remove('hidden');
+}
+function getRoleLabel(role) {
+if (role === 'admin') return 'مدير النظام (كامل الصلاحيات)';
+if (role === 'operator') return 'مشغّل المعمل';
+if (role === 'accountant') return 'المحاسب';
+}
 function buildSidebarNav() {
 const nav = document.getElementById('sidebarNav');
 nav.innerHTML = '';
 NAV_ITEMS.forEach(item => {
+if (item.roles.includes(currentUser.role)) {
 nav.innerHTML += ⁠<button class="nav-btn ${item.id === activeTab ? 'active' : ''}" id="nav-${item.id}" onclick="switchTab('${item.id}')"> <i class="fas ${item.icon}"></i> ${item.label} </button>⁠;
+}
 });
 }
 function switchTab(tabId) {
@@ -149,12 +220,16 @@ let totalQty = 0;
 store.loads.forEach(l => totalQty += Number(l.qty || 0));
 container.innerHTML = ⁠<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;"> <div class="card">أوامر التجهيز<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.orders.length}</strong></div> <div class="card">إجمالي الحمولات<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.loads.length}</strong></div> <div class="card">المجهز (م³)<strong style="display:block; font-size:24px; color:var(--primary-gold); margin-top:8px;">${totalQty} م³</strong></div> </div> <div class="card"> <h3>أحدث أوامر التجهيز</h3> <table> <thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون</th><th>الحالة</th><th>الكمية</th></tr></thead> <tbody> ${store.orders.slice(-5).reverse().map(o =>⁠<tr><td>\bm{{o.no}</td><td>}{o.date}</td><td>\bm{{o.customer}</td><td>}{getStatusBadge(o.status)}</td><td>${o.qty} م³</td></tr>⁠).join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات</td></tr>'} </tbody> </table> </div> ⁠;
 } else if (activeTab === 'orders') {
+if (currentUser.role === 'admin') {
 actionArea.innerHTML = ⁠<button class="btn-action" onclick="openNewOrderModal()"><i class="fas fa-plus"></i> إضافة أمر تجهيز جديد</button>⁠;
+}
 renderOrdersTable(container);
 } else if (activeTab === 'reports') {
 renderReportsView(container);
 } else {
+if (canAddInCurrentTab()) {
 actionArea.innerHTML = ⁠<button class="btn-action" onclick="openGenericModal('${activeTab}')"><i class="fas fa-plus"></i> إضافة عنصر جديد</button>⁠;
+}
 renderGenericTable(container, activeTab);
 }
 }
@@ -163,6 +238,12 @@ if (st === 'قيد الإنشاء' || !st) return '<span class="status-draft">ق
 if (st === 'تم القفل') return '<span class="status-locked">تم القفل</span>';
 if (st === 'مرحّل الفاتوره') return '<span class="status-invoiced">مرحّل الفاتوره</span>';
 return ⁠<span class="status-draft">${st}</span>⁠;
+}
+function canAddInCurrentTab() {
+if (currentUser.role === 'admin') return activeTab !== 'dashboard' && activeTab !== 'reports';
+if (currentUser.role === 'operator') return false;
+if (currentUser.role === 'accountant') return !['orders', 'plants', 'employees', 'permissions', 'settings'].includes(activeTab);
+return false;
 }
 function renderOrdersTable(container) {
 let ordersRows = '';
@@ -173,10 +254,32 @@ store.orders.forEach(o => {
 const orderLoads = store.loads.filter(l => l.orderNo === o.no);
 let deliveredSum = 0;
 orderLoads.forEach(l => deliveredSum += Number(l.qty || 0));
-let actionsHTML = ⁠<button class="btn-action" style="padding: 4px 8px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ حمولة (${orderLoads.length})</button> <button class="btn-action btn-gold" style="padding: 4px 8px; font-size:11px;" onclick="openFinalizeOrderModal('${o.no}')">⏹ قفل وإتمام</button> <button class="btn-action btn-blue" style="padding: 4px 8px; font-size:11px;" onclick="openEditOrderModal('${o.no}')"><i class="fas fa-edit"></i> تعديل</button> <button class="btn-action btn-danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteOrder('${o.no}')"><i class="fas fa-trash"></i> حذف</button>⁠;
+let actionsHTML = '';
+if (currentUser.role === 'admin') {
+actionsHTML += ⁠<button class="btn-action" style="padding: 4px 8px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ حمولة (${orderLoads.length})</button> ⁠;
+actionsHTML += ⁠<button class="btn-action btn-blue" style="padding: 4px 8px; font-size:11px;" onclick="openEditOrderModal('${o.no}')"><i class="fas fa-edit"></i> تعديل</button> ⁠;
+actionsHTML += ⁠<button class="btn-action btn-danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteOrder('${o.no}')"><i class="fas fa-trash"></i> حذف</button>⁠;
+}
+if (currentUser.role === 'operator') {
+if (o.status !== 'تم القفل' && o.status !== 'مرحّل الفاتوره') {
+actionsHTML += ⁠<button class="btn-action" style="padding: 4px 10px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ إضافة حمولة (${orderLoads.length})</button> ⁠;
+actionsHTML += ⁠<button class="btn-action btn-gold" style="padding: 4px 10px; font-size:11px;" onclick="openFinalizeOrderModal('${o.no}')">⏹ الكمية الفعلية والقفل</button>⁠;
+} else {
+actionsHTML += ⁠<span style="color:#eab308; font-weight:bold; font-size:11px;">تم قفل الأمر</span>⁠;
+}
+}
+if (currentUser.role === 'accountant') {
+actionsHTML += ⁠<span style="font-size:11px; color:var(--text-muted);">👁️ عرض وطباعة</span>⁠;
+if(o.status === 'تم القفل') {
+actionsHTML += ⁠ <button class="btn-action btn-blue" style="padding:3px 6px; font-size:10px;" onclick="updateOrderStatus('${o.no}', 'مرحّل الفاتوره')">ترحيل الفاتورة</button>⁠;
+}
+}
 let loadsHTML = '';
 orderLoads.forEach(l => {
-let loadActions = ⁠<button class="btn-action btn-gold" style="padding:3px 8px; font-size:11px;" onclick="printReceipt('${l.id}')"><i class="fas fa-print"></i> طباعة الوصل (A5)</button> <button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteLoad('${l.id}')">حذف</button>⁠;
+let loadActions = ⁠<button class="btn-action btn-gold" style="padding:3px 8px; font-size:11px;" onclick="printReceipt('${l.id}')"><i class="fas fa-print"></i> طباعة الوصل (A5)</button>⁠;
+if (currentUser.role === 'admin') {
+loadActions += ⁠ <button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteLoad('${l.id}')">حذف</button>⁠;
+}
 loadsHTML += ⁠<tr style="background: #080f15;"> <td>حمولة رقم: <b style="color:var(--primary-gold)">${l.loadIndex}</b></td> <td>وصل رقم: ${l.receiptNo}</td> <td>السائق: ${l.driver || 'علي حسين'}</td> <td>الآلية: ${l.vehicle}</td> <td colspan="2">الكمية المجهزة: ${l.qty} م³</td> <td colspan="2">${loadActions}</td> </tr>⁠;
 });
 ordersRows += ⁠<tr> <td><b>${o.no}</b></td> <td>${o.date}</td> <td>${o.customer}</td> <td>${o.site}</td> <td>${o.pour}</td> <td>${getStatusBadge(o.status)}</td> <td>${o.qty} م³ <br><small style="color:var(--primary-cyan)">فعلية: ${o.actualQty || deliveredSum} م³</small></td> <td>${actionsHTML}</td> </tr> ${loadsHTML}⁠;
@@ -191,7 +294,13 @@ if (items.length === 0) {
 rows = '<tr><td colspan="4" style="text-align:center; padding:15px;">لا توجد سجلات مسجلة في هذه القائمة.</td></tr>';
 } else {
 items.forEach((item, index) => {
-let ctrlBtns = ⁠<button class="btn-action btn-blue" style="padding:3px 8px; font-size:11px;" onclick="openGenericModal('${tabKey}', ${index})"><i class="fas fa-edit"></i> تعديل</button> <button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteGenericItem('${tabKey}', ${index})"><i class="fas fa-trash"></i> حذف</button>⁠;
+let ctrlBtns = '';
+if (currentUser.role === 'admin' || (currentUser.role === 'accountant' && canAddInCurrentTab())) {
+ctrlBtns += ⁠<button class="btn-action btn-blue" style="padding:3px 8px; font-size:11px;" onclick="openGenericModal('${tabKey}', ${index})"><i class="fas fa-edit"></i> تعديل</button> ⁠;
+ctrlBtns += ⁠<button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteGenericItem('${tabKey}', ${index})"><i class="fas fa-trash"></i> حذف</button>⁠;
+} else {
+ctrlBtns = ⁠<span style="font-size:11px; color:var(--text-muted);">عرض فقط</span>⁠;
+}
 rows += ⁠<tr> <td><b>#${index + 1}</b></td> <td>${item.name || item.title || item.code || 'سجل رقم ' + (index+1)}</td> <td>${item.details || item.phone || item.amount || item.date || '-'}</td> <td>${ctrlBtns}</td> </tr>⁠;
 });
 }
@@ -305,6 +414,13 @@ store[tabKey].push(newItem);
 }
 saveStore();
 closeModal();
+}
+function updateOrderStatus(no, newStatus) {
+const order = store.orders.find(o => o.no === no);
+if (order) {
+order.status = newStatus;
+saveStore();
+}
 }
 function deleteOrder(no) {
 if (confirm('هل أنت تأكد من حذف هذا الأمر وحمولاته بالكامل؟')) {
