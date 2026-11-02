@@ -3,673 +3,556 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>شركة صدى الإعمار | نظام إدارة الخرسانة الجاهزة الشامل</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>صدى الإعمار | إدارة الخرسانة الجاهزة</title>
 <style>
-:root {
---bg-dark: #090d12;
---panel-bg: #111a22;
---border-color: #29404d;
---primary-cyan: #42d8e8;
---primary-gold: #e4b84f;
---border-gold: #d4af37;
---text-white: #f3f7fa;
---text-muted: #93a7b3;
+:root{--bg:#090d12;--p:#111a22;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--muted:#93a7b3;--white:#f3f7fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Tahoma,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.side{background:#0d151c;padding:14px;border-left:1px solid var(--line)}
+.brand,.panel,.stat{background:var(--p);border:1px solid var(--line);border-radius:13px;padding:14px}
+.brand{text-align:center;margin-bottom:12px}
+.brand h3{margin:5px}
+.brand small{color:var(--cyan)}
+.nav{display:grid;gap:6px}
+.nav button,.btn{background:#102b34;color:var(--cyan);border:1px solid #287d89;border-radius:8px;padding:10px;text-align:right}
+.nav button.active{background:#173b45}
+.main{padding:18px;min-width:0}
+.top,.head,.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.top{margin-bottom:15px}
+.muted,.sub{color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.stat strong{display:block;color:var(--cyan);font-size:23px;margin-top:8px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:10px}
+.panel{margin-bottom:12px}
+.btn.primary{background:#147d77;color:white}
+.btn.gold{background:#352c18;color:#f1cc71;border-color:#6f5924}
+.btn.danger{background:#351a22;color:#ff8791;border-color:#71313d}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+td,th{padding:9px 7px;border-bottom:1px solid #293943;text-align:right;font-size:12px}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:#000c;display:grid;place-items:center;padding:12px;z-index:5;overflow:auto}
+.modal .panel{width:min(650px,100%);max-height:95vh;overflow:auto}
+.formgrid,.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.field{display:grid;gap:5px}
+.field label{font-size:12px;color:#b9c8d0}
+.field input,.field select{background:#080f15;color:white;border:1px solid var(--line);border-radius:7px;padding:10px;min-width:0}
+.full{grid-column:1/-1}
+.detail{background:#0b141b;padding:12px;border:1px solid var(--line);border-radius:8px}
+.detail span{display:block;color:var(--muted);font-size:11px}
+.detail strong{color:var(--cyan)}
+.toast{display:none;position:fixed;bottom:15px;left:15px;background:#17392f;padding:12px;border-radius:8px;z-index:9}
+.loadbox{background:#0b131a;padding:10px;border-radius:8px}
+.goldtext{color:var(--gold)}
+@media(max-width:800px){
+.app{grid-template-columns:1fr}
+.side{padding:8px}
+.brand{display:flex;align-items:center;gap:10px;text-align:right}
+.nav{display:flex;overflow:auto}
+.nav button{white-space:nowrap}
+.main{padding:10px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.layout{grid-template-columns:1fr}
 }
-￼ { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
-body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; overflow-x: hidden; }
-/* Login Screen */
-.login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #111a22 0%, #090d12 100%); }
-.login-card { background: var(--panel-bg); border: 2px solid var(--border-gold); border-radius: 16px; padding: 30px; width: 100%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
-.login-card h2 { color: var(--primary-gold); margin-bottom: 5px; font-size: 22px; }
-.login-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
-.form-group { text-align: right; margin-bottom: 15px; }
-.form-group label { display: block; font-size: 12px; margin-bottom: 6px; color: #b9c8d0; }
-.form-group input { width: 100%; padding: 11px; background: #080f15; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
-.form-group input:focus { border-color: var(--primary-gold); }
-.btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #c69214, #e6b800); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
-/* App Layout */
-.app-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
-.sidebar { background: #0d151c; padding: 15px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; max-height: 100vh; }
-.brand { text-align: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
-.brand h3 { color: var(--primary-gold); font-size: 16px; margin-top: 5px; }
-.brand small { color: var(--primary-cyan); font-size: 10px; }
-.user-badge { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: right; font-size: 11px; }
-.user-badge span { color: var(--primary-gold); font-weight: bold; display: block; font-size: 13px; }
-.nav-links { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.nav-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 12px; border-radius: 8px; text-align: right; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; width: 100%; }
-.nav-btn.active, .nav-btn:hover { background: #173b45; color: var(--primary-cyan); border-color: #287d89; }
-.btn-logout { background: #351a22; color: #ff8791; border: 1px solid #71313d; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 13px; width: 100%; text-align: center; }
-/* Main Content */
-.main-content { padding: 20px; overflow-y: auto; max-height: 100vh; }
-.header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-.card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
-.btn-action { background: #147d77; color: #fff; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
-.btn-gold { background: #352c18; color: #f1cc71; border: 1px solid #6f5924; }
-.btn-danger { background: #351a22; color: #ff8791; border: 1px solid #71313d; }
-.btn-blue { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 10px; border-bottom: 1px solid var(--border-color); text-align: right; font-size: 12px; }
-th { background: #080f15; color: var(--primary-cyan); }
-.hidden { display: none !important; }
-/* Status Colors */
-.status-draft { background: #ffffff; color: #000; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-.status-locked { background: #fef08a; color: #854d0e; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-.status-invoiced { background: #bbf7d0; color: #166534; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-/* Modal */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-body { background: var(--panel-bg); padding: 20px; border-radius: 12px; width: 90%; max-width: 550px; border: 1px solid var(--border-gold); max-height: 90vh; overflow-y: auto; }
+@media(max-width:480px){
+.formgrid,.details{grid-template-columns:1fr}
+.full{grid-column:auto}
+}
 </style>
 </head>
 <body>
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" class="login-screen">
-<div class="login-card">
-<i class="fas fa-building-circle-check" style="font-size: 45px; color: var(--primary-gold); margin-bottom: 10px;"></i>
-<h2>شركة صدى الإعمار</h2>
-<p>نظام إدارة الخرسانة الجاهزة والوصولات</p>
-<form onsubmit="handleLogin(event)">
-<div class="form-group">
-<label>اسم المستخدم</label>
-<input type="text" id="username" placeholder="أدخل اسم المستخدم" required autocomplete="off">
-</div>
-<div class="form-group">
-<label>كلمة المرور</label>
-<input type="password" id="password" placeholder="أدخل كلمة المرور" required>
-</div>
-<button type="submit" class="btn-login">تسجيل الدخول</button>
-</form>
-<div id="loginError" style="color: #ff8791; font-size: 12px; margin-top: 15px; display: none; font-weight: bold;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-<div style="margin-top: 20px; text-align: right; background: #080f15; padding: 12px; border-radius: 8px; font-size: 11px; color: var(--text-muted); border: 1px solid #1c2b36;">
-<strong style="color: var(--primary-gold); font-size: 12px; display:block; margin-bottom: 6px;">حسابات الدخول المعتمدة:</strong>
-• <b>صفحة المدير:</b> المستخدم <code>raed</code> / كلمة المرور <code>2002</code>
 
-• <b>صفحة المشغل:</b> المستخدم <code>raed1</code> / كلمة المرور <code>20021</code>
-
-• <b>صفحة المحاسب:</b> المستخدم <code>raed 2</code> / كلمة المرور <code>20022</code>
-</div>
-</div>
-</div>
-<!-- MAIN APP INTERFACE -->
-<div id="appLayout" class="app-layout hidden">
-<aside class="sidebar">
+<div class="app">
+<aside class="side">
 <div class="brand">
-<i class="fas fa-truck-monster" style="font-size: 28px; color: var(--primary-gold);"></i>
-<h3>صدى الإعمار</h3>
+<div style="font-size:25px;color:#e4b84f">▦</div>
+<h3>صدى الإعمار للكونكريت الجاهز</h3>
 <small>SADA AL-EMAR CONCRETE</small>
 </div>
-<div class="user-badge">
-المستخدم: <span id="displayUser">-</span>
-الصفحة: <small id="displayRole" style="color: var(--primary-cyan); display:block; margin-top:2px;">-</small>
-</div>
-<nav class="nav-links" id="sidebarNav"></nav>
-<button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+<nav class="nav" id="nav"></nav>
 </aside>
-<main class="main-content">
-<header class="header-bar">
-<h2 id="pageTitle">الرئيسية</h2>
-<div id="actionArea"></div>
+
+<main class="main">
+<header class="top">
+<div>
+<h2 id="pageTitle">لوحة التحكم</h2>
+<div class="sub">متابعة أوامر التجهيز والحمولات</div>
+</div>
+<div class="actions">
+<span id="today" class="muted"></span>
+<button class="btn primary" onclick="openOrder()">＋ أمر تجهيز جديد</button>
+</div>
 </header>
-<div id="mainViewContainer"></div>
+
+<section id="dashboard">
+<div class="stats">
+<div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
+<div class="stat">الحمولات<strong id="statLoads">0</strong></div>
+<div class="stat">المجهز م³<strong id="statQty">0</strong></div>
+<div class="stat">قيد التجهيز<strong id="statPending">0</strong></div>
+</div>
+<div class="layout">
+<div class="panel">
+<h3>أحدث الأوامر</h3>
+<div class="tablewrap"><table><tbody id="recentOrders"></tbody></table></div>
+</div>
+<div class="panel">
+<h3>ملخص العمل</h3>
+<div class="details">
+<div class="detail">العملاء<strong id="statCustomers">0</strong></div>
+<div class="detail">السائقون<strong id="statDrivers">0</strong></div>
+<div class="detail">الخلاطات<strong id="statVehicles">0</strong></div>
+</div>
+<p class="muted">التخزين محلي على هذا الجهاز.</p>
+</div>
+</div>
+</section>
+
+<section id="orders" class="hidden">
+<div class="panel">
+<div class="head">
+<h3>أوامر التجهيز والحمولات</h3>
+<button class="btn primary" onclick="openOrder()">＋ إضافة أمر</button>
+</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>المقاومة</th><th>م³</th><th>الإجراءات</th></tr></thead>
+<tbody id="ordersBody"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="customers" class="hidden">
+<div class="panel">
+<div class="head"><h3>العملاء</h3><button class="btn primary" onclick="openSimple('customer')">＋ إضافة عميل</button></div>
+<table><tbody id="customersBody"></tbody></table>
+</div>
+</section>
+
+<section id="drivers" class="hidden">
+<div class="panel">
+<div class="head"><h3>السائقون</h3><button class="btn primary" onclick="openSimple('driver')">＋ إضافة سائق</button></div>
+<table><tbody id="driversBody"></tbody></table>
+</div>
+</section>
+
+<section id="vehicles" class="hidden">
+<div class="panel">
+<div class="head"><h3>الآليات والخلاطات</h3><button class="btn primary" onclick="openSimple('vehicle')">＋ إضافة آلية</button></div>
+<table><tbody id="vehiclesBody"></tbody></table>
+</div>
+</section>
+
+<section id="reports" class="hidden">
+<div class="panel">
+<h3>التقارير والطباعة</h3>
+<div class="details">
+<div class="detail">الأوامر<strong id="reportOrders">0</strong></div>
+<div class="detail">الحمولات<strong id="reportLoads">0</strong></div>
+<div class="detail">المجهز<strong id="reportQty">0 م³</strong></div>
+<div class="detail">المتبقي<strong id="reportRemaining">0 م³</strong></div>
+</div>
+<button class="btn" onclick="print()">طباعة التقرير</button>
+</div>
+</section>
+
+<section id="settings" class="hidden">
+<div class="panel">
+<h3>الإعدادات</h3>
+<p class="muted">نسخة محلية. لا توجد مزامنة Supabase في هذا الملف.</p>
+<button class="btn danger" onclick="clearData()">مسح البيانات المحلية</button>
+</div>
+</section>
+
+<p class="muted" style="text-align:center">نظام إدارة الخرسانة الجاهزة · SADA AL-EMAR CONCRETE</p>
 </main>
 </div>
-<!-- DYNAMIC MODAL -->
-<div id="modalOverlay" class="modal-overlay hidden">
-<div class="modal-body">
-<h3 id="modalTitle" style="color: var(--primary-gold); margin-bottom: 15px;">إضافة / تعديل</h3>
-<form id="dynamicForm" onsubmit="handleFormSubmit(event)"></form>
+
+<div id="modal" class="modal hidden">
+<div class="panel">
+<div class="head">
+<h3 id="modalTitle">إضافة</h3>
+<button class="btn danger" onclick="closeModal()">إغلاق</button>
+</div>
+<form id="form" class="formgrid"></form>
 </div>
 </div>
+<div id="toast" class="toast"></div>
+
 <script>
-const USERS = {
-'raed': { pass: '2002', role: 'admin', name: 'المدير العام', title: 'صفحة المدير العام (كامل الصلاحيات)' },
-'raed1': { pass: '20021', role: 'operator', name: 'مشغّل المعمل', title: 'صفحة مشغّل المعمل (إدخال وإتمام والتجهيز)' },
-'raed 2': { pass: '20022', role: 'accountant', name: 'المحاسب', title: 'صفحة المحاسب (عرض، فواتير، أرشفة وتقارير)' }
-};
-const NAV_ITEMS = [
-{ id: 'dashboard', label: 'الرئيسية', icon: 'fa-home', roles: ['admin', 'operator', 'accountant'] },
-{ id: 'orders', label: 'أوامر التجهيز', icon: 'fa-file-invoice', roles: ['admin', 'operator', 'accountant'] },
-{ id: 'customers', label: 'العملاء', icon: 'fa-users', roles: ['admin', 'accountant'] },
-{ id: 'plants', label: 'المعامل', icon: 'fa-industry', roles: ['admin'] },
-{ id: 'drivers', label: 'السائقون', icon: 'fa-user-tie', roles: ['admin', 'operator'] },
-{ id: 'vehicles', label: 'الآليات / الخلاطات', icon: 'fa-truck-moving', roles: ['admin', 'operator'] },
-{ id: 'inventory', label: 'المخزون', icon: 'fa-boxes', roles: ['admin', 'operator'] },
-{ id: 'accounts', label: 'الحسابات', icon: 'fa-calculator', roles: ['admin', 'accountant'] },
-{ id: 'invoices', label: 'الفواتير', icon: 'fa-receipt', roles: ['admin', 'accountant'] },
-{ id: 'receipts', label: 'القبض', icon: 'fa-hand-holding-usd', roles: ['admin', 'accountant'] },
-{ id: 'expenses', label: 'المصروفات', icon: 'fa-wallet', roles: ['admin', 'accountant'] },
-{ id: 'employees', label: 'الموظفون', icon: 'fa-id-card', roles: ['admin'] },
-{ id: 'archive', label: 'المتابعة والأرشفة', icon: 'fa-archive', roles: ['admin', 'accountant'] },
-{ id: 'reports', label: 'التقارير', icon: 'fa-chart-line', roles: ['admin', 'operator', 'accountant'] },
-{ id: 'permissions', label: 'المستخدمون والصلاحيات', icon: 'fa-user-shield', roles: ['admin'] },
-{ id: 'settings', label: 'الإعدادات', icon: 'fa-cog', roles: ['admin'] }
-];
-let currentUser = null;
-let activeTab = 'dashboard';
-let store = {
-orders: [], loads: [], customers: [], plants: [], drivers: [], vehicles: [],
-inventory: [], accounts: [], invoices: [], receipts: [], expenses: [],
-employees: [], archive: [], permissions: [], settings: {},
-nextOrderNo: 129, nextReceiptNo: 1
-};
-try {
-const saved = localStorage.getItem('sada_app_data_v11');
-if (saved) {
-store = JSON.parse(saved);
+'use strict';
+
+const KEY='sada-concrete-v1';
+const blank=()=>({
+orders:[],loads:[],customers:[],drivers:[],vehicles:[],
+nextOrder:744,nextLoad:1
+});
+
+let data;
+try{
+data=JSON.parse(localStorage.getItem(KEY))||blank();
+}catch(e){
+data=blank();
 }
-} catch (e) {
-console.warn("Storage reset due to parse error");
-}
-function saveStore() {
-try {
-localStorage.setItem('sada_app_data_v11', JSON.stringify(store));
-} catch(e) {}
+
+['orders','loads','customers','drivers','vehicles'].forEach(k=>{
+if(!Array.isArray(data[k]))data[k]=[];
+});
+
+data.nextOrder=data.nextOrder||744;
+data.nextLoad=data.nextLoad||1;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+
+$('today').textContent=new Date().toLocaleDateString('ar-IQ');
+
+const pages={
+dashboard:'الرئيسية',
+orders:'أوامر التجهيز',
+customers:'العملاء',
+drivers:'السائقون',
+vehicles:'الآليات والخلاطات',
+reports:'التقارير',
+settings:'الإعدادات'
+};
+
+$('nav').innerHTML=Object.entries(pages).map(([k,v],i)=>
+`<button data-page="${k}" class="${i===0?'active':''}">${v}</button>`
+).join('');
+
+$('nav').onclick=e=>{
+let b=e.target.closest('[data-page]');
+if(b)navigate(b.dataset.page);
+};
+
+function navigate(p){
+Object.keys(pages).forEach(k=>$(k).classList.toggle('hidden',k!==p));
+$('pageTitle').textContent=pages[p];
+document.querySelectorAll('[data-page]').forEach(b=>
+b.classList.toggle('active',b.dataset.page===p)
+);
 render();
 }
-function handleLogin(e) {
-e.preventDefault();
-const u = document.getElementById('username').value.trim();
-const p = document.getElementById('password').value.trim();
-const err = document.getElementById('loginError');
-if (USERS[u] && USERS[u].pass === p) {
-currentUser = USERS[u];
-err.style.display = 'none';
-document.getElementById('loginScreen').classList.add('hidden');
-document.getElementById('appLayout').classList.remove('hidden');
-document.getElementById('displayUser').innerText = currentUser.name;
-document.getElementById('displayRole').innerText = currentUser.title;
-buildSidebarNav();
-switchTab('dashboard');
-} else {
-err.style.display = 'block';
+
+function toast(s){
+$('toast').textContent=s;
+$('toast').style.display='block';
+setTimeout(()=>$('toast').style.display='none',2200);
 }
-}
-function handleLogout() {
-currentUser = null;
-document.getElementById('username').value = '';
-document.getElementById('password').value = '';
-document.getElementById('appLayout').classList.add('hidden');
-document.getElementById('loginScreen').classList.remove('hidden');
-}
-function buildSidebarNav() {
-const nav = document.getElementById('sidebarNav');
-nav.innerHTML = '';
-NAV_ITEMS.forEach(item => {
-if (item.roles.includes(currentUser.role)) {
-nav.innerHTML += ⁠<button class="nav-btn ${item.id === activeTab ? 'active' : ''}" id="nav-${item.id}" onclick="switchTab('${item.id}')"> <i class="fas ${item.icon}"></i> ${item.label} </button>⁠;
-}
-});
-}
-function switchTab(tabId) {
-activeTab = tabId;
-document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-const activeBtn = document.getElementById(⁠nav-${tabId}⁠);
-if (activeBtn) activeBtn.classList.add('active');
-const item = NAV_ITEMS.find(i => i.id === tabId);
-document.getElementById('pageTitle').innerText = item ? item.label : '';
+
+function save(){
+localStorage.setItem(KEY,JSON.stringify(data));
 render();
 }
-function render() {
-const container = document.getElementById('mainViewContainer');
-const actionArea = document.getElementById('actionArea');
-actionArea.innerHTML = '';
-if (activeTab === 'dashboard') {
-let totalQty = 0;
-store.loads.forEach(l => totalQty += Number(l.qty || 0));
-container.innerHTML = ⁠<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;"> <div class="card">أوامر التجهيز<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.orders.length}</strong></div> <div class="card">إجمالي الحمولات<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.loads.length}</strong></div> <div class="card">المجهز (م³)<strong style="display:block; font-size:24px; color:var(--primary-gold); margin-top:8px;">${totalQty} م³</strong></div> </div> <div class="card"> <h3>أحدث أوامر التجهيز المنشأة</h3> <table> <thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون</th><th>الحالة</th><th>الكمية</th></tr></thead> <tbody> ${store.orders.slice(-5).reverse().map(o =>⁠<tr><td>￼{o.date}</td><td>￼{getStatusBadge(o.status)}</td><td>${o.qty} م³</td></tr>⁠).join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات مسجلة</td></tr>'} </tbody> </table> </div> ⁠;
-} else if (activeTab === 'orders') {
-if (currentUser.role === 'admin') {
-actionArea.innerHTML = ⁠<button class="btn-action" onclick="openNewOrderModal()"><i class="fas fa-plus"></i> إنشاء أمر تجهيز جديد</button>⁠;
+
+function tableRows(a,fn,n=4){
+return a.length?a.map(fn).join(''):
+`<tr><td colspan="${n}" style="text-align:center;color:#93a7b3;padding:18px">لا توجد بيانات</td></tr>`;
 }
-renderOrdersTable(container);
-} else if (activeTab === 'reports') {
-renderReportsView(container);
-} else {
-if (canAddInCurrentTab()) {
-actionArea.innerHTML = ⁠<button class="btn-action" onclick="openGenericModal('${activeTab}')"><i class="fas fa-plus"></i> إضافة عنصر جديد</button>⁠;
-}
-renderGenericTable(container, activeTab);
-}
-}
-function getStatusBadge(st) {
-if (st === 'قيد الإنشاء' || !st) return '<span class="status-draft">قيد الإنشاء</span>';
-if (st === 'تم القفل') return '<span class="status-locked">تم القفل</span>';
-if (st === 'مرحّل الفاتوره') return '<span class="status-invoiced">مرحّل الفاتوره</span>';
-return ⁠<span class="status-draft">${st}</span>⁠;
-}
-function canAddInCurrentTab() {
-if (currentUser.role === 'admin') return activeTab !== 'dashboard' && activeTab !== 'reports';
-if (currentUser.role === 'operator') return false;
-if (currentUser.role === 'accountant') return !['orders', 'plants', 'employees', 'permissions', 'settings'].includes(activeTab);
-return false;
-}
-function renderOrdersTable(container) {
-let ordersRows = '';
-if (store.orders.length === 0) {
-ordersRows = '<tr><td colspan="8" style="text-align:center; padding:15px;">لا توجد أوامر تجهيز مسجلة.</td></tr>';
-} else {
-store.orders.forEach(o => {
-const orderLoads = store.loads.filter(l => l.orderNo === o.no);
-let deliveredSum = 0;
-orderLoads.forEach(l => deliveredSum += Number(l.qty || 0));
-let actionsHTML = '';
-if (currentUser.role === 'admin') {
-actionsHTML += ⁠<button class="btn-action" style="padding: 4px 8px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ حمولة (${orderLoads.length})</button> ⁠;
-actionsHTML += ⁠<button class="btn-action btn-blue" style="padding: 4px 8px; font-size:11px;" onclick="openEditOrderModal('${o.no}')"><i class="fas fa-edit"></i> تعديل</button> ⁠;
-actionsHTML += ⁠<button class="btn-action btn-danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteOrder('${o.no}')"><i class="fas fa-trash"></i> حذف</button>⁠;
-}
-if (currentUser.role === 'operator') {
-if (o.status !== 'تم القفل' && o.status !== 'مرحّل الفاتوره') {
-actionsHTML += ⁠<button class="btn-action" style="padding: 4px 10px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ إضافة حمولة (${orderLoads.length})</button> ⁠;
-actionsHTML += ⁠<button class="btn-action btn-gold" style="padding: 4px 10px; font-size:11px;" onclick="openFinalizeOrderModal('${o.no}')">⏹ الكمية الفعلية والقفل</button>⁠;
-} else {
-actionsHTML += ⁠<span style="color:#eab308; font-weight:bold; font-size:11px;">تم قفل الأمر من قبل المشغل</span>⁠;
-}
-}
-if (currentUser.role === 'accountant') {
-actionsHTML += ⁠<span style="font-size:11px; color:var(--text-muted); margin-left:5px;">👁️ عرض وتدقيق</span>⁠;
-if(o.status === 'تم القفل') {
-actionsHTML += ⁠<button class="btn-action btn-blue" style="padding:3px 8px; font-size:11px;" onclick="updateOrderStatus('${o.no}', 'مرحّل الفاتوره')">ترحيل الفاتورة</button>⁠;
-}
-}
-let loadsHTML = '';
-orderLoads.forEach(l => {
-let loadActions = ⁠<button class="btn-action btn-gold" style="padding:3px 8px; font-size:11px;" onclick="printReceipt('${l.id}')"><i class="fas fa-print"></i> طباعة الوصل (A5)</button>⁠;
-if (currentUser.role === 'admin') {
-loadActions += ⁠ <button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteLoad('${l.id}')">حذف</button>⁠;
-}
-loadsHTML += ⁠<tr style="background: #080f15;"> <td>حمولة رقم: <b style="color:var(--primary-gold)">${l.loadIndex}</b></td> <td>وصل رقم: ${l.receiptNo}</td> <td>السائق: ${l.driver || 'علي حسين'}</td> <td>الآلية: ${l.vehicle}</td> <td colspan="2">الكمية المجهزة: ${l.qty} م³</td> <td colspan="2">${loadActions}</td> </tr>⁠;
-});
-ordersRows += ⁠<tr> <td><b>${o.no}</b></td> <td>${o.date}</td> <td>${o.customer}</td> <td>${o.site}</td> <td>${o.pour}</td> <td>${getStatusBadge(o.status)}</td> <td>${o.qty} م³ <br><small style="color:var(--primary-cyan)">فعلية: ${o.actualQty || deliveredSum} م³</small></td> <td>${actionsHTML}</td> </tr> ${loadsHTML}⁠;
-});
-}
-container.innerHTML = ⁠<div class="card"> <h3>جدول أوامر التجهيز والحمولات والكميات الفعلية (${currentUser.title})</h3> <div style="overflow-x:auto;"> <table> <thead> <tr> <th>رقم الأمر</th> <th>التاريخ</th> <th>اسم الزبون</th> <th>موقع الصب</th> <th>نوع الصب</th> <th>الحالة (الدلالة)</th> <th>الكمية المطلوبة / الفعلية</th> <th>الإجراءات المتاحة</th> </tr> </thead> <tbody>${ordersRows}</tbody> </table> </div> </div>⁠;
-}
-function renderGenericTable(container, tabKey) {
-const items = store[tabKey] || [];
-let rows = '';
-if (items.length === 0) {
-rows = '<tr><td colspan="4" style="text-align:center; padding:15px;">لا توجد سجلات مسجلة في هذه القائمة.</td></tr>';
-} else {
-items.forEach((item, index) => {
-let ctrlBtns = '';
-if (currentUser.role === 'admin' || (currentUser.role === 'accountant' && canAddInCurrentTab())) {
-ctrlBtns += ⁠<button class="btn-action btn-blue" style="padding:3px 8px; font-size:11px;" onclick="openGenericModal('${tabKey}', ${index})"><i class="fas fa-edit"></i> تعديل</button> ⁠;
-ctrlBtns += ⁠<button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteGenericItem('${tabKey}', ${index})"><i class="fas fa-trash"></i> حذف</button>⁠;
-} else {
-ctrlBtns = ⁠<span style="font-size:11px; color:var(--text-muted);">عرض فقط</span>⁠;
-}
-rows += ⁠<tr> <td><b>#${index + 1}</b></td> <td>${item.name || item.title || item.code || 'سجل رقم ' + (index+1)}</td> <td>${item.details || item.phone || item.amount || item.date || '-'}</td> <td>${ctrlBtns}</td> </tr>⁠;
-});
-}
-container.innerHTML = ⁠<div class="card"> <h3>جدول سجلات: ${NAV_ITEMS.find(i=>i.id===tabKey).label}</h3> <div style="overflow-x:auto;"> <table> <thead> <tr> <th>#</th> <th>البيان / الاسم</th> <th>التفاصيل / القيمة</th> <th>الإجراءات المتاحة</th> </tr> </thead> <tbody>${rows}</tbody> </table> </div> </div>⁠;
-}
-function openNewOrderModal() {
-document.getElementById('modalTitle').innerText = 'أمر تجهيز جديد (خاص بالمدير العام)';
-const form = document.getElementById('dynamicForm');
-form.innerHTML = ⁠<input type="hidden" name="formType" value="newOrder"> <div class="form-group"><label>اسم الزبون</label><input type="text" name="customer" value="شركة النور للمقاولات" required></div> <div class="form-group"><label>موقع الصب</label><input type="text" name="site" value="كربلاء - حي الحسين" required></div> <div class="form-group"><label>نوع الصب</label><input type="text" name="pour" value="سقوف" required></div> <div class="form-group"><label>المواصفة (رتبة الخرسانة)</label><input type="text" name="grade" value="C25" required></div> <div class="form-group"><label>الكمية التقديرية (م³)</label><input type="number" name="qty" value="50" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action" style="flex:1;">حفظ الأمر</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
-document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function openEditOrderModal(orderNo) {
-const order = store.orders.find(o => o.no === orderNo);
-if (!order) return;
-document.getElementById('modalTitle').innerText = 'تعديل أمر تجهيز ' + orderNo;
-const form = document.getElementById('dynamicForm');
-form.innerHTML = ⁠<input type="hidden" name="formType" value="editOrder"> <input type="hidden" name="orderNo" value="${orderNo}"> <div class="form-group"><label>اسم الزبون</label><input type="text" name="customer" value="${order.customer}" required></div> <div class="form-group"><label>موقع الصب</label><input type="text" name="site" value="${order.site}" required></div> <div class="form-group"><label>نوع الصب</label><input type="text" name="pour" value="${order.pour}" required></div> <div class="form-group"><label>المواصفة</label><input type="text" name="grade" value="${order.grade}" required></div> <div class="form-group"><label>الكمية (م³)</label><input type="number" name="qty" value="${order.qty}" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action" style="flex:1;">حفظ التغييرات</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
-document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function openAddLoadModal(orderNo) {
-const existingLoads = store.loads.filter(l => l.orderNo === orderNo);
-const nextIndex = existingLoads.length + 1;
-document.getElementById('modalTitle').innerText = 'إضافة حمولة للأمر ' + orderNo;
-const form = document.getElementById('dynamicForm');
-form.innerHTML = ⁠<input type="hidden" name="formType" value="newLoad"> <input type="hidden" name="orderNo" value="${orderNo}"> <div class="form-group"><label>رقم الحمولة التسلسلي</label><input type="number" name="loadIndex" value="${nextIndex}" readonly style="background:#080f15;"></div> <div class="form-group"><label>رقم الآلية (الخلاطة)</label><input type="text" name="vehicle" value="KRB-101" required></div> <div class="form-group"><label>رقم المضخة</label><input type="text" name="pump" value="P-01" required></div> <div class="form-group"><label>اسم السائق</label><input type="text" name="driver" value="علي حسين" required></div> <div class="form-group"><label>وقت النقلة</label><input type="text" name="time" value="02:00" required></div> <div class="form-group"><label>الكمية المجهزة (م³)</label><input type="number" name="qty" value="6" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action" style="flex:1;">تسجيل وطباعة الوصل (A5)</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
-document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function openFinalizeOrderModal(orderNo) {
-const order = store.orders.find(o => o.no === orderNo);
-const orderLoads = store.loads.filter(l => l.orderNo === orderNo);
-let currentDelivered = 0;
-orderLoads.forEach(l => currentDelivered += Number(l.qty || 0));
-document.getElementById('modalTitle').innerText = 'إدخال الكمية الفعلية وقفل الأمر ' + orderNo + ' (خاص بالمشغّل)';
-const form = document.getElementById('dynamicForm');
-form.innerHTML = ⁠<input type="hidden" name="formType" value="finalizeOrder"> <input type="hidden" name="orderNo" value="${orderNo}"> <div class="form-group"><label>الكمية التقديرية المطلوبة</label><input type="text" value="${order.qty} م³" readonly style="background:#080f15;"></div> <div class="form-group"><label>إجمالي المجهز بالحمولات فعلياً</label><input type="text" value="${currentDelivered} م³" readonly style="background:#080f15;"></div> <div class="form-group"><label>الكمية الفعلية النهائية المعتمدة (م³)</label><input type="number" name="actualQty" value="${currentDelivered || order.qty}" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action btn-gold" style="flex:1;">اعتماد وقفل الأمر (أصفر فاتح)</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
-document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function openGenericModal(tabKey, editIndex = null) {
-const isEdit = editIndex !== null;
-const item = isEdit ? store[tabKey][editIndex] : {};
-document.getElementById('modalTitle').innerText = (isEdit ? 'تعديل سجل في ' : 'إضافة سجل جديد في ') + NAV_ITEMS.find(i=>i.id===tabKey).label;
-const form = document.getElementById('dynamicForm');
-if (tabKey === 'orders') {
-openNewOrderModal();
-return;
-}
-form.innerHTML = ⁠<input type="hidden" name="tabKey" value="${tabKey}"> <input type="hidden" name="editIndex" value="${isEdit ? editIndex : ''}"> <div class="form-group"><label>الاسم / البيان الرئيسي</label><input type="text" name="name" value="${item.name || ''}" required></div> <div class="form-group"><label>التفاصيل / الهاتف / القيمة</label><input type="text" name="details" value="${item.details || ''}" required></div> <div style="display:flex; gap:10px; margin-top:20px;"> <button type="submit" class="btn-action" style="flex:1;">${isEdit ? 'حفظ التعديل' : 'إضافة السجل'}</button> <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button> </div>⁠;
-document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function closeModal() {
-document.getElementById('modalOverlay').classList.add('hidden');
-}
-function handleFormSubmit(e) {
-e.preventDefault();
-const formData = new FormData(e.target);
-const formType = formData.get('formType');
-const tabKey = formData.get('tabKey');
-if (formType === 'newOrder') {
-const newOrder = {
-no: '000' + store.nextOrderNo++,
-customer: formData.get('customer'),
-site: formData.get('site'),
-pour: formData.get('pour'),
-grade: formData.get('grade'),
-qty: formData.get('qty'),
-actualQty: 0,
-status: 'قيد الإنشاء',
-date: '2026-11-01'
-};
-store.orders.push(newOrder);
-} else if (formType === 'editOrder') {
-const orderNo = formData.get('orderNo');
-const order = store.orders.find(o => o.no === orderNo);
-if (order) {
-order.customer = formData.get('customer');
-order.site = formData.get('site');
-order.pour = formData.get('pour');
-order.grade = formData.get('grade');
-order.qty = formData.get('qty');
-}
-} else if (formType === 'newLoad') {
-const newLoad = {
-id: Date.now().toString(),
-orderNo: formData.get('orderNo'),
-loadIndex: formData.get('loadIndex'),
-receiptNo: String(store.nextReceiptNo++).padStart(4, '0'),
-vehicle: formData.get('vehicle'),
-pump: formData.get('pump'),
-driver: formData.get('driver'),
-time: formData.get('time'),
-qty: formData.get('qty'),
-date: '2026-11-01'
-};
-store.loads.push(newLoad);
-} else if (formType === 'finalizeOrder') {
-const orderNo = formData.get('orderNo');
-const order = store.orders.find(o => o.no === orderNo);
-if (order) {
-order.actualQty = formData.get('actualQty');
-order.status = 'تم القفل';
-}
-} else if (tabKey) {
-const editIndex = formData.get('editIndex');
-const newItem = { name: formData.get('name'), details: formData.get('details') };
-if (!store[tabKey]) store[tabKey] = [];
-if (editIndex !== '' && editIndex !== null) {
-store[tabKey][editIndex] = newItem;
-} else {
-store[tabKey].push(newItem);
-}
-}
-saveStore();
-closeModal();
-}
-function updateOrderStatus(no, newStatus) {
-const order = store.orders.find(o => o.no === no);
-if (order) {
-order.status = newStatus;
-saveStore();
-}
-}
-function deleteOrder(no) {
-if (confirm('هل أنت تأكد من حذف هذا الأمر وحمولاته بالكامل؟')) {
-store.orders = store.orders.filter(o => o.no !== no);
-store.loads = store.loads.filter(l => l.orderNo !== no);
-saveStore();
-}
-}
-function deleteLoad(id) {
-if (confirm('حذف هذه الحمولة؟')) {
-store.loads = store.loads.filter(l => l.id !== id);
-saveStore();
-}
-}
-function deleteGenericItem(tabKey, index) {
-if (confirm('حذف هذا السجل نهائياً؟')) {
-store[tabKey].splice(index, 1);
-saveStore();
-}
-}
-function renderReportsView(container, filterFrom = '2026-11-01', filterTo = '2026-11-01') {
-const filteredOrders = store.orders.filter(o => {
-if (!filterFrom && !filterTo) return true;
-const d = o.date || '2026-11-01';
-if (filterFrom && d < filterFrom) return false;
-if (filterTo && d > filterTo) return false;
-return true;
-});
-let totalRequestedQty = 0;
-let totalDeliveredQty = 0;
-let ordersReportRows = '';
-if (filteredOrders.length === 0) {
-ordersReportRows = '<tr><td colspan="6" style="text-align:center; padding:20px;">لا توجد أوامر تجهيز ضمن الفترة المحددة.</td></tr>';
-} else {
-filteredOrders.forEach(o => {
-totalRequestedQty += Number(o.qty || 0);
-const orderLoads = store.loads.filter(l => l.orderNo === o.no);
-let orderDelivered = 0;
-orderLoads.forEach(l => orderDelivered += Number(l.qty || 0));
-let finalDelivered = Number(o.actualQty || orderDelivered);
-totalDeliveredQty += finalDelivered;
-let loadsDetailsRows = '';
-if (orderLoads.length === 0) {
-loadsDetailsRows = '<tr><td colspan="3" style="color:#94a3b8; font-style:italic;">لا توجد حمولات مسجلة.</td></tr>';
-} else {
-orderLoads.forEach(l => {
-loadsDetailsRows += ⁠<tr> <td style="text-align:right;"><i class="fas fa-arrow-left" style="color:var(--primary-gold); margin-left:5px;"></i> ${l.loadIndex}- حمولة: <b>${l.driver || 'علي حسين'}</b></td> <td style="text-align:center;">نقلة في ${l.time || '02:00'}</td> <td style="text-align:center; font-weight:bold;">${l.qty}.00 م³</td> </tr>⁠;
-});
-}
-ordersReportRows += ⁠<tr> <td style="text-align:center; font-weight:bold;">${o.no}</td> <td style="text-align:center;">${o.date}</td> <td> <b>${o.customer}</b> - ${o.site} <table style="width:100%; margin-top:6px; background:#0f172a; border-radius:6px; color:#fff;"> ${loadsDetailsRows} </table> </td> <td style="text-align:center;"><b>${o.grade || 'C30'} / ${o.pour}</b></td> <td style="text-align:center; font-weight:bold;">${Number(o.qty).toFixed(2)}</td> <td style="text-align:center; font-weight:bold; color:#16a34a;">${finalDelivered.toFixed(2)} م³</td> </tr>⁠;
-});
-}
-container.innerHTML = `
-<div class="card" style="background:#fff; color:#000; padding:20px; border-radius:12px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1e293b; padding-bottom:12px; margin-bottom:15px;">
-<div>
-<h2 style="color:#0f172a; font-size:18px; font-weight:900;">شركة الركيزة المتحدة للخرسانة الجاهزة</h2>
-<p style="font-size:12px; color:#475569; font-weight:bold; margin-top:3px;">شركة صدى الإعمار للخرسانة والكونكريت الجاهز - تقرير التجهيزات والحمولات - فرع (B)</p>
-</div>
-<div style="text-align:left;">
-<div style="background:#1e293b; color:#ffd700; padding:4px 12px; border-radius:6px; font-weight:bold; font-size:12px; display:inline-block;">SADA AL-EMAR</div>
-</div>
-</div>
-<div style="display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; padding:10px 15px; border-radius:8px; margin-bottom:15px; flex-wrap:wrap; gap:10px;" class="no-print">
-<div style="display:flex; align-items:center; gap:10px;">
-<label style="font-size:12px; font-weight:bold;">الفترة من:</label>
-<input type="date" id="repFrom" value="${filterFrom}" style="padding:5px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
-<label style="font-size:12px; font-weight:bold;">إلى:</label>
-<input type="date" id="repTo" value="${filterTo}" style="padding:5px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
-<button class="btn-action" onclick="applyReportFilter()"><i class="fas fa-filter"></i> تصفية التاريخ</button>
-</div>
-<div>
-<button class="btn-action btn-gold" onclick="window.print()"><i class="fas fa-print"></i> طباعة التقرير (A4)</button>
-</div>
-</div>
-<div style="display:flex; justify-content:space-between; background:#e2e8f0; padding:10px 15px; border-radius:8px; font-weight:bold; font-size:13px; margin-bottom:15px;">
-<div>عدد الطلبات: <span style="color:#dc2626;">￼
-￼{totalRequestedQty.toFixed(2)} م³</span></div>
-<div>إجمالي المجهز فعلياً: <span style="color:#16a34a;">${totalDeliveredQty.toFixed(2)} م³</span></div>
-</div>
-<table style="width:100%; border-collapse:collapse; background:#fff; color:#000;">
-<thead>
-<tr style="background:#0f172a; color:#fff;">
-<th style="padding:8px; text-align:center;">رقم</th>
-<th style="padding:8px; text-align:center;">التاريخ</th>
-<th style="padding:8px; text-align:right;">اسم الزبون والموقع / الحمولات</th>
-<th style="padding:8px; text-align:center;">المواصفة والصب</th>
-<th style="padding:8px; text-align:center;">المطلوب (م³)</th>
-<th style="padding:8px; text-align:center;">المجهز (م³)</th>
+
+function render(){
+let qty=data.loads.reduce((s,x)=>s+(+x.qty||0),0);
+let est=data.orders.reduce((s,x)=>s+(+x.qty||0),0);
+
+$('statOrders').textContent=data.orders.length;
+$('statLoads').textContent=data.loads.length;
+$('statQty').textContent=fmt(qty);
+$('statPending').textContent=data.orders.filter(x=>x.status!=='مكتمل').length;
+
+$('statCustomers').textContent=data.customers.length;
+$('statDrivers').textContent=data.drivers.length;
+$('statVehicles').textContent=data.vehicles.length;
+
+$('reportOrders').textContent=data.orders.length;
+$('reportLoads').textContent=data.loads.length;
+$('reportQty').textContent=fmt(qty)+' م³';
+$('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' م³';
+
+$('recentOrders').innerHTML=tableRows(
+data.orders.slice(-5).reverse(),
+o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${esc(o.qty)} م³</td></tr>`,
+4
+);
+
+$('ordersBody').innerHTML=tableRows(
+data.orders.slice().reverse(),
+o=>{
+let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
+return `
+<tr>
+<td>${esc(o.no)}</td><td>${esc(o.date)}</td>
+<td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
+<td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${esc(o.qty)}</td>
+<td><div class="actions">
+<button class="btn" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>
+<button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
+<button class="btn" onclick="editOrder('${esc(o.no)}')">تعديل</button>
+<button class="btn danger" onclick="delOrder('${esc(o.no)}')">حذف</button>
+</div></td>
 </tr>
-</thead>
-<tbody>
-${ordersReportRows}
-</tbody>
-</table>
-<div style="margin-top:20px; text-align:left; font-weight:bold; font-size:13px; border-top:2px solid #cbd5e1; padding-top:10px;">
-المجموع النهائي للفترة: <span style="color:#16a34a;">￼{totalRequestedQty.toFixed(2)} م³</span>
-</div>
-</div>
-`;
+<tr><td colspan="8"><div class="loadbox">
+<b class="goldtext">حمولات الأمر ${esc(o.no)}</b>
+${ls.length?`<table><tbody>${ls.map(l=>`
+<tr>
+<td>حمولة ${esc(l.no)}</td>
+<td>${esc(l.driver||'—')}</td>
+<td>${esc(l.vehicle||'—')}</td>
+<td>${esc(l.qty)} م³</td>
+<td>
+<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة الوصل</button>
+<button class="btn" onclick="editLoad('${esc(l.no)}')">تعديل</button>
+<button class="btn danger" onclick="delLoad('${esc(l.no)}')">حذف</button>
+</td>
+</tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات بعد.</p>'}
+</div></td></tr>`;
+},8
+);
+
+[
+['customers','customersBody',['name','phone','address']],
+['drivers','driversBody',['name','phone','note']],
+['vehicles','vehiclesBody',['name','capacity','kind']]
+].forEach(([k,id,fs])=>{
+$(id).innerHTML=tableRows(data[k],x=>
+`<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
+<td><button class="btn danger" onclick="delSimple('${k}','${esc(x.id)}')">حذف</button></td></tr>`
+);
+});
 }
-function applyReportFilter() {
-const f = document.getElementById('repFrom').value;
-const t = document.getElementById('repTo').value;
-renderReportsView(document.getElementById('mainViewContainer'), f, t);
+
+function openForm(title,fields,cb){
+$('modalTitle').textContent=title;
+$('form').innerHTML=fields.map(f=>`
+<div class="field ${f.full?'full':''}">
+<label>${f.label}</label>
+${f.options?
+`<select name="${f.name}">${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
+`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} value="${esc(f.value??'')}">`}
+</div>`).join('')+
+'<div class="full"><button class="btn primary" type="submit">حفظ</button></div>';
+
+$('form').onsubmit=e=>{
+e.preventDefault();
+cb(Object.fromEntries(new FormData(e.currentTarget)));
+};
+$('modal').classList.remove('hidden');
 }
-function printReceipt(loadId) {
-const load = store.loads.find(l => l.id === loadId);
-const order = store.orders.find(o => o.no === load.orderNo);
-if (!load || !order) return;
-const win = window.open('', '_blank');
-win.document.write(`
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<title>وصل تجهيز خرسانة - ${load.receiptNo}</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+function closeModal(){$('modal').classList.add('hidden')}
+
+function openOrder(){
+openForm('أمر تجهيز جديد',[
+{name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
+{name:'phone',label:'الهاتف'},
+{name:'site',label:'موقع الصب',required:true},
+{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
+{name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
+{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
+{name:'price',label:'سعر المتر',type:'number'},
+{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
+],v=>{
+v.no=String(data.nextOrder++).padStart(7,'0');
+v.status='قيد التجهيز';
+data.orders.push(v);
+save();closeModal();toast('تم حفظ الأمر');
+});
+}
+
+function openLoad(no){
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('إضافة حمولة للأمر '+no,[
+{name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},
+{name:'vehicle',label:'رقم الآلية',options:['غير محدد',...data.vehicles.map(x=>x.name)]},
+{name:'qty',label:'الكمية م³',type:'number',required:true,value:Math.min(9,+o.qty||9)},
+{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},
+{name:'pump',label:'رقم المضخة'},
+{name:'status',label:'الحالة',options:['تم التسجيل','في الطريق','تم التسليم']}
+],v=>{
+v.orderNo=o.no;
+v.no=String(data.nextLoad++).padStart(7,'0');
+v.date=new Date().toISOString().slice(0,10);
+data.loads.push(v);
+save();closeModal();toast('تم حفظ الحمولة');
+});
+}
+
+function openSimple(t){
+let c={
+customer:['العملاء','customers',[['name','اسم العميل'],['phone','الهاتف'],['address','العنوان']]],
+driver:['السائقون','drivers',[['name','اسم السائق'],['phone','الهاتف'],['note','ملاحظات']]],
+vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity','السعة م³'],['kind','النوع']]]
+}[t];
+
+openForm('إضافة '+c[0],c[2].map(([name,label])=>({
+name,label,required:name==='name'
+})),v=>{
+v.id=Date.now();
+data[c[1]].push(v);
+save();closeModal();toast('تم الحفظ');
+});
+}
+
+function editOrder(no){
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o)return;
+openForm('تعديل أمر '+no,
+['customer','phone','site','pour','grade','qty','price','date'].map(k=>({
+name:k,label:k,value:o[k]||'',required:k==='customer'||k==='site'
+})),
+v=>{Object.assign(o,v);save();closeModal();}
+);
+}
+
+function editLoad(no){
+let l=data.loads.find(x=>String(x.no)===String(no));
+if(!l)return;
+openForm('تعديل حمولة '+no,
+['driver','vehicle','qty','time','pump','status'].map(k=>({
+name:k,label:k,value:l[k]||''
+})),
+v=>{Object.assign(l,v);save();closeModal();}
+);
+}
+
+function delOrder(no){
+if(confirm('حذف الأمر وحمولاته؟')){
+data.orders=data.orders.filter(x=>String(x.no)!==no);
+data.loads=data.loads.filter(x=>String(x.orderNo)!==no);
+save();
+}
+}
+
+function delLoad(no){
+if(confirm('حذف الحمولة؟')){
+data.loads=data.loads.filter(x=>String(x.no)!==no);
+save();
+}
+}
+
+function delSimple(k,id){
+if(confirm('حذف السجل؟')){
+data[k]=data[k].filter(x=>String(x.id)!==id);
+save();
+}
+}
+
+function printDoc(title,content){
+let w=window.open('','_blank');
+if(!w){toast('اسمح بالنوافذ المنبثقة');return}
+w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><body>${content}<script>onload=()=>setTimeout(()=>print(),250)<\/script></body></html>`);
+w.document.close();
+}
+
+function receiptOrder(no){
+let o=data.orders.find(x=>String(x.no)===no);
+if(!o)return;
+printDoc('وصل أمر',`
 <style>
-@page { size: A5 portrait; margin: 5mm; }
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
-body { background: #fff; color: #0f172a; direction: rtl; }
-.receipt-container { width: 100%; max-width: 148mm; margin: 0 auto; background: #fff; padding: 2px; }
-.border-outer { border: 3px double #d4af37; padding: 10px; position: relative; min-height: 200mm; display: flex; flex-direction: column; justify-content: space-between; }
-.header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
-.brand-logo-area { display: flex; align-items: center; gap: 8px; }
-.logo-box { width: 45px; height: 45px; background: linear-gradient(135deg, #111, #333); border: 2px solid #d4af37; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #d4af37; font-weight: bold; font-size: 10px; }
-.brand-titles h1 { font-size: 16px; color: #c69214; font-weight: 900; line-height: 1.1; }
-.brand-titles h2 { font-size: 11px; color: #1e293b; font-weight: bold; }
-.brand-titles p { font-size: 8px; color: #64748b; font-weight: 600; }
-.values-pills { display: flex; gap: 5px; margin-top: 3px; }
-.pill { font-size: 8px; font-weight: bold; color: #334155; background: #f1f5f9; padding: 1px 4px; border-radius: 8px; border: 1px solid #cbd5e1; }
-.pill i { color: #c69214; }
-.header-truck-img { text-align: center; }
-.truck-illustration { font-size: 30px; color: #334155; }
-.slogan { font-size: 9px; font-weight: bold; color: #0f172a; margin-top: 2px; }
-.title-banner { background: linear-gradient(135deg, #000, #1e293b); color: #fff; text-align: center; padding: 5px 10px; border-radius: 15px; margin: 8px 20px 10px 20px; border: 2px solid #d4af37; }
-.title-banner h2 { font-size: 15px; color: #ffda66; }
-.title-banner span { font-size: 8px; letter-spacing: 1px; color: #cbd5e1; display: block; }
-.meta-boxes { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.meta-box { border: 2px solid #cbd5e1; border-radius: 6px; overflow: hidden; width: 32%; text-align: center; background: #f8fafc; }
-.meta-box .title { background: #e2e8f0; font-weight: bold; font-size: 10px; padding: 2px; color: #1e293b; }
-.meta-box .value { font-size: 13px; font-weight: 800; padding: 3px; color: #0f172a; }
-.meta-box.doc-no .value { color: #dc2626; }
-.details-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-.details-table td { border: 2px solid #cbd5e1; padding: 5px 8px; font-size: 11px; }
-.details-table td.label-col { background-color: #f1f5f9; font-weight: bold; color: #1e293b; width: 30%; text-align: right; }
-.details-table td.val-col { font-weight: 700; color: #0f172a; text-align: center; }
-.dispatch-section { border: 2px solid #000; border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
-.dispatch-header { background: #000; color: #fff; text-align: center; padding: 4px; font-size: 12px; font-weight: bold; }
-.dispatch-body { display: flex; align-items: center; padding: 8px; background: #fff; gap: 8px; }
-.dispatch-card { border: 2px solid #cbd5e1; border-radius: 6px; background: #f8fafc; flex: 1; text-align: center; overflow: hidden; }
-.dispatch-card .head { background: #e2e8f0; padding: 3px; font-weight: bold; font-size: 10px; color: #1e293b; }
-.dispatch-card .body-val { font-size: 32px; font-weight: 900; color: #000; padding: 4px 0; line-height: 1; }
-.signatures-area { display: flex; justify-content: space-between; margin-top: 10px; padding: 0 10px; }
-.sig-box { text-align: center; width: 42%; }
-.sig-box p { font-weight: bold; font-size: 11px; color: #1e293b; margin-bottom: 22px; }
-.sig-line { border-bottom: 2px dashed #94a3b8; width: 100%; }
-.footer-area { margin-top: auto; padding-top: 6px; border-top: 2px solid #e2e8f0; }
-.skyline-img { text-align: center; color: #94a3b8; font-size: 14px; letter-spacing: 4px; margin-bottom: 2px; }
-.footer-contacts { display: flex; justify-content: space-between; align-items: center; font-size: 8px; font-weight: bold; color: #334155; }
-.qr-placeholder { width: 30px; height: 30px; border: 1px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 6px; }
+body{font-family:Tahoma;padding:20px}
+.r{border:3px double #b28a29;padding:20px}
+h2,h3{text-align:center}
+p{border-bottom:1px solid #ddd;padding:8px}
 </style>
-</head>
-<body onload="setTimeout(() => window.print(), 350)">
-<div class="receipt-container">
-<div class="border-outer">
-<div>
-<div class="header">
-<div class="brand-logo-area">
-<div class="logo-box"><i class="fas fa-building" style="font-size: 18px;"></i></div>
-<div class="brand-titles">
-<h1>شركة صدى الاعمار</h1>
-<h2>للخرسانة والكونكريت الجاهز</h2>
-<p>SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</p>
-<div class="values-pills">
-<span class="pill"><i class="fas fa-check-circle"></i> جودة</span>
-<span class="pill"><i class="fas fa-handshake"></i> التزام</span>
-<span class="pill"><i class="fas fa-shield-alt"></i> ثقة</span>
-</div>
-</div>
-</div>
-<div class="header-truck-img">
-<i class="fas fa-truck-monster truck-illustration"></i>
-<div class="slogan">خرسانة أقوى .. لنستاع أعمر</div>
-</div>
-</div>
-<div class="title-banner">
-<h2>وصل تجهيز خرسانة</h2>
-<span>CONCRETE DELIVERY RECEIPT</span>
-</div>
-<div class="meta-boxes">
-<div class="meta-box doc-no">
-<div class="title">رقم الوصل</div>
-<div class="value">￼
-￼
-￼
-￼
-￼
-￼{load.date || '2026-11-01'}</div>
-</div>
-</div>
-<table class="details-table">
-<tr><td class="label-col">اسم الزبون</td><td class="val-col">￼
-￼{order.site}</td></tr>
-<tr><td class="label-col">نوع الصب</td><td class="val-col">￼
-￼{order.grade}</td></tr>
-<tr><td class="label-col">رقم الآلية</td><td class="val-col">￼
-￼{load.pump || 'P-01'}</td></tr>
-<tr><td class="label-col">اسم السائق</td><td class="val-col">￼
-￼{load.qty}</td></tr>
-</table>
-<div class="dispatch-section">
-<div class="dispatch-header">تفاصيل التجهيز</div>
-<div class="dispatch-body">
-<div style="flex:1; text-align:center;">
-<i class="fas fa-truck-moving" style="font-size:28px; color:#1e293b;"></i>
-<div style="font-size:8px; font-weight:bold; margin-top:2px;">الجودة في كل متر مكعب</div>
-</div>
-<div class="dispatch-card">
-<div class="head">رقم الحمولة</div>
-<div class="body-val">￼
-￼
-￼
-￼
-￼{load.qty}</div>
-</div>
-</div>
-</div>
-<div class="signatures-area">
-<div class="sig-box"><p>توقيع المعمل</p><div class="sig-line"></div></div>
-<div class="sig-box"><p>توقيع الزبون</p><div class="sig-line"></div></div>
-</div>
-</div>
-<div class="footer-area">
-<div class="skyline-img"><i class="fas fa-industry"></i> <i class="fas fa-city"></i> <i class="fas fa-truck"></i></div>
-<div class="footer-contacts">
-<div><i class="fas fa-phone" style="color:#c69214"></i> 0770 123 4567 - 0780 123 4567
-<i class="fas fa-globe" style="color:#c69214"></i> www.sada-alaamar.com</div>
-<div style="text-align: center;"><strong>معاً نبني مستقبل أفضل</strong>
-<span style="font-size: 7px; color: #64748b;">BUILDING A BETTER TOMORROW</span></div>
-<div class="qr-placeholder"><i class="fas fa-qrcode" style="font-size: 14px;"></i><span style="font-size:5px;">التحقق</span></div>
-</div>
-</div>
-</div>
-</div>
-</body>
-</html>
-`);
-win.document.close();
+<div class="r">
+<h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+<h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3>
+<p>التاريخ: ${esc(o.date)}</p>
+<p>العميل: ${esc(o.customer)}</p>
+<p>الهاتف: ${esc(o.phone)}</p>
+<p>موقع الصب: ${esc(o.site)}</p>
+<p>نوع الصب: ${esc(o.pour)} — المقاومة: ${esc(o.grade)}</p>
+<p>الكمية التقديرية: ${esc(o.qty)} م³</p>
+<p>توقيع الزبون: __________　 توقيع المسؤول: __________</p>
+</div>`);
 }
+
+function receiptLoad(no){
+let l=data.loads.find(x=>String(x.no)===no);
+let o=l&&data.orders.find(x=>String(x.no)===String(l.orderNo));
+if(!l||!o)return toast('الحمولة أو أمرها غير موجود');
+
+let d=l.date||o.date||'—';
+
+printDoc('وصل تجهيز خرسانة',`
+<style>
+@page{size:A5 portrait;margin:6mm}
+*{box-sizing:border-box}
+body{font-family:Tahoma;color:#111;margin:0}
+.r{border:3px double #b28a29;padding:5mm;min-height:185mm}
+.head{text-align:center;border-bottom:3px solid #b28a29;padding-bottom:9px}
+.head h2{color:#a47b20;margin:4px}
+.en{font-size:10px}
+.title{text-align:center;background:#171717;color:#e7c36b;border:2px solid #b28a29;padding:9px;margin:10px 0;font-size:20px;font-weight:bold}
+.top{display:flex;gap:8px}
+.top div{border:1px solid #777;flex:1;text-align:center;padding:8px;font-weight:bold}
+.no{color:#a51d20;font-size:21px}
+.data{width:100%;border-collapse:collapse;margin:9px 0}
+.data td{border:1px solid #777;padding:8px;font-size:13px}
+.data td:first-child{background:#eee;font-weight:bold;width:30%}
+.section{text-align:center;background:#171717;color:#e7c36b;padding:8px;border:2px solid #b28a29}
+.big{display:flex;gap:8px;border:2px solid #b28a29;padding:8px}
+.big div{flex:1;border:1px solid #777;text-align:center;min-height:42mm}
+.big b{display:block;background:#eee;padding:8px}
+.big strong{display:block;font-size:42px;padding:12px}
+.sign{display:flex;gap:10px;margin-top:12px}
+.sign div{border:1px solid #777;flex:1;text-align:center;padding:18px 5px 28px;font-weight:bold}
+.foot{text-align:center;border-top:2px solid #b28a29;margin-top:12px;padding-top:7px;font-size:10px}
+</style>
+<div class="r">
+<div class="head">
+<h2>شركة صدى الإعمار</h2>
+<b>للخرسانة والكونكريت الجاهز</b>
+<div class="en">SADA AL-EMAR CONCRETE</div>
+<div class="en">BUILDING A BETTER TOMORROW</div>
+</div>
+<div class="title">وصل تجهيز خرسانة</div>
+<div class="top">
+<div>التاريخ<br>${esc(d)}</div>
+<div>رقم الوصل<br><span class="no">${esc(l.no)}</span></div>
+</div>
+<table class="data">
+<tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
+<tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
+<tr><td>نوع الصب</td><td>${esc(o.pour)}</td></tr>
+<tr><td>المواصفة</td><td>${esc(o.grade)}</td></tr>
+<tr><td>رقم الآلية</td><td>${esc(l.vehicle||'—')}</td></tr>
+<tr><td>رقم المضخة</td><td>${esc(l.pump||'—')}</td></tr>
+<tr><td>الكمية م³</td><td>${esc(l.qty)}</td></tr>
+</table>
+<div class="section">تفاصيل التجهيز</div>
+<div class="big">
+<div><b>رقم الحمولة</b><strong>${esc(l.no)}</strong></div>
+<div><b>الكمية المجهزة م³</b><strong>${esc(l.qty)}</strong></div>
+</div>
+<div class="sign">
+<div>توقيع الزبون<br><br>____________</div>
+<div>توقيع المعمل<br><br>____________</div>
+</div>
+<div class="foot">
+<b>صدى الإعمار للكونكريت الجاهز</b><br>
+وصل تجهيز رسمي — www.sada-alaamar.com
+</div>
+</div>`);
+}
+
+function clearData(){
+if(confirm('حذف كل البيانات المحلية؟')){
+localStorage.removeItem(KEY);
+data=blank();
+save();
+}
+}
+
+render();
 </script>
 </body>
 </html>
