@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>صدى الإعمار | إدارة الخرسانة الجاهزة</title>
+<title>صدى الإعمار | إدارة الخرسانة الجاهزة والوصولات</title>
 <style>
 :root{--bg:#090d12;--p:#111a22;--line:#29404d;--cyan:#42d8e8;--gold:#e4b84f;--muted:#93a7b3;--white:#f3f7fa}
 *{box-sizing:border-box}
@@ -163,7 +163,7 @@ td,th{padding:9px 7px;border-bottom:1px solid #293943;text-align:right;font-size
 <section id="settings" class="hidden">
 <div class="panel">
 <h3>الإعدادات</h3>
-<p class="muted">نسخة محلية. لا توجد مزامنة Supabase في هذا الملف.</p>
+<p class="muted">تحديث قالب وصل التجهيز المطابق للمواصفات الرسمية والتسلسل التلقائي.</p>
 <button class="btn danger" onclick="clearData()">مسح البيانات المحلية</button>
 </div>
 </section>
@@ -189,7 +189,7 @@ td,th{padding:9px 7px;border-bottom:1px solid #293943;text-align:right;font-size
 const KEY='sada-concrete-v1';
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
-nextOrder:744,nextLoad:1
+nextOrder:1,nextReceipt:1
 });
 
 let data;
@@ -203,8 +203,8 @@ data=blank();
 if(!Array.isArray(data[k]))data[k]=[];
 });
 
-data.nextOrder=data.nextOrder||744;
-data.nextLoad=data.nextLoad||1;
+data.nextOrder=data.nextOrder||1;
+data.nextReceipt=data.nextReceipt||1;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
@@ -302,14 +302,14 @@ return `
 <b class="goldtext">حمولات الأمر ${esc(o.no)}</b>
 ${ls.length?`<table><tbody>${ls.map(l=>`
 <tr>
-<td>حمولة ${esc(l.no)}</td>
-<td>${esc(l.driver||'—')}</td>
+<td>حمولة رقم: <b>${esc(l.loadIndex)}</b></td>
+<td>وصل: ${esc(l.receiptNo)}</td>
 <td>${esc(l.vehicle||'—')}</td>
 <td>${esc(l.qty)} م³</td>
 <td>
-<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة الوصل</button>
-<button class="btn" onclick="editLoad('${esc(l.no)}')">تعديل</button>
-<button class="btn danger" onclick="delLoad('${esc(l.no)}')">حذف</button>
+<button class="btn gold" onclick="receiptLoad('${esc(l.id)}')">طباعة الوصل</button>
+<button class="btn" onclick="editLoad('${esc(l.id)}')">تعديل</button>
+<button class="btn danger" onclick="delLoad('${esc(l.id)}')">حذف</button>
 </td>
 </tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات بعد.</p>'}
 </div></td></tr>`;
@@ -353,13 +353,13 @@ openForm('أمر تجهيز جديد',[
 {name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
 {name:'phone',label:'الهاتف'},
 {name:'site',label:'موقع الصب',required:true},
-{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
-{name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
+{name:'pour',label:'نوع الصب',options:['سقوف','أساس','أعمدة','أرضية','جدار','أخرى']},
+{name:'grade',label:'المواصفة (المقاومة)',options:['C25','C30','C35','C40','C45']},
 {name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
 {name:'price',label:'سعر المتر',type:'number'},
 {name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
 ],v=>{
-v.no=String(data.nextOrder++).padStart(7,'0');
+v.no='ORD-'+new Date().getFullYear()+'-'+String(data.nextOrder++).padStart(3,'0');
 v.status='قيد التجهيز';
 data.orders.push(v);
 save();closeModal();toast('تم حفظ الأمر');
@@ -369,19 +369,22 @@ save();closeModal();toast('تم حفظ الأمر');
 function openLoad(no){
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o)return;
+let existingLoads=data.loads.filter(l=>String(l.orderNo)===String(no));
+let nextLoadIndex = existingLoads.length + 1; // التسلسل الإجباري 1, 2, 3...
+
 openForm('إضافة حمولة للأمر '+no,[
+{name:'loadIndex',label:'رقم الحمولة الإجباري (تلقائي)',type:'number',value:nextLoadIndex,required:true},
+{name:'vehicle',label:'رقم الآلية (الخلاطة)',options:['KRB-101',...data.vehicles.map(x=>x.name)]},
+{name:'pump',label:'رقم المضخة',value:'P-01'},
 {name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},
-{name:'vehicle',label:'رقم الآلية',options:['غير محدد',...data.vehicles.map(x=>x.name)]},
-{name:'qty',label:'الكمية م³',type:'number',required:true,value:Math.min(9,+o.qty||9)},
-{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},
-{name:'pump',label:'رقم المضخة'},
-{name:'status',label:'الحالة',options:['تم التسجيل','في الطريق','تم التسليم']}
+{name:'qty',label:'الكمية المجهزة م³',type:'number',required:true,value:10},
+{name:'date',label:'تاريخ الوصل',type:'date',value:new Date().toISOString().slice(0,10)}
 ],v=>{
+v.id=Date.now();
 v.orderNo=o.no;
-v.no=String(data.nextLoad++).padStart(7,'0');
-v.date=new Date().toISOString().slice(0,10);
+v.receiptNo=String(data.nextReceipt++).padStart(4,'0');
 data.loads.push(v);
-save();closeModal();toast('تم حفظ الحمولة');
+save();closeModal();toast('تم حفظ الحمولة رقم '+v.loadIndex);
 });
 }
 
@@ -412,13 +415,16 @@ v=>{Object.assign(o,v);save();closeModal();}
 );
 }
 
-function editLoad(no){
-let l=data.loads.find(x=>String(x.no)===String(no));
+function editLoad(id){
+let l=data.loads.find(x=>String(x.id)===String(id));
 if(!l)return;
-openForm('تعديل حمولة '+no,
-['driver','vehicle','qty','time','pump','status'].map(k=>({
-name:k,label:k,value:l[k]||''
-})),
+openForm('تعديل حمولة',
+[
+{name:'loadIndex',label:'رقم الحمولة',value:l.loadIndex},
+{name:'vehicle',label:'رقم الآلية',value:l.vehicle},
+{name:'pump',label:'رقم المضخة',value:l.pump},
+{name:'qty',label:'الكمية م³',value:l.qty}
+],
 v=>{Object.assign(l,v);save();closeModal();}
 );
 }
@@ -431,9 +437,9 @@ save();
 }
 }
 
-function delLoad(no){
+function delLoad(id){
 if(confirm('حذف الحمولة؟')){
-data.loads=data.loads.filter(x=>String(x.no)!==no);
+data.loads=data.loads.filter(x=>String(x.id)!==String(id));
 save();
 }
 }
@@ -448,249 +454,186 @@ save();
 function printDoc(title,content){
 let w=window.open('','_blank');
 if(!w){toast('اسمح بالنوافذ المنبثقة');return}
-w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><body>${content}<script>onload=()=>setTimeout(()=>print(),250)<\/script></body></html>`);
+w.document.write(`<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>${title}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><body>${content}<script>onload=()=>setTimeout(()=>print(),300)<\/script></body></html>`);
 w.document.close();
 }
 
 function receiptOrder(no){
 let o=data.orders.find(x=>String(x.no)===no);
 if(!o)return;
-printDoc('وصل أمر',`
+printDoc('أمر تجهيز',`
 <style>
-body{font-family:Tahoma;padding:20px}
-.r{border:3px double #b28a29;padding:20px}
+body{font-family:Segoe UI,Tahoma;padding:20px}
+.r{border:4px double #d4af37;padding:20px}
 h2,h3{text-align:center}
 p{border-bottom:1px solid #ddd;padding:8px}
 </style>
 <div class="r">
-<h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
-<h3>وصل أمر تجهيز رقم ${esc(o.no)}</h3>
+<h2>شركة صدى الاعمار للخرسانة والكونكريت الجاهز</h2>
+<h3>أمر تجهيز رقم ${esc(o.no)}</h3>
 <p>التاريخ: ${esc(o.date)}</p>
 <p>العميل: ${esc(o.customer)}</p>
 <p>الهاتف: ${esc(o.phone)}</p>
 <p>موقع الصب: ${esc(o.site)}</p>
-<p>نوع الصب: ${esc(o.pour)} — المقاومة: ${esc(o.grade)}</p>
+<p>نوع الصب: ${esc(o.pour)} — المواصفة: ${esc(o.grade)}</p>
 <p>الكمية التقديرية: ${esc(o.qty)} م³</p>
 <p>توقيع الزبون: __________　 توقيع المسؤول: __________</p>
 </div>`);
 }
-function receiptLoad(no) {
-  let l = data.loads.find(x => String(x.no) === no);
-  let o = l && data.orders.find(
-    x => String(x.no) === String(l.orderNo)
-  );
 
-  if (!l || !o) return toast('الحمولة أو أمرها غير موجود');
+function receiptLoad(id){
+let l=data.loads.find(x=>String(x.id)===String(id));
+let o=l&&data.orders.find(x=>String(x.no)===String(l.orderNo));
+if(!l||!o)return toast('الحمولة غير موجودة');
 
-  let d = l.date || o.date || '—';
+let d=l.date||o.date||'2026/09/02';
 
-  printDoc('وصل تجهيز خرسانة', `
-  <style>
-    @page {
-      size: 148mm 210mm;
-      margin: 0;
-    }
+printDoc('وصل تجهيز خرسانة',`
+<style>
+:root { --border-gold: #d4af37; --primary-gold: #c69214; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; }
+body { background: #fff; color: #0f172a; padding: 10px; direction: rtl; }
+.receipt-container { width: 100%; max-width: 210mm; margin: 0 auto; background: #fff; padding: 10px; }
+.border-outer { border: 4px double var(--border-gold); padding: 15px; position: relative; min-height: 275mm; display: flex; flex-direction: column; justify-content: space-between; }
+.border-corner { position: absolute; width: 16px; height: 16px; border: 3px solid var(--border-gold); }
+.top-left { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+.top-right { top: 4px; right: 4px; border-left: none; border-bottom: none; }
+.bottom-left { bottom: 4px; left: 4px; border-right: none; border-top: none; }
+.bottom-right { bottom: 4px; right: 4px; border-left: none; border-top: none; }
+.header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+.brand-logo-area { display: flex; align-items: center; gap: 10px; }
+.logo-icon { color: var(--primary-gold); font-size: 38px; }
+.brand-titles h1 { font-size: 24px; color: var(--primary-gold); font-weight: 900; line-height: 1.1; }
+.brand-titles h2 { font-size: 14px; color: #1e293b; font-weight: bold; }
+.brand-titles p { font-size: 10px; color: #64748b; font-weight: 600; }
+.values-pills { display: flex; gap: 8px; margin-top: 4px; }
+.pill { font-size: 10px; font-weight: bold; color: #334155; background: #f1f5f9; padding: 2px 6px; border-radius: 10px; border: 1px solid #cbd5e1; }
+.pill i { color: var(--primary-gold); }
+.header-truck-img { text-align: center; }
+.truck-illustration { font-size: 45px; color: #334155; }
+.slogan { font-size: 12px; font-weight: bold; color: #0f172a; margin-top: 2px; }
+.title-banner { background: linear-gradient(135deg, #000, #1e293b); color: #fff; text-align: center; padding: 6px 15px; border-radius: 20px; margin: 10px 30px 12px 30px; border: 2px solid var(--border-gold); }
+.title-banner h2 { font-size: 20px; color: #ffda66; }
+.title-banner span { font-size: 10px; letter-spacing: 1.5px; color: #cbd5e1; display: block; }
+.meta-boxes { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.meta-box { border: 2px solid #cbd5e1; border-radius: 8px; overflow: hidden; width: 25%; text-align: center; background: #f8fafc; }
+.meta-box .title { background: #e2e8f0; font-weight: bold; font-size: 12px; padding: 3px; color: #1e293b; }
+.meta-box .value { font-size: 16px; font-weight: 800; padding: 4px; color: #0f172a; }
+.meta-box.doc-no .value { color: #dc2626; }
+.details-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.details-table td { border: 2px solid #cbd5e1; padding: 7px 10px; font-size: 13px; }
+.details-table td.label-col { background-color: #f1f5f9; font-weight: bold; color: #1e293b; width: 28%; text-align: right; }
+.details-table td.val-col { font-weight: 700; color: #0f172a; text-align: center; }
+.dispatch-section { border: 2px solid #000; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+.dispatch-header { background: #000; color: #fff; text-align: center; padding: 5px; font-size: 16px; font-weight: bold; }
+.dispatch-body { display: flex; align-items: center; padding: 12px; background: #fff; gap: 10px; }
+.dispatch-card { border: 2px solid #cbd5e1; border-radius: 8px; background: #f8fafc; flex: 1; text-align: center; overflow: hidden; }
+.dispatch-card .head { background: #e2e8f0; padding: 4px; font-weight: bold; font-size: 13px; color: #1e293b; }
+.dispatch-card .body-val { font-size: 50px; font-weight: 900; color: #000; padding: 6px 0; line-height: 1; }
+.signatures-area { display: flex; justify-content: space-between; margin-top: 15px; padding: 0 20px; }
+.sig-box { text-align: center; width: 42%; }
+.sig-box p { font-weight: bold; font-size: 14px; color: #1e293b; margin-bottom: 30px; }
+.sig-line { border-bottom: 2px dashed #94a3b8; width: 100%; }
+.footer-area { margin-top: auto; padding-top: 8px; border-top: 2px solid #e2e8f0; }
+.skyline-img { text-align: center; color: #94a3b8; font-size: 20px; letter-spacing: 6px; margin-bottom: 3px; }
+.footer-contacts { display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: bold; color: #334155; }
+.qr-placeholder { width: 40px; height: 40px; border: 1px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 7px; }
+@media print {
+    @page { size: A4 portrait; margin: 4mm; }
+    body { padding: 0; }
+}
+</style>
 
-    * {
-      box-sizing: border-box;
-    }
+<div class="receipt-container">
+    <div class="border-outer">
+        <div class="border-corner top-left"></div>
+        <div class="border-corner top-right"></div>
+        <div class="border-corner bottom-left"></div>
+        <div class="border-corner bottom-right"></div>
 
-    html, body {
-      width: 148mm;
-      min-height: 210mm;
-      margin: 0;
-      padding: 0;
-    }
+        <div>
+            <div class="header">
+                <div class="brand-logo-area">
+                    <i class="fas fa-building-circle-check logo-icon"></i>
+                    <div class="brand-titles">
+                        <h1>شركة صدى الاعمار</h1>
+                        <h2>للخرسانة والكونكريت الجاهز</h2>
+                        <p>SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</p>
+                        <div class="values-pills">
+                            <span class="pill"><i class="fas fa-check-circle"></i> جودة</span>
+                            <span class="pill"><i class="fas fa-handshake"></i> التزام</span>
+                            <span class="pill"><i class="fas fa-shield-alt"></i> ثقة</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-truck-img">
+                    <i class="fas fa-truck-monster truck-illustration"></i>
+                    <div class="slogan">خرسانة أقوى .. لنستاع أعمر</div>
+                </div>
+            </div>
 
-    body {
-      font-family: Tahoma, Arial, sans-serif;
-      color: #111;
-    }
+            <div class="title-banner">
+                <h2>وصل تجهيز خرسانة</h2>
+                <span>CONCRETE DELIVERY RECEIPT</span>
+            </div>
 
-    .r {
-      width: 148mm;
-      min-height: 210mm;
-      border: 3px double #b28a29;
-      padding: 6mm;
-      margin: 0 auto;
-      overflow: hidden;
-    }
+            <div class="meta-boxes">
+                <div class="meta-box doc-no">
+                    <div class="title">رقم الوصل</div>
+                    <div class="value">${esc(l.receiptNo)}</div>
+                </div>
+                <div style="width: 45%;"></div>
+                <div class="meta-box">
+                    <div class="title">التاريخ</div>
+                    <div class="value">${esc(d)}</div>
+                </div>
+            </div>
 
-    .head {
-      text-align: center;
-      border-bottom: 3px solid #b28a29;
-      padding-bottom: 9px;
-    }
+            <table class="details-table">
+                <tr><td class="label-col">اسم الزبون</td><td class="val-col">${esc(o.customer)}</td></tr>
+                <tr><td class="label-col">موقع الصب</td><td class="val-col">${esc(o.site)}</td></tr>
+                <tr><td class="label-col">نوع الصب</td><td class="val-col">${esc(o.pour)}</td></tr>
+                <tr><td class="label-col">المواصفة</td><td class="val-col">${esc(o.grade)}</td></tr>
+                <tr><td class="label-col">رقم الآلية</td><td class="val-col">${esc(l.vehicle||'KRB-101')}</td></tr>
+                <tr><td class="label-col">رقم المضخة</td><td class="val-col">${esc(l.pump||'P-01')}</td></tr>
+                <tr><td class="label-col">الكمية (م³)</td><td class="val-col">${esc(l.qty)}</td></tr>
+            </table>
 
-    .head h2 {
-      color: #a47b20;
-      margin: 4px;
-    }
+            <div class="dispatch-section">
+                <div class="dispatch-header">تفاصيل التجهيز</div>
+                <div class="dispatch-body">
+                    <div style="flex:1; text-align:center;">
+                        <i class="fas fa-truck-moving" style="font-size:40px; color:#1e293b;"></i>
+                        <div style="border:2px solid var(--primary-gold); border-radius:15px; padding:2px 10px; display:inline-block; font-weight:bold; color:var(--primary-gold); font-size:11px; margin-top:4px;">صدى الاعمار</div>
+                        <div style="font-size:9px; font-weight:bold; margin-top:2px;">الجودة في كل متر مكعب</div>
+                    </div>
+                    <div class="dispatch-card">
+                        <div class="head">رقم الحمولة</div>
+                        <div class="body-val">${esc(l.loadIndex)}</div>
+                    </div>
+                    <div class="dispatch-card">
+                        <div class="head">الكمية المجهزة (م³)</div>
+                        <div class="body-val">${esc(l.qty)}</div>
+                    </div>
+                </div>
+            </div>
 
-    .en {
-      font-size: 10px;
-    }
+            <div class="signatures-area">
+                <div class="sig-box"><p>توقيع المعمل</p><div class="sig-line"></div></div>
+                <div class="sig-box"><p>توقيع الزبون</p><div class="sig-line"></div></div>
+            </div>
+        </div>
 
-    .title {
-      text-align: center;
-      background: #171717;
-      color: #e7c36b;
-      border: 2px solid #b28a29;
-      padding: 9px;
-      margin: 10px 0;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .top {
-      display: flex;
-      gap: 8px;
-    }
-
-    .top div {
-      border: 1px solid #777;
-      flex: 1;
-      text-align: center;
-      padding: 8px;
-      font-weight: bold;
-    }
-
-    .no {
-      color: #a51d20;
-      font-size: 21px;
-    }
-
-    .data {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 9px 0;
-    }
-
-    .data td {
-      border: 1px solid #777;
-      padding: 8px;
-      font-size: 13px;
-    }
-
-    .data td:first-child {
-      background: #eee;
-      font-weight: bold;
-      width: 30%;
-    }
-
-    .section {
-      text-align: center;
-      background: #171717;
-      color: #e7c36b;
-      padding: 8px;
-      border: 2px solid #b28a29;
-    }
-
-    .big {
-      display: flex;
-      gap: 8px;
-      border: 2px solid #b28a29;
-      padding: 8px;
-    }
-
-    .big div {
-      flex: 1;
-      border: 1px solid #777;
-      text-align: center;
-      min-height: 42mm;
-    }
-
-    .big b {
-      display: block;
-      background: #eee;
-      padding: 8px;
-    }
-
-    .big strong {
-      display: block;
-      font-size: 42px;
-      padding: 12px;
-    }
-
-    .sign {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .sign div {
-      border: 1px solid #777;
-      flex: 1;
-      text-align: center;
-      padding: 18px 5px 28px;
-      font-weight: bold;
-    }
-
-    .foot {
-      text-align: center;
-      border-top: 2px solid #b28a29;
-      margin-top: 12px;
-      padding-top: 7px;
-      font-size: 10px;
-    }
-  </style>
-
-  <div class="r">
-
-    <div class="head">
-      <h2>شركة صدى الإعمار</h2>
-      <b>للخرسانة والكونكريت الجاهز</b>
-      <div class="en">SADA AL-EMAR CONCRETE</div>
-      <div class="en">BUILDING A BETTER TOMORROW</div>
+        <div class="footer-area">
+            <div class="skyline-img"><i class="fas fa-industry"></i> <i class="fas fa-city"></i> <i class="fas fa-truck"></i></div>
+            <div class="footer-contacts">
+                <div><i class="fas fa-phone" style="color:var(--primary-gold)"></i> 0770 123 4567 - 0780 123 4567<br><i class="fas fa-globe" style="color:var(--primary-gold)"></i> www.sada-alaamar.com</div>
+                <div style="text-align: center;"><strong>معاً نبني مستقبل أعمر</strong><br><span style="font-size: 8px; color: #64748b;">BUILDING A BETTER TOMORROW</span></div>
+                <div class="qr-placeholder"><i class="fas fa-qrcode" style="font-size: 20px;"></i><span>التحقق</span></div>
+            </div>
+        </div>
     </div>
-
-    <div class="title">وصل تجهيز خرسانة</div>
-
-    <div class="top">
-      <div>
-        التاريخ<br>${esc(d)}
-      </div>
-      <div>
-        رقم الوصل<br>
-        <span class="no">${esc(l.no)}</span>
-      </div>
-    </div>
-
-    <table class="data">
-      <tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
-      <tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
-      <tr><td>نوع الصب</td><td>${esc(o.pour)}</td></tr>
-      <tr><td>المواصفة</td><td>${esc(o.grade)}</td></tr>
-      <tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr>
-      <tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr>
-      <tr><td>الكمية م³</td><td>${esc(l.qty)}</td></tr>
-    </table>
-
-    <div class="section">تفاصيل التجهيز</div>
-
-    <div class="big">
-      <div>
-        <b>رقم الحمولة</b>
-        <strong>${esc(l.no)}</strong>
-      </div>
-      <div>
-        <b>الكمية المجهزة م³</b>
-        <strong>${esc(l.qty)}</strong>
-      </div>
-    </div>
-
-    <div class="sign">
-      <div>توقيع الزبون<br><br>____________</div>
-      <div>توقيع المعمل<br><br>____________</div>
-    </div>
-
-    <div class="foot">
-      <b>صدى الإعمار للكونكريت الجاهز</b><br>
-      وصل تجهيز رسمي — www.sada-alaamar.com
-    </div>
-
-  </div>
-  `);
+</div>`);
 }
 
 function clearData(){
