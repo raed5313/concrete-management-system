@@ -362,11 +362,15 @@ nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 });
 
 let data;
-try{
-data=JSON.parse(localStorage.getItem(KEY))||blank();
-}catch(e){
-data=blank();
+function loadData(){
+  try{
+    let saved = JSON.parse(localStorage.getItem(KEY));
+    data = saved || blank();
+  }catch(e){
+    data = blank();
+  }
 }
+loadData();
 
 ['orders','loads','customers','drivers','vehicles','inventory','invoices','receipts','expenses','employees','audit'].forEach(k=>{
 if(!Array.isArray(data[k]))data[k]=[];
@@ -474,19 +478,22 @@ function initSystem(){
   renderNav();
   navigate('dashboard');
   
-  // الاستماع للتحديثات الفورية بين الأجهزة والصفحات
+  // مزامنة فورية عند حدوث أي تغيير في تخزين المتصفح بين الصفحات
   window.addEventListener('storage', (e) => {
     if(e.key === KEY){
-      try {
-        data = JSON.parse(e.newValue) || blank();
-        render();
-      } catch(err){}
+      loadData();
+      render();
     }
   });
 
-  if(currentRole === 'plant'){
-    setInterval(checkNewOrdersForPlant, 3000);
-  }
+  // فحص دوري لتحديث البيانات وتنبيه المعمل فوراً
+  setInterval(() => {
+    loadData();
+    render();
+    if(currentRole === 'plant'){
+      checkNewOrdersForPlant();
+    }
+  }, 2500);
 }
 
 function renderNav(){
@@ -545,14 +552,6 @@ function triggerPlantAlert(order){
 }
 
 function checkNewOrdersForPlant(){
-  try {
-    let saved = JSON.parse(localStorage.getItem(KEY));
-    if(saved && saved.orders) {
-      data.orders = saved.orders;
-      data.loads = saved.loads || [];
-    }
-  } catch(e){}
-
   if(data.orders.length === 0) return;
   let latestOrder = data.orders[data.orders.length - 1];
   let latestId = Number(latestOrder.no);
@@ -567,7 +566,6 @@ function checkNewOrdersForPlant(){
     data.lastSeenOrder = latestId;
     save();
     triggerPlantAlert(latestOrder);
-    render();
   }
 }
 
