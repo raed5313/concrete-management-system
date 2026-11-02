@@ -293,7 +293,17 @@ return `
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${esc(o.qty)}</td>
 <td><div class="actions">
-<button class="btn" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>
+<button class="btn"
+onclick="openLoad('${esc(o.no)}')"
+${o.status==='تم القفل'||o.status==='مرحّل للفاتورة'?'disabled':''}>
+＋ حمولة (${ls.length})
+</button>
+
+<button class="btn primary"
+onclick="closeOrder('${esc(o.no)}')"
+${o.status==='تم القفل'||o.status==='مرحّل للفاتورة'?'disabled':''}>
+تسجيل الفعلي وقفل الأمر
+</button>
 <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
 <button class="btn" onclick="editOrder('${esc(o.no)}')">تعديل</button>
 <button class="btn danger" onclick="delOrder('${esc(o.no)}')">حذف</button>
@@ -366,7 +376,45 @@ data.orders.push(v);
 save();closeModal();toast('تم حفظ الأمر');
 });
 }
+function closeOrder(no){
+  let o=data.orders.find(x=>String(x.no)===String(no));
+  if(!o || o.status==='تم القفل' || o.status==='مرحّل للفاتورة') return;
 
+  let delivered=data.loads
+    .filter(x=>String(x.orderNo)===String(no))
+    .reduce((s,x)=>s+(Number(x.qty)||0),0);
+
+  openForm('تسجيل الكمية الفعلية وقفل الأمر '+no,[
+    {
+      name:'actualQty',
+      label:'الكمية الفعلية المجهزة م³',
+      type:'number',
+      required:true,
+      value:delivered
+    },
+    {
+      name:'lockNote',
+      label:'ملاحظات الإقفال',
+      full:true
+    }
+  ],v=>{
+    let q=Number(v.actualQty);
+
+    if(!Number.isFinite(q)||q<0){
+      toast('أدخل كمية فعلية صحيحة');
+      return;
+    }
+
+    o.actualQty=q;
+    o.lockNote=v.lockNote||'';
+    o.status='تم القفل';
+    o.lockedAt=new Date().toISOString();
+
+    save();
+    closeModal();
+    toast('تم تسجيل الكمية الفعلية وقفل الأمر');
+  });
+}
 function openLoad(no){
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o)return;
