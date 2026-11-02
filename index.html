@@ -1,31 +1,34 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>شركة صدى الإعمار | نظام إدارة الخرسانة الجاهزة</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root {
-    --bg-dark: #090d12;
-    --panel-bg: #111a22;
-    --border-color: #29404d;
-    --primary-cyan: #42d8e8;
-    --primary-gold: #e4b84f;
-    --border-gold: #d4af37;
-    --text-white: #f3f7fa;
-    --text-muted: #93a7b3;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
-body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; }
+
+<html lang="ar" dir="rtl">  
+<head>  
+<meta charset="utf-8">  
+<meta name="viewport" content="width=device-width,initial-scale=1">  
+<title>شركة صدى الإعمار | نظام إدارة الخرسانة الجاهزة الشامل</title>  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+<style>  
+:root {  
+    --bg-dark: #090d12;  
+    --panel-bg: #111a22;  
+    --border-color: #29404d;  
+    --primary-cyan: #42d8e8;  
+    --primary-gold: #e4b84f;  
+    --border-gold: #d4af37;  
+    --text-white: #f3f7fa;  
+    --text-muted: #93a7b3;  
+}  
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }  
+body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; overflow-x: hidden; }  /* Login Screen */
 .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #111a22 0%, #090d12 100%); }
 .login-card { background: var(--panel-bg); border: 2px solid var(--border-gold); border-radius: 16px; padding: 30px; width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
 .login-card h2 { color: var(--primary-gold); margin-bottom: 5px; font-size: 22px; }
 .login-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
 .form-group { text-align: right; margin-bottom: 15px; }
 .form-group label { display: block; font-size: 12px; margin-bottom: 6px; color: #b9c8d0; }
-.form-group input { width: 100%; padding: 10px; background: #080f15; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 13px; }
+.form-group input, .form-group select { width: 100%; padding: 10px; background: #080f15; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 13px; }
 .btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #c69214, #e6b800); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
+
+/* App Layout */
 .app-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 .sidebar { background: #0d151c; padding: 15px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; max-height: 100vh; }
 .brand { text-align: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
@@ -37,566 +40,871 @@ body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; 
 .nav-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 12px; border-radius: 8px; text-align: right; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; }
 .nav-btn.active, .nav-btn:hover { background: #173b45; color: var(--primary-cyan); border-color: #287d89; }
 .btn-logout { background: #351a22; color: #ff8791; border: 1px solid #71313d; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 13px; }
+
+/* Main Content */
 .main-content { padding: 20px; overflow-y: auto; max-height: 100vh; }
 .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
 .card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
-.btn-action { background: #147d77; color: #fff; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
+.btn-action { background: #147d77; color: #fff; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
 .btn-gold { background: #352c18; color: #f1cc71; border: 1px solid #6f5924; }
 .btn-danger { background: #351a22; color: #ff8791; border: 1px solid #71313d; }
+.btn-blue { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
+
 table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 th, td { padding: 10px; border-bottom: 1px solid var(--border-color); text-align: right; font-size: 12px; }
 th { background: #080f15; color: var(--primary-cyan); }
 .hidden { display: none !important; }
+
+/* Status Colors Based on User Request */
+.status-draft { background: #ffffff; color: #000; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+.status-locked { background: #fef08a; color: #854d0e; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+.status-invoiced { background: #bbf7d0; color: #166534; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+
+/* Modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-body { background: var(--panel-bg); padding: 20px; border-radius: 12px; width: 90%; max-width: 550px; border: 1px solid var(--border-gold); }
-.notification-banner { background: #352c18; border: 1px solid var(--border-gold); padding: 12px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+.modal-body { background: var(--panel-bg); padding: 20px; border-radius: 12px; width: 90%; max-width: 550px; border: 1px solid var(--border-gold); max-height: 90vh; overflow-y: auto; }
+
+/* Notif Modal */
+.notif-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.notif-card { background: #ffffff; color: #0f172a; border-radius: 24px; padding: 25px; width: 92%; max-width: 620px; box-shadow: 0 0 50px rgba(228, 184, 79, 0.4); text-align: center; position: relative; border: 4px solid var(--border-gold); }
+.notif-bell-container { width: 90px; height: 90px; background: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: -70px auto 10px auto; border: 4px solid #fff; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.5); animation: bellRing 1.2s infinite alternate ease-in-out; }
+@keyframes bellRing { 0% { transform: scale(1) rotate(-10deg); } 100% { transform: scale(1.1) rotate(10deg); } }
+.notif-bell-container i { font-size: 45px; color: #fff; }
+.notif-close-btn { position: absolute; top: 15px; left: 15px; background: #ef4444; color: #fff; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.notif-title { font-size: 32px; font-weight: 900; color: #000; margin-bottom: 2px; }
+.notif-sub { font-size: 15px; font-weight: bold; color: #475569; margin-bottom: 15px; }
+.notif-content-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 15px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 12px; align-items: center; margin-bottom: 20px; }
+.notif-truck-img { text-align: center; }
+.notif-truck-img i { font-size: 80px; color: #1e293b; }
+.notif-table { width: 100%; border-collapse: collapse; text-align: right; }
+.notif-table td { padding: 5px 8px; font-size: 13px; border-bottom: 1px dashed #cbd5e1; }
+.notif-table td.lbl { font-weight: bold; color: #334155; width: 45%; }
+.notif-table td.val { font-weight: 900; color: #0f172a; }
+.notif-table tr.highlight { background: #fef08a; }
+.notif-table tr.highlight td.val { color: #b45309; font-size: 15px; }
+.notif-actions { display: flex; gap: 12px; }
+.btn-go-order { flex: 1.5; background: linear-gradient(135deg, #eab308, #ca8a04); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-close-notif { flex: 1; background: #64748b; color: #fff; border: none; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 </style>
-</head>
-<body>
 
-    <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-card">
-            <i class="fas fa-building-circle-check" style="font-size: 45px; color: var(--primary-gold); margin-bottom: 10px;"></i>
-            <h2>شركة صدى الإعمار</h2>
-            <p>نظام إدارة الخرسانة الجاهزة والوصولات</p>
-            
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
-                </div>
-                <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
-                </div>
-                <button type="submit" class="btn-login">تسجيل الدخول</button>
-            </form>
-            <div id="loginError" style="color: #ff8791; font-size: 12px; margin-top: 15px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-            
-            <div style="margin-top: 20px; text-align: right; background: #080f15; padding: 10px; border-radius: 8px; font-size: 11px; color: var(--text-muted);">
-                <strong style="color: var(--primary-gold); font-size: 12px; display:block; margin-bottom: 4px;">حسابات الدخول المعتمدة:</strong>
-                • المدير: <b>raed</b> / <b>2002</b><br>
-                • المشغل: <b>raed1</b> / <b>20021</b><br>
-                • المحاسب: <b>raed 2</b> / <b>20022</b>
-            </div>
-        </div>
-    </div>
+</head>  
+<body>  <!-- LOGIN SCREEN -->  
+<div id="loginScreen" class="login-screen">  
+    <div class="login-card">  
+        <i class="fas fa-building-circle-check" style="font-size: 45px; color: var(--primary-gold); margin-bottom: 10px;"></i>  
+        <h2>شركة صدى الإعمار</h2>  
+        <p>نظام إدارة الخرسانة الجاهزة والوصولات</p>  
+          
+        <form onsubmit="handleLogin(event)">  
+            <div class="form-group">  
+                <label>اسم المستخدم</label>  
+                <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>  
+            </div>  
+            <div class="form-group">  
+                <label>كلمة المرور</label>  
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" required>  
+            </div>  
+            <button type="submit" class="btn-login">تسجيل الدخول</button>  
+        </form>  
+        <div id="loginError" style="color: #ff8791; font-size: 12px; margin-top: 15px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>  
+          
+        <div style="margin-top: 20px; text-align: right; background: #080f15; padding: 10px; border-radius: 8px; font-size: 11px; color: var(--text-muted);">  
+            <strong style="color: var(--primary-gold); font-size: 12px; display:block; margin-bottom: 4px;">حسابات الدخول:</strong>  
+            • المدير: <b>raed</b> / <b>2002</b><br>  
+            • المشغل: <b>raed1</b> / <b>20021</b><br>  
+            • المحاسب: <b>raed 2</b> / <b>20022</b>  
+        </div>  
+    </div>  
+</div>  
 
-    <!-- MAIN APP INTERFACE -->
-    <div id="appLayout" class="app-layout hidden">
-        <aside class="sidebar">
-            <div class="brand">
-                <i class="fas fa-truck-monster" style="font-size: 28px; color: var(--primary-gold);"></i>
-                <h3>صدى الإعمار</h3>
-                <small>SADA AL-EMAR CONCRETE</small>
-            </div>
+<!-- MAIN APP INTERFACE -->  
+<div id="appLayout" class="app-layout hidden">  
+    <aside class="sidebar">  
+        <div class="brand">  
+            <i class="fas fa-truck-monster" style="font-size: 28px; color: var(--primary-gold);"></i>  
+            <h3>صدى الإعمار</h3>  
+            <small>SADA AL-EMAR CONCRETE</small>  
+        </div>  
 
-            <div class="user-badge">
-                مرحباً: <span id="displayUser">-</span>
-                الصلاحية: <small id="displayRole" style="color: var(--primary-cyan); display:block;">-</small>
-            </div>
+        <div class="user-badge">  
+            مرحباً: <span id="displayUser">-</span>  
+            الصلاحية: <small id="displayRole" style="color: var(--primary-cyan); display:block;">-</small>  
+        </div>  
 
-            <nav class="nav-links" id="sidebarNav"></nav>
+        <nav class="nav-links" id="sidebarNav"></nav>  
 
-            <button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
-        </aside>
+        <button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>  
+    </aside>  
 
-        <main class="main-content">
-            <header class="header-bar">
-                <h2 id="pageTitle">الرئيسية</h2>
-                <div id="actionArea"></div>
-            </header>
+    <main class="main-content">  
+        <header class="header-bar">  
+            <h2 id="pageTitle">الرئيسية</h2>  
+            <div id="actionArea"></div>  
+        </header>  
 
-            <div id="operatorNotifications"></div>
-            <div id="mainViewContainer"></div>
-        </main>
-    </div>
+        <div id="mainViewContainer"></div>  
+    </main>  
+</div>  
 
-    <!-- MODAL -->
-    <div id="modalOverlay" class="modal-overlay hidden">
-        <div class="modal-body">
-            <h3 id="modalTitle" style="color: var(--primary-gold); margin-bottom: 15px;">إضافة</h3>
-            <form id="dynamicForm" onsubmit="handleFormSubmit(event)"></form>
-        </div>
-    </div>
+<!-- DYNAMIC MODAL -->  
+<div id="modalOverlay" class="modal-overlay hidden">  
+    <div class="modal-body">  
+        <h3 id="modalTitle" style="color: var(--primary-gold); margin-bottom: 15px;">إضافة / تعديل</h3>  
+        <form id="dynamicForm" onsubmit="handleFormSubmit(event)"></form>  
+    </div>  
+</div>  
 
-<script>
-const USERS = {
-    'raed': { pass: '2002', role: 'admin', name: 'المدير العام' },
-    'raed1': { pass: '20021', role: 'operator', name: 'مشغّل المعمل' },
-    'raed 2': { pass: '20022', role: 'accountant', name: 'المحاسب' }
-};
+<!-- NOTIFICATION POPUP MODAL -->  
+<div id="notifModalOverlay" class="notif-modal-overlay hidden">  
+    <div class="notif-card">  
+        <button class="notif-close-btn" onclick="closeNotifModal()"><i class="fas fa-times"></i></button>  
+        <div class="notif-bell-container"><i class="fas fa-bell"></i></div>  
+        <h2 class="notif-title">أمر تجهيز جديد</h2>  
+        <div class="notif-sub">لديك أمر تجهيز جديد صادِر من الإدارة</div>  
 
-const NAV_ITEMS = [
-    { id: 'dashboard', label: 'الرئيسية', icon: 'fa-home', roles: ['admin', 'operator', 'accountant'] },
-    { id: 'orders', label: 'أوامر التجهيز', icon: 'fa-file-invoice', roles: ['admin', 'operator', 'accountant'] },
-    { id: 'customers', label: 'العملاء', icon: 'fa-users', roles: ['admin', 'accountant'] },
-    { id: 'plants', label: 'المعامل', icon: 'fa-industry', roles: ['admin'] },
-    { id: 'drivers', label: 'السائقون', icon: 'fa-user-tie', roles: ['admin', 'operator'] },
-    { id: 'vehicles', label: 'الآليات / الخلاطات', icon: 'fa-truck-moving', roles: ['admin', 'operator'] },
-    { id: 'inventory', label: 'المخزون', icon: 'fa-boxes', roles: ['admin', 'operator'] },
-    { id: 'accounts', label: 'الحسابات', icon: 'fa-calculator', roles: ['admin', 'accountant'] },
-    { id: 'invoices', label: 'الفواتير', icon: 'fa-receipt', roles: ['admin', 'accountant'] },
-    { id: 'receipts', label: 'القبض', icon: 'fa-hand-holding-usd', roles: ['admin', 'accountant'] },
-    { id: 'expenses', label: 'المصروفات', icon: 'fa-wallet', roles: ['admin', 'accountant'] },
-    { id: 'employees', label: 'الموظفون', icon: 'fa-id-card', roles: ['admin'] },
-    { id: 'archive', label: 'المتابعة والأرشفة', icon: 'fa-archive', roles: ['admin', 'accountant'] },
-    { id: 'reports', label: 'التقارير', icon: 'fa-chart-line', roles: ['admin', 'operator', 'accountant'] },
-    { id: 'permissions', label: 'المستخدمون والصلاحيات', icon: 'fa-user-shield', roles: ['admin'] },
-    { id: 'settings', label: 'الإعدادات', icon: 'fa-cog', roles: ['admin'] }
-];
+        <div class="notif-content-grid">  
+            <div class="notif-truck-img">  
+                <i class="fas fa-truck-moving"></i>  
+                <div style="font-weight: bold; font-size: 11px; margin-top: 5px; color: #c69214;">صدى الاعمار</div>  
+                <div style="font-size: 11px; color: #ef4444; font-weight: bold; margin-top: 4px;">يرجى البدء بالتجهيز ...</div>  
+            </div>  
 
-let currentUser = null;
-let activeTab = 'dashboard';
+            <table class="notif-table">  
+                <tr class="highlight">  
+                    <td class="lbl">رقم الأمر :</td>  
+                    <td class="val" id="n-orderNo">ORD-2026-129</td>  
+                </tr>  
+                <tr>  
+                    <td class="lbl">اسم الزبون :</td>  
+                    <td class="val" id="n-customer">شركة النور للمقاولات[span_0](start_span)[span_0](end_span)</td>  
+                </tr>  
+                <tr>  
+                    <td class="lbl">موقع الصب :</td>  
+                    <td class="val" id="n-site">كربلاء - حي الحسين[span_1](start_span)[span_1](end_span)</td>  
+                </tr>  
+                <tr>  
+                    <td class="lbl">نوع الصب :</td>  
+                    <td class="val" id="n-pour">سقوف[span_2](start_span)[span_2](end_span)</td>  
+                </tr>  
+                <tr>  
+                    <td class="lbl">المواصفة :</td>  
+                    <td class="val" id="n-grade">C25[span_3](start_span)[span_3](end_span)</td>  
+                </tr>  
+                <tr>  
+                    <td class="lbl">الكمية التقديرية :</td>  
+                    <td class="val" id="n-qty">50 م³[span_4](start_span)[span_4](end_span)</td>  
+                </tr>  
+                <tr>  
+                    <td class="lbl">تاريخ الأمر :</td>  
+                    <td class="val" id="n-date">2026/09/02[span_5](start_span)[span_5](end_span)</td>  
+                </tr>  
+            </table>  
+        </div>  
 
-let store = JSON.parse(localStorage.getItem('sada_app_data')) || {
-    orders: [],
-    loads: [],
-    nextOrderNo: 1,
-    nextReceiptNo: 1
-};
+        <div class="notif-actions">  
+            <button class="btn-go-order" onclick="goToOrderFromNotif()"><i class="fas fa-arrow-left"></i> الذهاب إلى أمر التجهيز</button>  
+            <button class="btn-close-notif" onclick="closeNotifModal()"><i class="fas fa-bell-slash"></i> إغلاق</button>  
+        </div>  
+    </div>  
+</div>
 
-function saveStore() {
-    localStorage.setItem('sada_app_data', JSON.stringify(store));
-    render();
-}
-
-function playBeep() {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        gain.gain.setValueAtTime(0.1, ctx.currentTime);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.5);
-    } catch(e) {}
-}
-
-function handleLogin(e) {
-    e.preventDefault();
-    const u = document.getElementById('username').value.trim();
-    const p = document.getElementById('password').value.trim();
-    const err = document.getElementById('loginError');
-
-    if (USERS[u] && USERS[u].pass === p) {
-        currentUser = USERS[u];
-        err.style.display = 'none';
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('appLayout').classList.remove('hidden');
-        
-        document.getElementById('displayUser').innerText = currentUser.name;
-        document.getElementById('displayRole').innerText = getRoleLabel(currentUser.role);
-        
-        buildSidebarNav();
-        switchTab('dashboard');
-    } else {
-        err.style.display = 'block';
-    }
-}
-
-function handleLogout() {
-    currentUser = null;
-    document.getElementById('appLayout').classList.add('hidden');
-    document.getElementById('loginScreen').classList.remove('hidden');
-}
-
-function getRoleLabel(role) {
-    if (role === 'admin') return 'مدير النظام (جميع الصلاحيات)';
-    if (role === 'operator') return 'مشغّل معمل (أوامر وحمولات وتقارير)';
-    if (role === 'accountant') return 'محاسب (قراءة، طباعة وأرشفة)';
-}
-
-function buildSidebarNav() {
-    const nav = document.getElementById('sidebarNav');
-    nav.innerHTML = '';
-    
-    let allowedItems = NAV_ITEMS;
-    if (currentUser.role === 'operator') {
-        // للمشغل 3 عناصر فقط حسب الطلب
-        allowedItems = NAV_ITEMS.filter(i => ['dashboard', 'orders', 'reports'].includes(i.id));
-    }
-
-    allowedItems.forEach(item => {
-        if (item.roles.includes(currentUser.role)) {
-            nav.innerHTML += `
-                <button class="nav-btn ${item.id === activeTab ? 'active' : ''}" id="nav-${item.id}" onclick="switchTab('${item.id}')">
-                    <i class="fas ${item.icon}"></i> ${item.label}
-                </button>
-            `;
-        }
-    });
-}
-
-function switchTab(tabId) {
-    activeTab = tabId;
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.getElementById(`nav-${tabId}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    const item = NAV_ITEMS.find(i => i.id === tabId);
-    document.getElementById('pageTitle').innerText = item ? item.label : '';
-    
-    render();
-}
-
-function render() {
-    const container = document.getElementById('mainViewContainer');
-    const actionArea = document.getElementById('actionArea');
-    const notifArea = document.getElementById('operatorNotifications');
-    actionArea.innerHTML = '';
-    notifArea.innerHTML = '';
-
-    // إشعارات مشغل المعمل للأوامر المرسلة
-    if (currentUser.role === 'operator') {
-        const pendingOrders = store.orders.filter(o => o.status === 'مرسل للمعمل' || o.status === 'قيد الانتظار');
-        if (pendingOrders.length > 0) {
-            notifArea.innerHTML = pendingOrders.map(o => `
-                <div class="notification-banner">
-                    <div>
-                        <strong style="color:var(--primary-gold)"><i class="fas fa-bell"></i> أمر تجهيز جديد مطلوب!</strong>
-                        <div style="font-size:12px; margin-top:4px;">رقم الأمر: <b>${o.no}</b> | العميل: ${o.customer} | الكمية: ${o.qty} م³ | نوع الصب: ${o.pour} | الموقع: ${o.site}</div>
-                    </div>
-                    <div>
-                        ${o.status === 'قيد الانتظار' ? `<button class="btn-action" style="padding:5px 10px; font-size:11px;" onclick="updateOrderStatus('${o.no}', 'مرسل للمعمل')">استلام الأمر</button>` : ''}
-                        ${o.status === 'مرسل للمعمل' ? `<button class="btn-action btn-gold" style="padding:5px 10px; font-size:11px;" onclick="updateOrderStatus('${o.no}', 'بدء التجهيز')">بدء التجهيز</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    if (activeTab === 'dashboard') {
-        let totalQty = 0;
-        store.loads.forEach(l => totalQty += Number(l.qty || 0));
-        container.innerHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                <div class="card">أوامر التجهيز<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.orders.length}</strong></div>
-                <div class="card">إجمالي الحمولات<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.loads.length}</strong></div>
-                <div class="card">المجهز (م³)<strong style="display:block; font-size:24px; color:var(--primary-gold); margin-top:8px;">${totalQty} م³</strong></div>
-            </div>
-            <div class="card">
-                <h3>أحدث أوامر التجهيز</h3>
-                <table>
-                    <thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون</th><th>الحالة</th><th>الكمية</th></tr></thead>
-                    <tbody>
-                        ${store.orders.slice(-5).reverse().map(o => `<tr><td>${o.no}</td><td>${o.date}</td><td>${o.customer}</td><td><span style="color:var(--primary-cyan)">${o.status || 'جديد'}</span></td><td>${o.qty} م³</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات</td></tr>'}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    } else if (activeTab === 'orders') {
-        if (currentUser.role === 'admin') {
-            actionArea.innerHTML = `<button class="btn-action" onclick="openNewOrderModal()">＋ إضافة أمر تجهيز جديد</button>`;
-        }
-        
-        let ordersRows = '';
-        if (store.orders.length === 0) {
-            ordersRows = '<tr><td colspan="8" style="text-align:center; padding:15px;">لا توجد أوامر تجهيز مسجلة.</td></tr>';
-        } else {
-            store.orders.forEach(o => {
-                const orderLoads = store.loads.filter(l => l.orderNo === o.no);
-                let actionsHTML = '';
-                
-                // المدير: إرسال للمعمل، تعديل، حذف
-                if (currentUser.role === 'admin') {
-                    if (!o.status || o.status === 'جديد') {
-                        actionsHTML += `<button class="btn-action btn-gold" style="padding: 4px 10px; font-size:11px; margin-left: 4px;" onclick="sendToPlant('${o.no}')">📤 إرسال للمعمل</button>`;
-                    }
-                    actionsHTML += `<button class="btn-action btn-danger" style="padding: 4px 10px; font-size:11px;" onclick="deleteOrder('${o.no}')">حذف</button>`;
-                }
-
-                // المشغل: إضافة حمولة وإكمال الأمر
-                if (currentUser.role === 'operator') {
-                    actionsHTML += `<button class="btn-action" style="padding: 4px 10px; font-size:11px; margin-left: 4px;" onclick="openAddLoadModal('${o.no}')">＋ حمولة (${orderLoads.length})</button>`;
-                    if (o.status !== 'مكتمل') {
-                        actionsHTML += `<button class="btn-action btn-gold" style="padding: 4px 10px; font-size:11px;" onclick="updateOrderStatus('${o.no}', 'مكتمل')">إكمال الأمر</button>`;
-                    }
-                }
-
-                // المحاسب: عرض وطباعة فقط
-                if (currentUser.role === 'accountant') {
-                    actionsHTML += `<span style="font-size:11px; color:var(--text-muted);">👁️ مشاهدة فقط</span>`;
-                }
-
-                let loadsHTML = '';
-                orderLoads.forEach(l => {
-                    loadsHTML += `
-                        <tr style="background: #080f15;">
-                            <td>حمولة رقم: <b style="color:var(--primary-gold)">${l.loadIndex}</b></td>
-                            <td>وصل رقم: ${l.receiptNo}</td>
-                            <td>الآلية: ${l.vehicle}</td>
-                            <td>المضخة: ${l.pump}</td>
-                            <td>الكمية: ${l.qty} م³</td>
-                            <td colspan="3">
-                                <button class="btn-action btn-gold" style="padding:3px 8px; font-size:11px;" onclick="printReceipt('${l.id}')"><i class="fas fa-print"></i> طباعة الوصل</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                ordersRows += `
-                    <tr>
-                        <td><b>${o.no}</b></td>
-                        <td>${o.date}</td>
-                        <td>${o.customer}</td>
-                        <td>${o.site}</td>
-                        <td>${o.pour}</td>
-                        <td><span style="color:var(--primary-gold)">${o.status || 'جديد'}</span></td>
-                        <td>${o.qty} م³</td>
-                        <td>${actionsHTML}</td>
-                    </tr>
-                    ${loadsHTML}
-                `;
-            });
-        }
-
-        container.innerHTML = `
-            <div class="card">
-                <h3>جدول أوامر التجهيز والحمولات</h3>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>رقم الأمر</th>
-                                <th>التاريخ</th>
-                                <th>اسم الزبون</th>
-                                <th>موقع الصب</th>
-                                <th>نوع الصب</th>
-                                <th>الحالة</th>
-                                <th>الكمية (م³)</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>${ordersRows}</tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-    } else {
-        container.innerHTML = `
-            <div class="card">
-                <h3>قسم ${NAV_ITEMS.find(i=>i.id===activeTab).label}</h3>
-                <p style="color:var(--text-muted); font-size:13px; margin-top:10px;">القسم يعمل بنجاح ضمن الصلاحيات المخصصة لحسابك.</p>
-            </div>
-        `;
-    }
-}
-
-function openNewOrderModal() {
-    document.getElementById('modalTitle').innerText = 'أمر تجهيز جديد (صلاحية المدير)';
-    const form = document.getElementById('dynamicForm');
-    form.innerHTML = `
-        <input type="hidden" name="formType" value="newOrder">
-        <div class="form-group"><label>اسم الزبون</label><input type="text" name="customer" value="شركة النور للمقاولات" required></div>
-        <div class="form-group"><label>موقع الصب</label><input type="text" name="site" value="كربلاء - حي الحسين" required></div>
-        <div class="form-group"><label>نوع الصب</label><input type="text" name="pour" value="سقوف" required></div>
-        <div class="form-group"><label>المواصفة (رتبة الخرسانة)</label><input type="text" name="grade" value="C25" required></div>
-        <div class="form-group"><label>الكمية التقديرية (م³)</label><input type="number" name="qty" value="50" required></div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button type="submit" class="btn-action" style="flex:1;">حفظ الأمر</button>
-            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>
-        </div>
-    `;
-    document.getElementById('modalOverlay').classList.remove('hidden');
-}
-
-function openAddLoadModal(orderNo) {
-    const existingLoads = store.loads.filter(l => l.orderNo === orderNo);
-    const nextIndex = existingLoads.length + 1;
-
-    document.getElementById('modalTitle').innerText = 'إضافة حمولة للأمر ' + orderNo;
-    const form = document.getElementById('dynamicForm');
-    form.innerHTML = `
-        <input type="hidden" name="formType" value="newLoad">
-        <input type="hidden" name="orderNo" value="${orderNo}">
-        <div class="form-group"><label>رقم الحمولة الإجباري (تلقائي 1.2.3...)</label><input type="number" name="loadIndex" value="${nextIndex}" readonly style="background:#080f15;"></div>
-        <div class="form-group"><label>رقم الآلية (الخلاطة)</label><input type="text" name="vehicle" value="KRB-101" required></div>
-        <div class="form-group"><label>رقم المضخة</label><input type="text" name="pump" value="P-01" required></div>
-        <div class="form-group"><label>الكمية المجهزة (م³)</label><input type="number" name="qty" value="10" required></div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button type="submit" class="btn-action" style="flex:1;">تسجيل وطباعة الوصل</button>
-            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>
-        </div>
-    `;
-    document.getElementById('modalOverlay').classList.remove('hidden');
-}
-
-function closeModal() {
-    document.getElementById('modalOverlay').classList.add('hidden');
-}
-
-function handleFormSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const type = formData.get('formType');
-
-    if (type === 'newOrder') {
-        const newOrder = {
-            no: 'ORD-2026-' + String(store.nextOrderNo++).padStart(3, '0'),
-            customer: formData.get('customer'),
-            site: formData.get('site'),
-            pour: formData.get('pour'),
-            grade: formData.get('grade'),
-            qty: formData.get('qty'),
-            status: 'جديد',
-            date: new Date().toISOString().slice(0,10)
-        };
-        store.orders.push(newOrder);
-    } else if (type === 'newLoad') {
-        const newLoad = {
-            id: Date.now().toString(),
-            orderNo: formData.get('orderNo'),
-            loadIndex: formData.get('loadIndex'),
-            receiptNo: String(store.nextReceiptNo++).padStart(4, '0'),
-            vehicle: formData.get('vehicle'),
-            pump: formData.get('pump'),
-            qty: formData.get('qty'),
-            date: new Date().toISOString().slice(0,10)
-        };
-        store.loads.push(newLoad);
-    }
-
-    saveStore();
-    closeModal();
-}
-
-function sendToPlant(no) {
-    const order = store.orders.find(o => o.no === no);
-    if (order) {
-        order.status = 'مرسل للمعمل';
-        playBeep();
-        saveStore();
-        alert('تم إرسال الأمر إلى المعمل بنجاح وتنبيه المشغل!');
-    }
-}
-
-function updateOrderStatus(no, newStatus) {
-    const order = store.orders.find(o => o.no === no);
-    if (order) {
-        order.status = newStatus;
-        saveStore();
-    }
-}
-
-function deleteOrder(no) {
-    if (confirm('هل أنت تأكد من حذف هذا الأمر ومناقلاته؟')) {
-        store.orders = store.orders.filter(o => o.no !== no);
-        store.loads = store.loads.filter(l => l.orderNo !== no);
-        saveStore();
-    }
-}
-
-function printReceipt(loadId) {
-    const load = store.loads.find(l => l.id === loadId);
-    const order = store.orders.find(o => o.no === load.orderNo);
-
-    const win = window.open('', '_blank');
-    win.document.write(`
-        <!doctype html>
-        <html lang="ar" dir="rtl">
-        <head>
-            <meta charset="utf-8">
-            <title>وصل تجهيز خرسانة - ${load.receiptNo}</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-            <style>
-                :root { --border-gold: #d4af37; --primary-gold: #c69214; }
-                * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-                body { background: #fff; color: #0f172a; padding: 10px; }
-                .receipt-container { width: 100%; max-width: 210mm; margin: 0 auto; padding: 10px; }
-                .border-outer { border: 4px double var(--border-gold); padding: 15px; position: relative; min-height: 270mm; display: flex; flex-direction: column; justify-content: space-between; }
-                .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-                .brand-titles h1 { font-size: 24px; color: var(--primary-gold); }
-                .title-banner { background: #000; color: #fff; text-align: center; padding: 6px; border-radius: 20px; margin: 10px 0; border: 2px solid var(--border-gold); }
-                .meta-boxes { display: flex; justify-content: space-between; margin-bottom: 10px; }
-                .meta-box { border: 2px solid #cbd5e1; border-radius: 8px; width: 25%; text-align: center; background: #f8fafc; }
-                .meta-box .title { background: #e2e8f0; font-weight: bold; font-size: 12px; padding: 3px; }
-                .meta-box .value { font-size: 16px; font-weight: 800; padding: 4px; }
-                .details-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-                .details-table td { border: 2px solid #cbd5e1; padding: 7px 10px; font-size: 13px; }
-                .label-col { background: #f1f5f9; font-weight: bold; width: 30%; }
-                .val-col { font-weight: bold; text-align: center; }
-                .dispatch-section { border: 2px solid #000; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
-                .dispatch-header { background: #000; color: #fff; text-align: center; padding: 5px; font-size: 16px; font-weight: bold; }
-                .dispatch-body { display: flex; padding: 12px; gap: 10px; align-items: center; }
-                .dispatch-card { border: 2px solid #cbd5e1; border-radius: 8px; flex: 1; text-align: center; }
-                .dispatch-card .head { background: #e2e8f0; padding: 4px; font-size: 13px; font-weight: bold; }
-                .dispatch-card .body-val { font-size: 50px; font-weight: 900; }
-                .signatures-area { display: flex; justify-content: space-between; margin-top: 20px; }
-                .sig-box { text-align: center; width: 40%; }
-                .sig-line { border-bottom: 2px dashed #94a3b8; margin-top: 30px; }
-            </style>
-        </head>
-        <body onload="setTimeout(() => window.print(), 300)">
-            <div class="receipt-container">
-                <div class="border-outer">
-                    <div>
-                        <div class="header">
-                            <div class="brand-titles">
-                                <h1>شركة صدى الاعمار</h1>
-                                <h3>للخرسانة والكونكريت الجاهز</h3>
-                            </div>
-                            <div style="text-align:center;">
-                                <i class="fas fa-truck-monster" style="font-size:40px; color:#334155;"></i>
-                                <div style="font-size:12px; font-weight:bold;">خرسانة أقوى .. لنستاع أعمر</div>
-                            </div>
-                        </div>
-
-                        <div class="title-banner">
-                            <h2>وصل تجهيز خرسانة</h2>
-                            <span style="font-size:10px;">CONCRETE DELIVERY RECEIPT</span>
-                        </div>
-
-                        <div class="meta-boxes">
-                            <div class="meta-box"><div class="title">رقم الوصل</div><div class="value" style="color:red;">${load.receiptNo}</div></div>
-                            <div class="meta-box"><div class="title">التاريخ</div><div class="value">${load.date}</div></div>
-                        </div>
-
-                        <table class="details-table">
-                            <tr><td class="label-col">اسم الزبون</td><td class="val-col">${order.customer}</td></tr>
-                            <tr><td class="label-col">موقع الصب</td><td class="val-col">${order.site}</td></tr>
-                            <tr><td class="label-col">نوع الصب</td><td class="val-col">${order.pour}</td></tr>
-                            <tr><td class="label-col">المواصفة</td><td class="val-col">${order.grade}</td></tr>
-                            <tr><td class="label-col">رقم الآلية</td><td class="val-col">${load.vehicle}</td></tr>
-                            <tr><td class="label-col">رقم المضخة</td><td class="val-col">${load.pump}</td></tr>
-                            <tr><td class="label-col">الكمية (م³)</td><td class="val-col">${load.qty}</td></tr>
-                        </table>
-
-                        <div class="dispatch-section">
-                            <div class="dispatch-header">تفاصيل التجهيز</div>
-                            <div class="dispatch-body">
-                                <div style="flex:1; text-align:center;">
-                                    <i class="fas fa-truck-moving" style="font-size:40px;"></i>
-                                    <div style="font-weight:bold; color:var(--primary-gold);">صدى الاعمار</div>
-                                </div>
-                                <div class="dispatch-card">
-                                    <div class="head">رقم الحمولة</div>
-                                    <div class="body-val">${load.loadIndex}</div>
-                                </div>
-                                <div class="dispatch-card">
-                                    <div class="head">الكمية المجهزة (م³)</div>
-                                    <div class="body-val">${load.qty}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="signatures-area">
-                            <div class="sig-box"><p>توقيع المعمل</p><div class="sig-line"></div></div>
-                            <div class="sig-box"><p>توقيع الزبون</p><div class="sig-line"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-    `);
-    win.document.close();
-}
-</script>
-</body>
-</html>
+<script>  
+const USERS = {  
+    'raed': { pass: '2002', role: 'admin', name: 'المدير العام' },  
+    'raed1': { pass: '20021', role: 'operator', name: 'مشغّل المعمل' },  
+    'raed 2': { pass: '20022', role: 'accountant', name: 'المحاسب' }  
+};  
+  
+const NAV_ITEMS = [  
+    { id: 'dashboard', label: 'الرئيسية', icon: 'fa-home', roles: ['admin', 'operator', 'accountant'] },  
+    { id: 'orders', label: 'أوامر التجهيز', icon: 'fa-file-invoice', roles: ['admin', 'operator', 'accountant'] },  
+    { id: 'customers', label: 'العملاء', icon: 'fa-users', roles: ['admin', 'accountant'] },  
+    { id: 'plants', label: 'المعامل', icon: 'fa-industry', roles: ['admin'] },  
+    { id: 'drivers', label: 'السائقون', icon: 'fa-user-tie', roles: ['admin', 'operator'] },  
+    { id: 'vehicles', label: 'الآليات / الخلاطات', icon: 'fa-truck-moving', roles: ['admin', 'operator'] },  
+    { id: 'inventory', label: 'المخزون', icon: 'fa-boxes', roles: ['admin', 'operator'] },  
+    { id: 'accounts', label: 'الحسابات', icon: 'fa-calculator', roles: ['admin', 'accountant'] },  
+    { id: 'invoices', label: 'الفواتير', icon: 'fa-receipt', roles: ['admin', 'accountant'] },  
+    { id: 'receipts', label: 'القبض', icon: 'fa-hand-holding-usd', roles: ['admin', 'accountant'] },  
+    { id: 'expenses', label: 'المصروفات', icon: 'fa-wallet', roles: ['admin', 'accountant'] },  
+    { id: 'employees', label: 'الموظفون', icon: 'fa-id-card', roles: ['admin'] },  
+    { id: 'archive', label: 'المتابعة والأرشفة', icon: 'fa-archive', roles: ['admin', 'accountant'] },  
+    { id: 'reports', label: 'التقارير', icon: 'fa-chart-line', roles: ['admin', 'operator', 'accountant'] },  
+    { id: 'permissions', label: 'المستخدمون والصلاحيات', icon: 'fa-user-shield', roles: ['admin'] },  
+    { id: 'settings', label: 'الإعدادات', icon: 'fa-cog', roles: ['admin'] }  
+];  
+  
+let currentUser = null;  
+let activeTab = 'dashboard';  
+  
+let store = JSON.parse(localStorage.getItem('sada_app_data_v6')) || {  
+    orders: [], loads: [], customers: [], plants: [], drivers: [], vehicles: [],  
+    inventory: [], accounts: [], invoices: [], receipts: [], expenses: [],  
+    employees: [], archive: [], permissions: [], settings: {},  
+    nextOrderNo: 129, nextReceiptNo: 1  
+};  
+  
+function saveStore() {  
+    localStorage.setItem('sada_app_data_v6', JSON.stringify(store));  
+    render();  
+}  
+  
+function playBeep() {  
+    try {  
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();  
+        const osc = ctx.createOscillator();  
+        const gain = ctx.createGain();  
+        osc.type = 'sine';  
+        osc.frequency.setValueAtTime(880, ctx.currentTime);  
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);  
+        osc.connect(gain);  
+        gain.connect(ctx.destination);  
+        osc.start();  
+        osc.stop(ctx.currentTime + 0.6);  
+    } catch(e) {}  
+}  
+  
+function handleLogin(e) {  
+    e.preventDefault();  
+    const u = document.getElementById('username').value.trim();  
+    const p = document.getElementById('password').value.trim();  
+    const err = document.getElementById('loginError');  
+  
+    if (USERS[u] && USERS[u].pass === p) {  
+        currentUser = USERS[u];  
+        err.style.display = 'none';  
+        document.getElementById('loginScreen').classList.add('hidden');  
+        document.getElementById('appLayout').classList.remove('hidden');  
+          
+        document.getElementById('displayUser').innerText = currentUser.name;  
+        document.getElementById('displayRole').innerText = getRoleLabel(currentUser.role);  
+          
+        buildSidebarNav();  
+        switchTab('dashboard');  
+    } else {  
+        err.style.display = 'block';  
+    }  
+}  
+  
+function handleLogout() {  
+    currentUser = null;  
+    document.getElementById('appLayout').classList.add('hidden');  
+    document.getElementById('loginScreen').classList.remove('hidden');  
+}  
+  
+function getRoleLabel(role) {  
+    if (role === 'admin') return 'مدير النظام (جميع الصلاحيات)';  
+    if (role === 'operator') return 'مشغّل معمل (إدخال كمية فعلية وقفل الأمر)';  
+    if (role === 'accountant') return 'محاسب (عرض وطباعة وأرشفة)';  
+}  
+  
+function buildSidebarNav() {  
+    const nav = document.getElementById('sidebarNav');  
+    nav.innerHTML = '';  
+    let allowedItems = NAV_ITEMS;  
+    if (currentUser.role === 'operator') {  
+        allowedItems = NAV_ITEMS.filter(i => ['dashboard', 'orders', 'reports'].includes(i.id));  
+    }  
+  
+    allowedItems.forEach(item => {  
+        if (item.roles.includes(currentUser.role)) {  
+            nav.innerHTML += `  
+                <button class="nav-btn ${item.id === activeTab ? 'active' : ''}" id="nav-${item.id}" onclick="switchTab('${item.id}')">  
+                    <i class="fas ${item.icon}"></i> ${item.label}  
+                </button>  
+            `;  
+        }  
+    });  
+}  
+  
+function switchTab(tabId) {  
+    activeTab = tabId;  
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));  
+    const activeBtn = document.getElementById(`nav-${tabId}`);  
+    if (activeBtn) activeBtn.classList.add('active');  
+  
+    const item = NAV_ITEMS.find(i => i.id === tabId);  
+    document.getElementById('pageTitle').innerText = item ? item.label : '';  
+      
+    render();  
+}  
+  
+function render() {  
+    const container = document.getElementById('mainViewContainer');  
+    const actionArea = document.getElementById('actionArea');  
+    actionArea.innerHTML = '';  
+  
+    if (activeTab === 'dashboard') {  
+        let totalQty = 0;  
+        store.loads.forEach(l => totalQty += Number(l.qty || 0));  
+        container.innerHTML = `  
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">  
+                <div class="card">أوامر التجهيز<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.orders.length}</strong></div>  
+                <div class="card">إجمالي الحمولات<strong style="display:block; font-size:24px; color:var(--primary-cyan); margin-top:8px;">${store.loads.length}</strong></div>  
+                <div class="card">المجهز (م³)<strong style="display:block; font-size:24px; color:var(--primary-gold); margin-top:8px;">${totalQty} م³</strong></div>  
+            </div>  
+            <div class="card">  
+                <h3>أحدث أوامر التجهيز</h3>  
+                <table>  
+                    <thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون</th><th>الحالة</th><th>الكمية</th></tr></thead>  
+                    <tbody>  
+                        ${store.orders.slice(-5).reverse().map(o => `<tr><td>${o.no}</td><td>${o.date}</td><td>${o.customer}</td><td>${getStatusBadge(o.status)}</td><td>${o.qty} م³</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات</td></tr>'}  
+                    </tbody>  
+                </table>  
+            </div>  
+        `;  
+    } else if (activeTab === 'orders') {  
+        if (currentUser.role === 'admin') {  
+            actionArea.innerHTML = `<button class="btn-action" onclick="openNewOrderModal()"><i class="fas fa-plus"></i> إضافة أمر تجهيز جديد</button>`;  
+        }  
+        renderOrdersTable(container);  
+    } else if (activeTab === 'reports') {  
+        renderReportsView(container);  
+    } else {  
+        if (canAddInCurrentTab()) {  
+            actionArea.innerHTML = `<button class="btn-action" onclick="openGenericModal('${activeTab}')"><i class="fas fa-plus"></i> إضافة عنصر جديد</button>`;  
+        }  
+        renderGenericTable(container, activeTab);  
+    }  
+}  
+  
+function getStatusBadge(st) {  
+    if (st === 'قيد الإنشاء' || !st) return '<span class="status-draft">قيد الإنشاء</span>';  
+    if (st === 'تم القفل') return '<span class="status-locked">تم القفل</span>';  
+    if (st === 'مرحّل الفاتوره') return '<span class="status-invoiced">مرحّل الفاتوره</span>';  
+    return `<span class="status-draft">${st}</span>`;  
+}  
+  
+function canAddInCurrentTab() {  
+    if (currentUser.role === 'admin') return activeTab !== 'dashboard' && activeTab !== 'reports';  
+    if (currentUser.role === 'operator') return false;  
+    if (currentUser.role === 'accountant') return !['orders', 'plants', 'employees', 'permissions', 'settings'].includes(activeTab);  
+    return false;  
+}  
+  
+function renderOrdersTable(container) {  
+    let ordersRows = '';  
+    if (store.orders.length === 0) {  
+        ordersRows = '<tr><td colspan="9" style="text-align:center; padding:15px;">لا توجد أوامر تجهيز مسجلة.</td></tr>';  
+    } else {  
+        store.orders.forEach(o => {  
+            const orderLoads = store.loads.filter(l => l.orderNo === o.no);  
+            let deliveredSum = 0;  
+            orderLoads.forEach(l => deliveredSum += Number(l.qty || 0));  
+  
+            let actionsHTML = '';  
+              
+            if (currentUser.role === 'admin') {  
+                actionsHTML += `<button class="btn-action" style="padding: 4px 8px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ حمولة (${orderLoads.length})</button> `;  
+                if (!o.status || o.status === 'قيد الإنشاء') {  
+                    actionsHTML += `<button class="btn-action btn-gold" style="padding: 4px 8px; font-size:11px;" onclick="sendToPlant('${o.no}')">📤 إرسال للمعمل</button> `;  
+                }  
+                actionsHTML += `<button class="btn-action btn-blue" style="padding: 4px 8px; font-size:11px;" onclick="openEditOrderModal('${o.no}')"><i class="fas fa-edit"></i> تعديل</button> `;  
+                actionsHTML += `<button class="btn-action btn-danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteOrder('${o.no}')"><i class="fas fa-trash"></i> حذف</button>`;  
+            }  
+  
+            if (currentUser.role === 'operator') {  
+                if (o.status !== 'تم القفل' && o.status !== 'مرحّل الفاتوره') {  
+                    actionsHTML += `<button class="btn-action" style="padding: 4px 10px; font-size:11px;" onclick="openAddLoadModal('${o.no}')">＋ إضافة حمولة (${orderLoads.length})</button> `;  
+                    actionsHTML += `<button class="btn-action btn-gold" style="padding: 4px 10px; font-size:11px;" onclick="openFinalizeOrderModal('${o.no}')">⏹ الكمية الفعلية والقفل</button>`;  
+                } else {  
+                    actionsHTML += `<span style="color:#eab308; font-weight:bold; font-size:11px;">تم قفل الأمر وإتمام التجهيز</span>`;  
+                }  
+            }  
+  
+            if (currentUser.role === 'accountant') {  
+                actionsHTML += `<span style="font-size:11px; color:var(--text-muted);">👁️ عرض وطباعة فقط</span>`;  
+                if(o.status === 'تم القفل') {  
+                    actionsHTML += ` <button class="btn-action btn-blue" style="padding:3px 6px; font-size:10px;" onclick="updateOrderStatus('${o.no}', 'مرحّل الفاتوره')">ترحيل الفاتورة</button>`;  
+                }  
+            }  
+  
+            let loadsHTML = '';  
+            orderLoads.forEach(l => {  
+                let loadActions = `<button class="btn-action btn-gold" style="padding:3px 8px; font-size:11px;" onclick="printReceipt('${l.id}')"><i class="fas fa-print"></i> طباعة الوصل (A5)</button>`;  
+                if (currentUser.role === 'admin') {  
+                    loadActions += ` <button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteLoad('${l.id}')">حذف</button>`;  
+                }  
+  
+                loadsHTML += `  
+                    <tr style="background: #080f15;">  
+                        <td>حمولة رقم: <b style="color:var(--primary-gold)">${l.loadIndex}</b></td>  
+                        <td>وصل رقم: ${l.receiptNo}</td>  
+                        <td>السائق: ${l.driver || 'علي حسين'}[span_6](start_span)[span_6](end_span)</td>  
+                        <td>الآلية: ${l.vehicle}[span_7](start_span)[span_7](end_span)</td>  
+                        <td colspan="2">الكمية المجهزة: ${l.qty} م³[span_8](start_span)[span_8](end_span)</td>  
+                        <td colspan="3">${loadActions}</td>  
+                    </tr>  
+                `;  
+            });  
+  
+            ordersRows += `  
+                <tr>  
+                    <td><b>${o.no}</b></td>  
+                    <td>${o.date}</td>  
+                    <td>${o.customer}[span_9](start_span)[span_9](end_span)</td>  
+                    <td>${o.site}[span_10](start_span)[span_10](end_span)</td>  
+                    <td>${o.pour}[span_11](start_span)[span_11](end_span)</td>  
+                    <td>${getStatusBadge(o.status)}</td>  
+                    <td>${o.qty} م³ <br><small style="color:var(--primary-cyan)">فعلية: ${o.actualQty || deliveredSum} م³</small></td>  
+                    <td>${actionsHTML}</td>  
+                </tr>  
+                ${loadsHTML}  
+            `;  
+        });  
+    }  
+  
+    container.innerHTML = `  
+        <div class="card">  
+            <h3>جدول أوامر التجهيز والحمولات والكميات الفعلية</h3>  
+            <div style="overflow-x:auto;">  
+                <table>  
+                    <thead>  
+                        <tr>  
+                            <th>رقم الأمر</th>  
+                            <th>التاريخ</th>  
+                            <th>اسم الزبون[span_12](start_span)[span_12](end_span)</th>  
+                            <th>موقع الصب[span_13](start_span)[span_13](end_span)</th>  
+                            <th>نوع الصب[span_14](start_span)[span_14](end_span)</th>  
+                            <th>الحالة (الدلالة)</th>  
+                            <th>الكمية المطلوبة / الفعلية</th>  
+                            <th>الإجراءات المتاحة</th>  
+                        </tr>  
+                    </thead>  
+                    <tbody>${ordersRows}</tbody>  
+                </table>  
+            </div>  
+        </div>  
+    `;  
+}  
+  
+function renderGenericTable(container, tabKey) {  
+    const items = store[tabKey] || [];  
+    let rows = '';  
+  
+    if (items.length === 0) {  
+        rows = '<tr><td colspan="4" style="text-align:center; padding:15px;">لا توجد سجلات مسجلة في هذه القائمة.</td></tr>';  
+    } else {  
+        items.forEach((item, index) => {  
+            let ctrlBtns = '';  
+            if (currentUser.role === 'admin' || (currentUser.role === 'accountant' && canAddInCurrentTab())) {  
+                ctrlBtns += `<button class="btn-action btn-blue" style="padding:3px 8px; font-size:11px;" onclick="openGenericModal('${tabKey}', ${index})"><i class="fas fa-edit"></i> تعديل</button> `;  
+                ctrlBtns += `<button class="btn-action btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteGenericItem('${tabKey}', ${index})"><i class="fas fa-trash"></i> حذف</button>`;  
+            } else {  
+                ctrlBtns = `<span style="font-size:11px; color:var(--text-muted);">عرض فقط</span>`;  
+            }  
+  
+            rows += `  
+                <tr>  
+                    <td><b>#${index + 1}</b></td>  
+                    <td>${item.name || item.title || item.code || 'سجل رقم ' + (index+1)}</td>  
+                    <td>${item.details || item.phone || item.amount || item.date || '-'}</td>  
+                    <td>${ctrlBtns}</td>  
+                </tr>  
+            `;  
+        });  
+    }  
+  
+    container.innerHTML = `  
+        <div class="card">  
+            <h3>جدول سجلات: ${NAV_ITEMS.find(i=>i.id===tabKey).label}</h3>  
+            <div style="overflow-x:auto;">  
+                <table>  
+                    <thead>  
+                        <tr>  
+                            <th>#</th>  
+                            <th>البيان / الاسم</th>  
+                            <th>التفاصيل / القيمة</th>  
+                            <th>الإجراءات المتاحة</th>  
+                        </tr>  
+                    </thead>  
+                    <tbody>${rows}</tbody>  
+                </table>  
+            </div>  
+        </div>  
+    `;  
+}  
+  
+// Modal Form Controllers  
+function openNewOrderModal() {  
+    document.getElementById('modalTitle').innerText = 'أمر تجهيز جديد (صلاحية المدير)';  
+    const form = document.getElementById('dynamicForm');  
+    form.innerHTML = `  
+        <input type="hidden" name="formType" value="newOrder">  
+        <div class="form-group"><label>اسم الزبون[span_15](start_span)[span_15](end_span)</label><input type="text" name="customer" value="شركة النور للمقاولات[span_16](start_span)"[span_16](end_span) required></div>  
+        <div class="form-group"><label>موقع الصب[span_17](start_span)[span_17](end_span)</label><input type="text" name="site" value="كربلاء - حي الحسين[span_18](start_span)"[span_18](end_span) required></div>  
+        <div class="form-group"><label>نوع الصب[span_19](start_span)[span_19](end_span)</label><input type="text" name="pour" value="سقوف[span_20](start_span)"[span_20](end_span) required></div>  
+        <div class="form-group"><label>المواصفة (رتبة الخرسانة)[span_21](start_span)[span_21](end_span)</label><input type="text" name="grade" value="C25[span_22](start_span)"[span_22](end_span) required></div>  
+        <div class="form-group"><label>الكمية التقديرية (م³)[span_23](start_span)[span_23](end_span)</label><input type="number" name="qty" value="50[span_24](start_span)"[span_24](end_span) required></div>  
+        <div style="display:flex; gap:10px; margin-top:20px;">  
+            <button type="submit" class="btn-action" style="flex:1;">حفظ الأمر وإرسال تنبيه للمعمل</button>  
+            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>  
+        </div>  
+    `;  
+    document.getElementById('modalOverlay').classList.remove('hidden');  
+}  
+  
+function openEditOrderModal(orderNo) {  
+    const order = store.orders.find(o => o.no === orderNo);  
+    if (!order) return;  
+  
+    document.getElementById('modalTitle').innerText = 'تعديل أمر تجهيز ' + orderNo;  
+    const form = document.getElementById('dynamicForm');  
+    form.innerHTML = `  
+        <input type="hidden" name="formType" value="editOrder">  
+        <input type="hidden" name="orderNo" value="${orderNo}">  
+        <div class="form-group"><label>اسم الزبون</label><input type="text" name="customer" value="${order.customer}" required></div>  
+        <div class="form-group"><label>موقع الصب</label><input type="text" name="site" value="${order.site}" required></div>  
+        <div class="form-group"><label>نوع الصب</label><input type="text" name="pour" value="${order.pour}" required></div>  
+        <div class="form-group"><label>المواصفة</label><input type="text" name="grade" value="${order.grade}" required></div>  
+        <div class="form-group"><label>الكمية (م³)</label><input type="number" name="qty" value="${order.qty}" required></div>  
+        <div style="display:flex; gap:10px; margin-top:20px;">  
+            <button type="submit" class="btn-action" style="flex:1;">حفظ التغييرات</button>  
+            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>  
+        </div>  
+    `;  
+    document.getElementById('modalOverlay').classList.remove('hidden');  
+}  
+  
+function openAddLoadModal(orderNo) {  
+    const existingLoads = store.loads.filter(l => l.orderNo === orderNo);  
+    const nextIndex = existingLoads.length + 1;  
+  
+    document.getElementById('modalTitle').innerText = 'إضافة حمولة للأمر ' + orderNo;  
+    const form = document.getElementById('dynamicForm');  
+    form.innerHTML = `  
+        <input type="hidden" name="formType" value="newLoad">  
+        <input type="hidden" name="orderNo" value="${orderNo}">  
+        <div class="form-group"><label>رقم الحمولة التسلسلي الإجباري[span_25](start_span)[span_25](end_span)</label><input type="number" name="loadIndex" value="${nextIndex}" readonly style="background:#080f15;"></div>  
+        <div class="form-group"><label>رقم الآلية (الخلاطة)[span_26](start_span)[span_26](end_span)</label><input type="text" name="vehicle" value="KRB-101[span_27](start_span)"[span_27](end_span) required></div>  
+        <div class="form-group"><label>رقم المضخة[span_28](start_span)[span_28](end_span)</label><input type="text" name="pump" value="P-01[span_29](start_span)"[span_29](end_span) required></div>  
+        <div class="form-group"><label>اسم السائق[span_30](start_span)[span_30](end_span)</label><input type="text" name="driver" value="علي حسين[span_31](start_span)"[span_31](end_span) required></div>  
+        <div class="form-group"><label>وقت النقلة</label><input type="text" name="time" value="02:00" required></div>  
+        <div class="form-group"><label>الكمية المجهزة (م³)[span_32](start_span)[span_32](end_span)</label><input type="number" name="qty" value="6[span_33](start_span)"[span_33](end_span) required></div>  
+        <div style="display:flex; gap:10px; margin-top:20px;">  
+            <button type="submit" class="btn-action" style="flex:1;">تسجيل وطباعة الوصل (A5)</button>  
+            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>  
+        </div>  
+    `;  
+    document.getElementById('modalOverlay').classList.remove('hidden');  
+}  
+  
+// ⏹ إدخال الكمية الفعلية وقفل الأمر (خاص بمشغل المعمل)  
+function openFinalizeOrderModal(orderNo) {  
+    const order = store.orders.find(o => o.no === orderNo);  
+    const orderLoads = store.loads.filter(l => l.orderNo === orderNo);  
+    let currentDelivered = 0;  
+    orderLoads.forEach(l => currentDelivered += Number(l.qty || 0));  
+  
+    document.getElementById('modalTitle').innerText = 'إدخال الكمية الفعلية وقفل الأمر ' + orderNo;  
+    const form = document.getElementById('dynamicForm');  
+    form.innerHTML = `  
+        <input type="hidden" name="formType" value="finalizeOrder">  
+        <input type="hidden" name="orderNo" value="${orderNo}">  
+        <div class="form-group"><label>الكمية التقديرية المطلوبة</label><input type="text" value="${order.qty} م³" readonly style="background:#080f15;"></div>  
+        <div class="form-group"><label>إجمالي الكمية المجهزة بالحمولات فعلياً</label><input type="text" value="${currentDelivered} م³" readonly style="background:#080f15;"></div>  
+        <div class="form-group"><label>الكمية الفعلية النهائية المعتمدة (م³)</label><input type="number" name="actualQty" value="${currentDelivered || order.qty}" required></div>  
+        <div style="display:flex; gap:10px; margin-top:20px;">  
+            <button type="submit" class="btn-action btn-gold" style="flex:1;">اعتماد الكمية و قفل الأمر (أصفر فاتح)</button>  
+            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>  
+        </div>  
+    `;  
+    document.getElementById('modalOverlay').classList.remove('hidden');  
+}  
+  
+function openGenericModal(tabKey, editIndex = null) {  
+    const isEdit = editIndex !== null;  
+    const item = isEdit ? store[tabKey][editIndex] : {};  
+      
+    document.getElementById('modalTitle').innerText = (isEdit ? 'تعديل سجل في ' : 'إضافة سجل جديد في ') + NAV_ITEMS.find(i=>i.id===tabKey).label;  
+    const form = document.getElementById('dynamicForm');  
+  
+    if (tabKey === 'orders') {  
+        openNewOrderModal();  
+        return;  
+    }  
+  
+    form.innerHTML = `  
+        <input type="hidden" name="tabKey" value="${tabKey}">  
+        <input type="hidden" name="editIndex" value="${isEdit ? editIndex : ''}">  
+        <div class="form-group"><label>الاسم / البيان الرئيسي</label><input type="text" name="name" value="${item.name || ''}" required></div>  
+        <div class="form-group"><label>التفاصيل / الهاتف / القيمة</label><input type="text" name="details" value="${item.details || ''}" required></div>  
+        <div style="display:flex; gap:10px; margin-top:20px;">  
+            <button type="submit" class="btn-action" style="flex:1;">${isEdit ? 'حفظ التعديل' : 'إضافة السجل'}</button>  
+            <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="closeModal()">إلغاء</button>  
+        </div>  
+    `;  
+    document.getElementById('modalOverlay').classList.remove('hidden');  
+}  
+  
+function closeModal() {  
+    document.getElementById('modalOverlay').classList.add('hidden');  
+}  
+  
+function handleFormSubmit(e) {  
+    e.preventDefault();  
+    const formData = new FormData(e.target);  
+    const formType = formData.get('formType');  
+    const tabKey = formData.get('tabKey');  
+  
+    if (formType === 'newOrder') {  
+        const newOrder = {  
+            no: '000' + store.nextOrderNo++,  
+            customer: formData.get('customer'),  
+            site: formData.get('site'),  
+            pour: formData.get('pour'),  
+            grade: formData.get('grade'),  
+            qty: formData.get('qty'),  
+            actualQty: 0,  
+            status: 'قيد الإنشاء', // أبيض طبيعي  
+            date: '2026-11-01'  
+        };  
+        store.orders.push(newOrder);  
+        saveStore();  
+        closeModal();  
+        sendToPlant(newOrder.no);  
+        return;  
+    } else if (formType === 'editOrder') {  
+        const orderNo = formData.get('orderNo');  
+        const order = store.orders.find(o => o.no === orderNo);  
+        if (order) {  
+            order.customer = formData.get('customer');  
+            order.site = formData.get('site');  
+            order.pour = formData.get('pour');  
+            order.grade = formData.get('grade');  
+            order.qty = formData.get('qty');  
+        }  
+    } else if (formType === 'newLoad') {  
+        const newLoad = {  
+            id: Date.now().toString(),  
+            orderNo: formData.get('orderNo'),  
+            loadIndex: formData.get('loadIndex'),  
+            receiptNo: String(store.nextReceiptNo++).padStart(4, '0'),  
+            vehicle: formData.get('vehicle'),  
+            pump: formData.get('pump'),  
+            driver: formData.get('driver'),  
+            time: formData.get('time'),  
+            qty: formData.get('qty'),  
+            date: '2026-11-01'  
+        };  
+        store.loads.push(newLoad);  
+    } else if (formType === 'finalizeOrder') {  
+        const orderNo = formData.get('orderNo');  
+        const order = store.orders.find(o => o.no === orderNo);  
+        if (order) {  
+            order.actualQty = formData.get('actualQty');  
+            order.status = 'تم القفل'; // أصفر فاتح  
+        }  
+    } else if (tabKey) {  
+        const editIndex = formData.get('editIndex');  
+        const newItem = { name: formData.get('name'), details: formData.get('details') };  
+        if (!store[tabKey]) store[tabKey] = [];  
+        if (editIndex !== '' && editIndex !== null) {  
+            store[tabKey][editIndex] = newItem;  
+        } else {  
+            store[tabKey].push(newItem);  
+        }  
+    }  
+  
+    saveStore();  
+    closeModal();  
+}  
+  
+function sendToPlant(no) {  
+    const order = store.orders.find(o => o.no === no);  
+    if (!order) return;  
+      
+    order.status = 'قيد الإنشاء';  
+    saveStore();  
+    playBeep();  
+  
+    document.getElementById('n-orderNo').innerText = order.no;  
+    document.getElementById('n-customer').innerText = order.customer;  
+    document.getElementById('n-site').innerText = order.site;  
+    document.getElementById('n-pour').innerText = order.pour;  
+    document.getElementById('n-grade').innerText = order.grade;  
+    document.getElementById('n-qty').innerText = order.qty + ' م³[span_34](start_span)[span_34](end_span)';  
+    document.getElementById('n-date').innerText = order.date;  
+  
+    document.getElementById('notifModalOverlay').classList.remove('hidden');  
+}  
+  
+function closeNotifModal() {  
+    document.getElementById('notifModalOverlay').classList.add('hidden');  
+}  
+  
+function goToOrderFromNotif() {  
+    closeNotifModal();  
+    switchTab('orders');  
+}  
+  
+function updateOrderStatus(no, newStatus) {  
+    const order = store.orders.find(o => o.no === no);  
+    if (order) {  
+        order.status = newStatus; // مرحل الفاتورة (أخضر فاتح)  
+        saveStore();  
+    }  
+}  
+  
+function deleteOrder(no) {  
+    if (confirm('هل أنت تأكد من حذف هذا الأمر وحمولاته بالكامل؟')) {  
+        store.orders = store.orders.filter(o => o.no !== no);  
+        store.loads = store.loads.filter(l => l.orderNo !== no);  
+        saveStore();  
+    }  
+}  
+  
+function deleteLoad(id) {  
+    if (confirm('حذف هذه الحمولة؟')) {  
+        store.loads = store.loads.filter(l => l.id !== id);  
+        saveStore();  
+    }  
+}  
+  
+function deleteGenericItem(tabKey, index) {  
+    if (confirm('حذف هذا السجل نهائياً؟')) {  
+        store[tabKey].splice(index, 1);  
+        saveStore();  
+    }  
+}  
+  
+// 📊 قسم التقارير المماثل للصورة  
+function renderReportsView(container, filterFrom = '2026-11-01', filterTo = '2026-11-01') {  
+    const filteredOrders = store.orders.filter(o => {  
+        if (!filterFrom && !filterTo) return true;  
+        const d = o.date || '2026-11-01';  
+        if (filterFrom && d < filterFrom) return false;  
+        if (filterTo && d > filterTo) return false;  
+        return true;  
+    });  
+  
+    let totalRequestedQty = 0;  
+    let totalDeliveredQty = 0;  
+    let ordersReportRows = '';  
+  
+    if (filteredOrders.length === 0) {  
+        ordersReportRows = '<tr><td colspan="6" style="text-align:center; padding:20px;">لا توجد أوامر تجهيز ضمن الفترة المحددة.</td></tr>';  
+    } else {  
+        filteredOrders.forEach(o => {  
+            totalRequestedQty += Number(o.qty || 0);  
+            const orderLoads = store.loads.filter(l => l.orderNo === o.no);  
+            let orderDelivered = 0;  
+            orderLoads.forEach(l => orderDelivered += Number(l.qty || 0));  
+            let finalDelivered = Number(o.actualQty || orderDelivered);  
+            totalDeliveredQty += finalDelivered;  
+  
+            let loadsDetailsRows = '';  
+            if (orderLoads.length === 0) {  
+                loadsDetailsRows = '<tr><td colspan="3" style="color:#94a3b8; font-style:italic;">لا توجد حمولات مسجلة.</td></tr>';  
+            } else {  
+                orderLoads.forEach(l => {  
+                    loadsDetailsRows += `  
+                        <tr>  
+                            <td style="text-align:right;"><i class="fas fa-arrow-left" style="color:var(--primary-gold); margin-left:5px;"></i> ${l.loadIndex}- حمولة: <b>${l.driver || 'علي حسين'}[span_35](start_span)[span_35](end_span)</b></td>  
+                            <td style="text-align:center;">نقلة في ${l.time || '02:00'}</td>  
+                            <td style="text-align:center; font-weight:bold;">${l.qty}.00 م³[span_36](start_span)[span_36](end_span)</td>  
+                        </tr>  
+                    `;  
+                });  
+            }  
+  
+            ordersReportRows += `  
+                <tr>  
+                    <td style="text-align:center; font-weight:bold;">${o.no}</td>  
+                    <td style="text-align:center;">${o.date}</td>  
+                    <td>  
+                        <b>${o.customer}[span_37](start_span)[span_37](end_span)</b> - ${o.site}[span_38](start_span)[span_38](end_span)  
+                        <table style="width:100%; margin-top:6px; background:#0f172a; border-radius:6px; color:#fff;">  
+                            ${loadsDetailsRows}  
+                        </table>  
+                    </td>  
+                    <td style="text-align:center;"><b>${o.grade || 'C30'} / ${o.pour}[span_39](start_span)[span_39](end_span)</b></td>  
+                    <td style="text-align:center; font-weight:bold;">${Number(o.qty).toFixed(2)}[span_40](start_span)[span_40](end_span)</td>  
+                    <td style="text-align:center; font-weight:bold; color:#16a34a;">${finalDelivered.toFixed(2)} م³[span_41](start_span)[span_41](end_span)</td>  
+                </tr>  
+            `;  
+        });  
+    }  
+  
+    container.innerHTML = `  
+        <div class="card" style="background:#fff; color:#000; padding:20px; border-radius:12px;">  
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1e293b; padding-bottom:12px; margin-bottom:15px;">  
+                <div>  
+                    <h2 style="color:#0f172a; font-size:18px; font-weight:900;">شركة الركيزة المتحدة للخرسانة الجاهزة</h2>  
+                    <p style="font-size:12px; color:#475569; font-weight:bold; margin-top:3px;">شركة صدى الإعمار للخرسانة والكونكريت الجاهز - تقرير التجهيزات والحمولات - فرع (B)</p>  
+                </div>  
+                <div style="text-align:left;">  
+                    <div style="background:#1e293b; color:#ffd700; padding:4px 12px; border-radius:6px; font-weight:bold; font-size:12px; display:inline-block;">SADA AL-EMAR</div>  
+                </div>  
+            </div>  
+  
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; padding:10px 15px; border-radius:8px; margin-bottom:15px; flex-wrap:wrap; gap:10px;" class="no-print">  
+                <div style="display:flex; align-items:center; gap:10px;">  
+                    <label style="font-size:12px; font-weight:bold;">الفترة من:</label>  
+                    <input type="date" id="repFrom" value="${filterFrom}" style="padding:5px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">  
+                    <label style="font-size:12px; font-weight:bold;">إلى:</label>  
+                    <input type="date" id="repTo" value="${filterTo}" style="padding:5px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">  
+                    <button class="btn-action" onclick="applyReportFilter()"><i class="fas fa-filter"></i> تصفية التاريخ</button>  
+                </div>  
+                <div>  
+                    <button class="btn-action btn-gold" onclick="window.print()"><i class="fas fa-print"></i> طباعة التقرير (A4)</button>  
+                </div>  
+            </div>  
+  
+            <div style="display:flex; justify-content:space-between; background:#e2e8f0; padding:10px 15px; border-radius:8px; font-weight:bold; font-size:13px; margin-bottom:15px;">  
+                <div>عدد الطلبات: <span style="color:#dc2626;">${filteredOrders.length}</span></div>  
+                <div>إجمالي الكمية المطلوبة: <span style="color:#0f172a;">${totalRequestedQty.toFixed(2)} م³[span_42](start_span)[span_42](end_span)</span></div>  
+                <div>إجمالي المجهز فعلياً: <span style="color:#16a34a;">${totalDeliveredQty.toFixed(2)} م³[span_43](start_span)[span_43](end_span)</span></div>  
+            </div>  
+  
+            <table style="width:100%; border-collapse:collapse; background:#fff; color:#000;">  
+                <thead>  
+                    <tr style="background:#0f172a; color:#fff;">  
+                        <th style="padding:8px; text-align:center;">رقم</th>  
+                        <th style="padding:8px; text-align:center;">التاريخ[span_44](start_span)[span_44](end_span)</th>  
+                        <th style="padding:8px; text-align:right;">اسم الزبون والموقع / الحمولات[span_45](start_span)[span_45](end_span)</th>  
+                        <th style="padding:8px; text-align:center;">المواصفة والصب[span_46](start_span)[span_46](end_span)</th>  
+                        <th style="padding:8px; text-align:center;">المطلوب (م³)[span_47](start_span)[span_47](end_span)</th>  
+                        <th style="padding:8px; text-align:center;">المجهز (م³)[span_48](start_span)[span_48](end_span)</th>  
+                    </tr>  
+                </thead>  
+                <tbody>  
+                    ${ordersReportRows}  
+                </tbody>  
+            </table>  
+  
+            <div style="margin-top:20px; text-align:left; font-weight:bold; font-size:13px; border-top:2px solid #cbd5e1; padding-top:10px;">  
+                المجموع النهائي للفترة: <span style="color:#16a34a;">${totalDeliveredQty.toFixed(2)} م³[span_49](start_span)[span_49](end_span)</span> من أصل <span style="color:#0f172a;">${totalRequestedQty.toFixed(2)} م³[span_50](start_span)[span_50](end_span)</span>  
+            </div>  
+        </div>  
+    `;  
+}  
+  
+function applyReportFilter() {  
+    const f = document.getElementById('repFrom').value;  
+    const t = document.getElementById('repTo').value;  
+    renderReportsView(document.getElementById('mainViewContainer'), f, t);  
+}  
+  
+// طباعة وصل الحمولة بحجم A5 فقط  
+function printReceipt(loadId) {  
+    const load = store.loads.find(l => l.id === loadId);  
+    const order = store.orders.find(o => o.no === load.orderNo);  
+    if (!load || !order) return;  
+  
+    const win = window.open('', '_blank');  
+    win.document.write(`  
+        <!doctype html>  
+        <html lang="ar" dir="rtl">  
+        <head>  
+            <meta charset="utf-8">  
+            <title>وصل تجهيز خرسانة - ${load.receiptNo}</title>  
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+            <style>  
+                @page { size: A5 portrait; margin: 5mm; }  
+                * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }  
+                body { background: #fff; color: #0f172a; direction: rtl; }  
+                .receipt-container { width: 100%; max-width: 148mm; margin: 0 auto; background: #fff; padding: 2px; }  
+                .border-outer { border: 3px double #d4af37; padding: 10px; position: relative; min-height: 200mm; display: flex; flex-direction: column; justify-content: space-between; }  
+                .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }  
+          
