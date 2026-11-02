@@ -315,8 +315,18 @@ $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
 o=>{
 let ls=data.loads.filter(l=>String(l.orderNo)===String(o.no));
+
+let state=o.status==='تم القفل'
+  ? 'locked'
+  : o.status==='مرحّل للفاتورة'
+  ? 'invoiced'
+  : 'open';
+
+let actual=Number(o.actualQty??ls.reduce(
+  (s,l)=>s+(Number(l.qty)||0),0
+));
 return `
-<tr>
+<tr class="order-${state}">
 <td>${esc(o.no)}</td><td>${esc(o.date)}</td>
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td>${esc(o.grade)}</td><td>${esc(o.qty)}</td>
