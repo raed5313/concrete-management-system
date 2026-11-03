@@ -642,9 +642,9 @@ $('toast').style.display='block';
 setTimeout(()=>$('toast').style.display='none',2500);
 }
 
-function save(){
-localStorage.setItem(KEY,JSON.stringify(data));
-render();
+async function save(){
+    localStorage.setItem(KEY, JSON.stringify(data));
+    render();
 }
 
 function tableRows(a,fn,n=4){
