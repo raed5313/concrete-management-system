@@ -1267,8 +1267,7 @@ printDocA5('وصل أمر تجهيز',`
 }
 
  
-    
-async function receiptLoad(no) {
+ async function receiptLoad(no) {
     const l = data.loads.find(x => String(x.no) === String(no));
 
     const o = l && data.orders.find(
@@ -1414,7 +1413,8 @@ async function receiptLoad(no) {
     
         console.error('خطأ في طباعة وصل الحمولة:', err);}
         toast('تعذرت طباعة الوصل: ' + (err.message || 'خطأ غير معروف')); catch (err) {);
-} 
+}    
+
 
 function printDailyPlantReport(){
 let pDate = $('printDateFilter') ? $('printDateFilter').value : new Date().toISOString().slice(0,10);
