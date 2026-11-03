@@ -474,15 +474,7 @@ window.onload = async function() {
     }
   }
 };
-function handleLogin(e){
-  e.preventDefault();
-  let u = $('loginUser').value.trim();
-  let p = $('loginPass').value.trim();
-  
-  if(usersDB[u] && usersDB[u].pass === p){
-    currentRole = usersDB[u].role;
-    currentUserName = u + ' (' + usersDB[u].title + ')';
-    localStorage.setItem('sada-logged-role', currentRole);
+-role', currentRole);
     localStorage.setItem('sada-logged-user', currentUserName);
     
     $('loginScreen').classList.add('hidden');
@@ -498,17 +490,6 @@ function logout(){
   localStorage.removeItem('sada-logged-user');
   location.reload();
 }
-
-window.onload = function(){
-  if(currentRole && currentUserName){
-    $('loginScreen').classList.add('hidden');
-    $('mainApp').classList.remove('hidden');
-    initSystem();
-  } else {
-    $('loginScreen').classList.remove('hidden');
-    $('mainApp').classList.add('hidden');
-  }
-};
 
 const roleMenus = {
 manager: [
