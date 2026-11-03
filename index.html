@@ -969,7 +969,7 @@ logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: $
 save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
 });
 } 
-function openLoad(no) {
+async function openLoad(no) {
     if (currentRole !== 'plant' && currentRole !== 'operator') {
         toast('إضافة الحمولة متاحة لمشغّل المعمل فقط');
         return;
@@ -1003,27 +1003,47 @@ function openLoad(no) {
                     throw orderError || new Error('أمر التجهيز غير موجود');
                 }
 
-                const { data: orderLoads, error: loadsError } = await supabaseClient
-    .from('loads')
-    .select('load_no')
-    .eq('orderId', orderRow.id);
+                // جلب حمولات هذا الأمر فقط
+                const {data: orderLoads, error: loadsError} =
+                    await supabaseClient
+                    .from('loads')
+                    .select('load_no')
+                    .eq('orderId', orderRow.id);
 
-if (loadsError) throw loadsError;
+                if (loadsError) throw loadsError;
 
-const lastLoadNo = (orderLoads || []).reduce((max, item) => {
-    const n = parseInt(item.load_no, 10);
-    return Number.isFinite(n) ? Math.max(max, n) : max;
-}, 0);
+                // الترقيم يبدأ من 1 لكل أمر
+                const lastLoadNo = (orderLoads || []).reduce((max, item) => {
+                    const n = parseInt(item.load_no, 10);
+                    return Number.isFinite(n) ? Math.max(max, n) : max;
+                }, 0);
 
-const loadNo = String(lastLoadNo + 1);
+                const loadNo = String(lastLoadNo + 1);
 
-                if (error) throw error;
+                // حفظ الحمولة فعلياً في قاعدة البيانات
+                const {data: savedLoad, error: saveError} =
+                    await supabaseClient
+                    .from('loads')
+                    .insert({
+                        load_no: loadNo,
+                        orderId: orderRow.id,
+                        orderNo: String(o.no),
+                        driver: v.driver,
+                        vehicle: v.vehicle,
+                        qty: Number(v.qty),
+                        pump: v.pump || null,
+                        status: 'تم التسجيل'
+                    })
+                    .select()
+                    .single();
+
+                if (saveError) throw saveError;
 
                 v.orderNo = o.no;
                 v.no = loadNo;
                 v.date = new Date().toISOString().slice(0, 10);
+                v.id = savedLoad.id;
 
-                data.nextLoad++;
                 data.loads.push(v);
                 o.status = 'قيد العمل';
 
@@ -1035,11 +1055,12 @@ const loadNo = String(lastLoadNo + 1);
 
                 save();
                 closeModal();
-                toast('تم حفظ الحمولة بنجاح');
+                render();
+                toast('تم حفظ الحمولة رقم ' + loadNo + ' بنجاح');
 
             } catch (err) {
                 console.error(err);
-                toast('فشل الحفظ: ' + (err.message || 'خطأ غير معروف'));
+                toast('فشل حفظ الحمولة: ' + (err.message || 'خطأ غير معروف'));
             }
         })();
     });
