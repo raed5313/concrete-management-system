@@ -1,0 +1,62 @@
+
+name: Sada Concrete - Codex Editor
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  codex:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - name: Run Codex
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          prompt: |
+            You are maintaining the Sada Al-Emar ready-mix concrete
+            management system.
+
+            Inspect the repository, especially index.html.
+            Preserve the existing Arabic RTL design, company branding,
+            existing records, receipt numbering, Supabase configuration,
+            and role permissions.
+
+            Do not expose secrets or add private keys to frontend files.
+            Do not delete existing data or change database schemas.
+
+            Make only safe, necessary fixes.
+            Run available checks.
+            Summarize every changed file and explain the changes.
+
+      - name: Create patch branch and pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="codex/sada-update-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes made."
+            exit 0
+          fi
+          git commit -m "Codex: maintain Sada concrete system"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Codex updates for Sada Concrete" \
+            --body "Automated Codex changes. Please review before merging." \
+            --base main \
+            --head "$BRANCH"
