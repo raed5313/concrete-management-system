@@ -882,29 +882,87 @@ $('modal').classList.remove('hidden');
 function closeModal(){$('modal').classList.add('hidden')}
 
 function openOrder(){
-if(currentRole !== 'manager'){
-toast('عذراً، إضافة أمر التجهيز مخصصة للمدير فقط');
-return;
-}
-openForm('أمر تجهيز جديد',[
-{name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
-{name:'phone',label:'الهاتف'},
-{name:'site',label:'موقع الصب',required:true},
-{name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
-{name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
-{name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
-{name:'price',label:'سعر المتر',type:'number',required:true,value:75000},
-{name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
-],v=>{
-v.no=String(data.nextOrder++).padStart(7,'0');
-v.status='قيد التجهيز';
-data.orders.push(v);
-data.lastSeenOrder = Number(v.no) - 1;
-logAction(currentUserName, 'إنشاء أمر تجهيز', `رقم الأمر: ${v.no} للعميل ${v.customer}`);
-save();closeModal();toast('تم حفظ أمر التجهيز وإرساله للمعمل');
-});
-}
+function openOrder(){
+  if(currentRole !== 'manager'){
+    toast('إضافة أمر التجهيز مخصصة للمدير فقط');
+    return;
+  }
 
+  openForm('أمر تجهيز جديد',[
+    {name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
+    {name:'phone',label:'الهاتف'},
+    {name:'site',label:'موقع الصب',required:true},
+    {name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
+    {name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
+    {name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
+    {name:'price',label:'سعر المتر',type:'number',required:true,value:75000},
+    {name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
+  ], v => {
+    if(!v.qty || Number(v.qty) <= 0){
+      toast('أدخل كمية صحيحة');
+      return;
+    }
+
+    (async()=>{
+      try{
+        const {data: existing, error: readError} = await supabaseClient
+          .from('concrete_orders')
+          .select('order_no')
+          .order('order_no',{ascending:false})
+          .limit(1);
+
+        if(readError) throw readError;
+
+        const lastNo = existing && existing.length
+          ? parseInt(existing[0].order_no,10) || 0
+          : 0;
+
+        const orderNo = String(lastNo + 1).padStart(6,'0');
+
+        const {data: saved, error} = await supabaseClient
+          .from('concrete_orders')
+          .insert({
+            order_no:orderNo,
+            customer:v.customer,
+            phone:v.phone || '',
+            site:v.site,
+            pour:v.pour || '',
+            grade:v.grade || '',
+            qty:Number(v.qty),
+            price:Number(v.price || 0),
+            date:v.date,
+            status:'قيد التجهيز',
+            note:v.note || ''
+          })
+          .select()
+          .single();
+
+        if(error) throw error;
+
+        v.no = saved.order_no;
+        v.id = saved.id;
+        v.status = saved.status;
+        data.orders.push(v);
+        data.nextOrder = lastNo + 2;
+
+        logAction(
+          currentUserName,
+          'إنشاء أمر تجهيز',
+          'رقم الأمر: '+orderNo+' للعميل '+v.customer
+        );
+
+        save();
+        closeModal();
+        toast('تم حفظ أمر التجهيز وإرساله للمعمل');
+
+      }catch(err){
+        console.error(err);
+        toast('فشل حفظ الأمر: '+(err.message || 'خطأ غير معروف'));
+      }
+    })();
+  });
+}
+  
 function startProcessing(no){
 let o = data.orders.find(x=>String(x.no)===String(no));
 if(o){
