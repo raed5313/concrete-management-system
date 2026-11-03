@@ -524,35 +524,87 @@ accountant: [
 ]
 };
 
-function initSystem(){
-  $('today').textContent=new Date().toLocaleDateString('ar-IQ');
-  if($('printDateFilter')) $('printDateFilter').value = new Date().toISOString().slice(0,10);
-  $('currentUserName').textContent = currentUserName;
-  const canAddOrders = currentRole === 'manager';
+async function initSystem(){
+  $('today').textContent = new Date().toLocaleDateString('ar-IQ');
+  if($('printDateFilter'))
+    $('printDateFilter').value = new Date().toISOString().slice(0,10);
 
-['globalAddOrderBtn','orderSecAddBtn'].forEach(id => {
-  const btn = $(id);
-  if (btn) btn.style.display = canAddOrders ? '' : 'none';
-});
-  renderNav();
-  navigate('dashboard');
-  
-  window.addEventListener('storage', (e) => {
-    if(e.key === KEY){
-      loadData();
-      render();
-    }
+  $('currentUserName').textContent = currentUserName;
+
+  const canAddOrders = currentRole === 'manager';
+  ['globalAddOrderBtn','orderSecAddBtn'].forEach(id => {
+    const btn = $(id);
+    if(btn) btn.style.display = canAddOrders ? '' : 'none';
   });
 
-  setInterval(() => {
-    loadData();
-    render();
-    if(currentRole === 'plant'){
-      checkNewOrdersForPlant();
-    }
-  }, 2500);
-}
+  renderNav();
 
+  async function syncCloudData(){
+    try {
+      const [ordersResult, loadsResult] = await Promise.all([
+        supabaseClient.from('concrete_orders').select('*').order('created_at'),
+        supabaseClient.from('loads').select('*').order('created_at')
+      ]);
+
+      if(ordersResult.error) throw ordersResult.error;
+      if(loadsResult.error) throw loadsResult.error;
+
+      data.orders = (ordersResult.data || []).map(x => ({
+        id:x.id,
+        no:x.order_no,
+        customer:x.customer,
+        phone:x.phone,
+        site:x.site,
+        pour:x.pour,
+        grade:x.grade,
+        qty:x.qty,
+        price:x.price,
+        date:x.date,
+        note:x.note,
+        status:x.status
+      }));
+
+      data.loads = (loadsResult.data || []).map(x => ({
+        id:x.id,
+        no:x.load_no,
+        orderNo:x.orderNo,
+        driver:x.driver,
+        vehicle:x.vehicle,
+        qty:x.qty,
+        pump:x.pump,
+        status:x.status,
+        date:x.created_at
+      }));
+
+      localStorage.setItem(KEY, JSON.stringify(data));
+      render();
+
+    } catch(err) {
+      console.error('Supabase sync:', err);
+      toast('تعذر تحديث البيانات من قاعدة البيانات');
+    }
+  }
+
+  await syncCloudData();
+  navigate('dashboard');
+
+  if(window.sadaRealtimeChannel){
+    await supabaseClient.removeChannel(window.sadaRealtimeChannel);
+  }
+
+  window.sadaRealtimeChannel = supabaseClient
+    .channel('sada-orders-loads')
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'concrete_orders'},
+      syncCloudData
+    )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'loads'},
+      syncCloudData
+    )
+    .subscribe();
+}
+  
 function renderNav(){
 let menuList = roleMenus[currentRole] || roleMenus.manager;
 $('nav').innerHTML = menuList.map(([k,v],i)=>
