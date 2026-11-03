@@ -629,7 +629,7 @@ if(el) el.classList.toggle('hidden', k!==p);
 });
 
 let foundItem = menuList.find(x=>x[0]===p);
-$('pageTitle').textContent = foundItem ? foundItem.v.replace(/^[^\w\u0600-\u06FF]+/,'').trim() : 'لوحة التحكم';
+$('pageTitle').textContent = foundItem ? String(foundItem[1] || '').replace(/^[^\w\u0600-\u06FF]+/,'').trim() : 'لوحة التحكم';
 document.querySelectorAll('[data-page]').forEach(b=>
 b.classList.toggle('active', b.dataset.page===p)
 );
