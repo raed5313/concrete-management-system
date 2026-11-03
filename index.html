@@ -486,7 +486,6 @@ manager: [
 ['dashboard','الرئيسية'],
 ['orders','أوامر التجهيز'],
 ['customers','العملاء'],
-['plants','المعامل'],
 ['drivers','السائقون'],
 ['vehicles','الآليات / الخلاطات'],
 ['inventory','المخزون'],
@@ -499,12 +498,14 @@ manager: [
 ['reports','التقارير'],
 ['settings','الإعدادات']
 ],
+
 plant: [
 ['dashboard','🏠 الرئيسية'],
-  ['plants','الحمولات '],
 ['orders','📋 أوامر التجهيز'],
+['plants','🚚 الحمولات'],
 ['reports','📊 التقارير']
 ],
+
 accountant: [
 ['dashboard','الرئيسية'],
 ['customers','العملاء'],
@@ -527,6 +528,12 @@ function initSystem(){
   $('today').textContent=new Date().toLocaleDateString('ar-IQ');
   if($('printDateFilter')) $('printDateFilter').value = new Date().toISOString().slice(0,10);
   $('currentUserName').textContent = currentUserName;
+  const canAddOrders = currentRole === 'manager';
+
+['globalAddOrderBtn','orderSecAddBtn'].forEach(id => {
+  const btn = $(id);
+  if (btn) btn.style.display = canAddOrders ? '' : 'none';
+});
   renderNav();
   navigate('dashboard');
   
