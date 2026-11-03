@@ -1257,44 +1257,7 @@ printDocA5('وصل أمر تجهيز',`
 </div>`);
 }
 
- function receiptLoad(no) {
-    let l = data.loads.find(x => String(x.no) === String(no));
-    let o = l && data.orders.find(
-        x => String(x.no) === String(l.orderNo)
-    );
-
-    if (!l || !o) {
-        return toast('الحمولة أو أمر التجهيز غير موجود');
-    }
-
-    let d = l.date || o.date || '—';
-
-    // جمع كميات جميع الحمولات التابعة لنفس أمر التجهيز
-    let orderLoads = data.loads.filter(
-        x => String(x.orderNo) === String(o.no)
-    );
-
-    let accumulatedQty = orderLoads.reduce(
-        (sum, x) => sum + (Number(x.qty) || 0),
-        0
-    );
-
-    let fmtQty = n => Number(n.toFixed(2)).toString();
-
-    printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
-    <div class="r">
-
-        <div class="head">
-            <img
-                src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
-                alt="شعار شركة صدى الإعمار"
-                style="display:block;width:65px;height:65px;object-fit:contain;margin:0 auto 5px;"
-            >
-
-            <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
-            <div class="en">
-                SADA ALAAMAR COMPANY FOR READY MIX CONCRETE
-            </div>
+ </div>
         </div>
 
         <div class="title">وصل تجهيز حمولة</div>
@@ -1377,35 +1340,175 @@ printDocA5('وصل أمر تجهيز',`
             font-weight:bold;
             font-size:18px;
         ">
-            إجمالي الكمية المجهزة لهذا الأمر
-            <br>
-            <strong style="font-size:27px;">
-                ${esc(fmtQty(accumulatedQty))} م³
-            </strong>
-        </div>
+async function receiptLoad(no) {
+    let l = data.loads.find(x => String(x.no) === String(no));
 
-        <div class="sign">
-            <div>
-                توقيع المعمل
-                <br><br>
-                __________________
+    let o = l && data.orders.find(
+        x => String(x.no) === String(l.orderNo)
+    );
+
+    if (!l || !o) {
+        return toast('الحمولة أو أمر التجهيز غير موجود');
+    }
+
+    try {
+        // جلب رقم الأمر الداخلي من قاعدة البيانات
+        const { data: orderRow, error: orderError } =
+            await supabaseClient
+                .from('concrete_orders')
+                .select('id,order_no')
+                .eq('order_no', String(o.no))
+                .single();
+
+        if (orderError || !orderRow) {
+            throw orderError || new Error('لم يتم العثور على الأمر');
+        }
+
+        // جلب جميع حمولات هذا الأمر باستخدام orderId
+        const { data: orderLoads, error: loadsError } =
+            await supabaseClient
+                .from('loads')
+                .select('qty')
+                .eq('orderId', orderRow.id);
+
+        if (loadsError) throw loadsError;
+
+        // حساب مجموع الكميات
+        let accumulatedQty = (orderLoads || []).reduce(
+            (sum, item) => sum + (Number(item.qty) || 0),
+            0
+        );
+
+        let fmtQty = n => Number(n.toFixed(2)).toString();
+        let d = l.date || o.date || '—';
+
+        printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
+        <div class="r">
+
+            <div class="head">
+                <img
+                    src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
+                    alt="شعار شركة صدى الإعمار"
+                    style="display:block;width:65px;height:65px;object-fit:contain;margin:0 auto 5px;"
+                >
+
+                <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+                <div class="en">
+                    SADA ALAAMAR COMPANY FOR READY MIX CONCRETE
+                </div>
             </div>
 
-            <div>
-                توقيع الزبون
-                <br><br>
-                __________________
+            <div class="title">وصل تجهيز حمولة</div>
+
+            <div class="top">
+                <div>
+                    رقم الوصل / أمر التجهيز
+                    <br>
+                    <span class="no">${esc(o.no)}</span>
+                </div>
+
+                <div>
+                    تاريخ التجهيز
+                    <br>
+                    ${esc(d)}
+                </div>
             </div>
+
+            <table class="data">
+                <tr>
+                    <td>اسم الزبون</td>
+                    <td>${esc(o.customer || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>موقع الصب</td>
+                    <td>${esc(o.site || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>نوع الصب</td>
+                    <td>${esc(o.pour || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>المواصفة</td>
+                    <td>${esc(o.grade || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>رقم الآلية</td>
+                    <td>${esc(l.vehicle || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>رقم المضخة</td>
+                    <td>${esc(l.pump || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>كمية هذه النقلة (م³)</td>
+                    <td>${esc(l.qty || '—')}</td>
+                </tr>
+
+                <tr>
+                    <td>الكمية المتراكمة للأمر (م³)</td>
+                    <td><b>${esc(fmtQty(accumulatedQty))}</b></td>
+                </tr>
+            </table>
+
+            <div class="big">
+                <div>
+                    <b>كمية هذه النقلة (م³)</b>
+                    <strong>${esc(l.qty || '—')}</strong>
+                </div>
+
+                <div>
+                    <b>رقم النقلة / الحمولة</b>
+                    <strong>${esc(l.no)}</strong>
+                </div>
+            </div>
+
+            <div style="
+                text-align:center;
+                border:2px solid #222;
+                padding:10px;
+                margin-top:10px;
+                font-weight:bold;
+                font-size:18px;
+            ">
+                إجمالي الكمية المجهزة لهذا الأمر
+                <br>
+                <strong style="font-size:27px;">
+                    ${esc(fmtQty(accumulatedQty))} م³
+                </strong>
+            </div>
+
+            <div class="sign">
+                <div>
+                    توقيع المعمل
+                    <br><br>
+                    __________________
+                </div>
+
+                <div>
+                    توقيع الزبون
+                    <br><br>
+                    __________________
+                </div>
+            </div>
+
+            <div class="foot">
+                شركة صدى الإعمار للكونكريت الجاهز
+            </div>
+
         </div>
+        `);
 
-        <div class="foot">
-            شركة صدى الإعمار للكونكريت الجاهز
-        </div>
-
-    </div>
-    `);
- } 
-
+    } catch (err) {
+        console.error(err);
+        toast('تعذر حساب الكمية المتراكمة: ' + (err.message || 'خطأ'));
+    }
+}
 
 function printDailyPlantReport(){
 let pDate = $('printDateFilter') ? $('printDateFilter').value : new Date().toISOString().slice(0,10);
