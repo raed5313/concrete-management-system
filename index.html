@@ -427,9 +427,10 @@ async function activateUserSession(user) {
 
   currentUserName = profile.display_name || user.email;
 
-  $('loginScreen').classList.add('hidden');
+    $('loginError').textContent = 'تم التحقق، جارٍ فتح النظام...';
   $('mainApp').classList.remove('hidden');
-  initSystem();
+  await initSystem();
+  $('loginScreen').classList.add('hidden');
 }
 
 async function handleLogin(e) {
