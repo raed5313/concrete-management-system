@@ -352,8 +352,22 @@ th{color:var(--gold)}
 'use strict';
 
 const KEY='sada-concrete-v8';
-let currentRole = localStorage.getItem('sada-logged-role') || '';
-let currentUserName = localStorage.getItem('sada-logged-user') || '';
+let currentRole = '';
+let currentUserName = '';
+
+const SUPABASE_URL = 'https://nwhmcbwjjpusvxyyquaz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_N_nx0pUqoOFCGsrsPjK4Uw_6LgY9ZjL';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const loginAccounts = {
+  'مدير': 'raed@sada-alaamar.com',
+  'معمل': 'raed1@sada-alaamar.com',
+  'محاسب': 'raed2@sada-alaamar.com'
+};
 
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
@@ -387,12 +401,78 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
 }[c]));
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 
-const usersDB = {
-  "مدير": { pass: "1", role: "manager", title: "المدير العام" },
-  "معمل": { pass: "2", role: "plant", title: "مشغّل المعمل" },
-  "محاسب": { pass: "3", role: "accountant", title: "المحاسب" }
-};
+async function activateUserSession(user) {
+  const { data: profile, error } = await supabaseClient
+    .from('user_profiles')
+    .select('display_name,app_role')
+    .eq('user_id', user.id)
+    .single();
 
+  if (error || !profile) {
+    throw new Error('لم يتم العثور على صلاحية المستخدم.');
+  }
+
+  currentRole = profile.app_role === 'operator'
+    ? 'plant'
+    : profile.app_role;
+
+  currentUserName = profile.display_name || user.email;
+
+  $('loginScreen').classList.add('hidden');
+  $('mainApp').classList.remove('hidden');
+  initSystem();
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+
+  const u = $('loginUser').value.trim();
+  const p = $('loginPass').value;
+  const email = loginAccounts[u] || u;
+
+  $('loginError').textContent = 'جارٍ التحقق من الحساب...';
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: p
+  });
+
+  if (error) {
+    $('loginError').textContent = 'بيانات الدخول غير صحيحة.';
+    return;
+  }
+
+  try {
+    await activateUserSession(data.user);
+    $('loginError').textContent = '';
+  } catch (err) {
+    await supabaseClient.auth.signOut();
+    $('loginError').textContent = err.message;
+  }
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  currentRole = '';
+  currentUserName = '';
+  location.reload();
+}
+
+window.onload = async function() {
+  $('loginScreen').classList.remove('hidden');
+  $('mainApp').classList.add('hidden');
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    try {
+      await activateUserSession(session.user);
+    } catch (err) {
+      await supabaseClient.auth.signOut();
+      $('loginError').textContent = err.message;
+    }
+  }
+};
 function handleLogin(e){
   e.preventDefault();
   let u = $('loginUser').value.trim();
