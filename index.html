@@ -969,7 +969,7 @@ o.status='مكتمل ومجهز';
 logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: ${no} - الكمية الفعلية: ${q}`);
 save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
 });
-  
+} 
 function openLoad(no) {
     if (currentRole !== 'plant' && currentRole !== 'operator') {
         toast('إضافة الحمولة متاحة لمشغّل المعمل فقط');
