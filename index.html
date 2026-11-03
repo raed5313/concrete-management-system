@@ -1340,10 +1340,11 @@ printDocA5('وصل أمر تجهيز',`
             font-weight:bold;
             font-size:18px;
         ">
-async function receiptLoad(no) {
-    let l = data.loads.find(x => String(x.no) === String(no));
 
-    let o = l && data.orders.find(
+async function receiptLoad(no) {
+    const l = data.loads.find(x => String(x.no) === String(no));
+
+    const o = l && data.orders.find(
         x => String(x.no) === String(l.orderNo)
     );
 
@@ -1352,7 +1353,6 @@ async function receiptLoad(no) {
     }
 
     try {
-        // جلب رقم الأمر الداخلي من قاعدة البيانات
         const { data: orderRow, error: orderError } =
             await supabaseClient
                 .from('concrete_orders')
@@ -1364,7 +1364,6 @@ async function receiptLoad(no) {
             throw orderError || new Error('لم يتم العثور على الأمر');
         }
 
-        // جلب جميع حمولات هذا الأمر باستخدام orderId
         const { data: orderLoads, error: loadsError } =
             await supabaseClient
                 .from('loads')
@@ -1373,14 +1372,13 @@ async function receiptLoad(no) {
 
         if (loadsError) throw loadsError;
 
-        // حساب مجموع الكميات
-        let accumulatedQty = (orderLoads || []).reduce(
+        const fmtQty = n => Number(n.toFixed(2)).toString();
+        const accumulatedQty = (orderLoads || []).reduce(
             (sum, item) => sum + (Number(item.qty) || 0),
             0
         );
 
-        let fmtQty = n => Number(n.toFixed(2)).toString();
-        let d = l.date || o.date || '—';
+        const d = l.date || o.date || '—';
 
         printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
         <div class="r">
@@ -1388,10 +1386,9 @@ async function receiptLoad(no) {
             <div class="head">
                 <img
                     src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
-                    alt="شعار شركة صدى الإعمار"
+                    alt="شعار الشركة"
                     style="display:block;width:65px;height:65px;object-fit:contain;margin:0 auto 5px;"
                 >
-
                 <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
                 <div class="en">
                     SADA ALAAMAR COMPANY FOR READY MIX CONCRETE
@@ -1400,115 +1397,96 @@ async function receiptLoad(no) {
 
             <div class="title">وصل تجهيز حمولة</div>
 
-            <div class="top">
+            <div class="top" style="direction:rtl;">
                 <div>
-                    رقم الوصل / أمر التجهيز
-                    <br>
-                    <span class="no">${esc(o.no)}</span>
-                </div>
-
-                <div>
-                    تاريخ التجهيز
-                    <br>
+                    تاريخ التجهيز<br>
                     ${esc(d)}
+                </div>
+                <div>
+                    رقم الوصل / أمر التجهيز<br>
+                    <span class="no">${esc(o.no)}</span>
                 </div>
             </div>
 
-            <table class="data">
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                margin-bottom:8px;
+                border:2px solid #000;
+            ">
                 <tr>
-                    <td>اسم الزبون</td>
-                    <td>${esc(o.customer || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">اسم الزبون</td>
+                    <td style="border:1px solid #000;padding:7px;">${esc(o.customer || '—')}</td>
                 </tr>
-
                 <tr>
-                    <td>موقع الصب</td>
-                    <td>${esc(o.site || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">موقع الصب</td>
+                    <td style="border:1px solid #000;padding:7px;">${esc(o.site || '—')}</td>
                 </tr>
-
                 <tr>
-                    <td>نوع الصب</td>
-                    <td>${esc(o.pour || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">نوع الصب</td>
+                    <td style="border:1px solid #000;padding:7px;">${esc(o.pour || '—')}</td>
                 </tr>
-
                 <tr>
-                    <td>المواصفة</td>
-                    <td>${esc(o.grade || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">المواصفة</td>
+                    <td style="border:1px solid #000;padding:7px;">${esc(o.grade || '—')}</td>
                 </tr>
-
                 <tr>
-                    <td>رقم الآلية</td>
-                    <td>${esc(l.vehicle || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">رقم الآلية</td>
+                    <td style="border:1px solid #000;padding:7px;">${esc(l.vehicle || '—')}</td>
                 </tr>
-
                 <tr>
-                    <td>رقم المضخة</td>
-                    <td>${esc(l.pump || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">رقم المضخة</td>
+                    <td style="border:1px solid #000;padding:7px;">${esc(l.pump || '—')}</td>
                 </tr>
-
                 <tr>
-                    <td>كمية هذه النقلة (م³)</td>
-                    <td>${esc(l.qty || '—')}</td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">اسم السائق</td>
+                    <td style="border:1px solid #000;padding:7px;color:#1672C5;font-weight:bold;">
+                        ${esc(l.driver || '—')}
+                    </td>
                 </tr>
-
                 <tr>
-                    <td>الكمية المتراكمة للأمر (م³)</td>
-                    <td><b>${esc(fmtQty(accumulatedQty))}</b></td>
+                    <td style="border:1px solid #000;padding:7px;background:#eee;font-weight:bold;">كمية هذه النقلة (م³)</td>
+                    <td style="border:1px solid #000;padding:7px;color:#16833B;font-weight:bold;">
+                        ${esc(l.qty || '—')} م³
+                    </td>
                 </tr>
             </table>
 
-            <div class="big">
-                <div>
-                    <b>كمية هذه النقلة (م³)</b>
-                    <strong>${esc(l.qty || '—')}</strong>
+            <div style="display:flex;direction:rtl;gap:8px;margin-top:12px;">
+                <div style="flex:1;border:2px solid #000;text-align:center;padding:10px;">
+                    <b>إجمالي الكمية المجهزة</b>
+                    <strong style="display:block;color:#D62828;font-size:27px;margin-top:8px;">
+                        ${esc(fmtQty(accumulatedQty))} م³
+                    </strong>
                 </div>
 
-                <div>
+                <div style="flex:1;border:2px solid #000;text-align:center;padding:10px;">
                     <b>رقم النقلة / الحمولة</b>
-                    <strong>${esc(l.no)}</strong>
+                    <strong style="display:block;color:#1672C5;font-size:27px;margin-top:8px;">
+                        ${esc(l.no)}
+                    </strong>
                 </div>
             </div>
 
-            <div style="
-                text-align:center;
-                border:2px solid #222;
-                padding:10px;
-                margin-top:10px;
-                font-weight:bold;
-                font-size:18px;
-            ">
-                إجمالي الكمية المجهزة لهذا الأمر
-                <br>
-                <strong style="font-size:27px;">
-                    ${esc(fmtQty(accumulatedQty))} م³
-                </strong>
-            </div>
-
-            <div class="sign">
-                <div>
+            <div class="sign" style="direction:rtl;margin-top:18px;">
+                <div style="border:1px solid #000;flex:1;text-align:center;padding:12px 5px 25px;">
                     توقيع المعمل
                     <br><br>
                     __________________
                 </div>
-
-                <div>
+                <div style="border:1px solid #000;flex:1;text-align:center;padding:12px 5px 25px;">
                     توقيع الزبون
                     <br><br>
                     __________________
                 </div>
             </div>
 
-            <div class="foot">
-                شركة صدى الإعمار للكونكريت الجاهز
-            </div>
-
         </div>
         `);
 
-    } catch (err) {
-        console.error(err);
-        toast('تعذر حساب الكمية المتراكمة: ' + (err.message || 'خطأ'));
-    }
+    } 
 }
+
 
 function printDailyPlantReport(){
 let pDate = $('printDateFilter') ? $('printDateFilter').value : new Date().toISOString().slice(0,10);
