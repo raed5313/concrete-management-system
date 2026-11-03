@@ -1004,20 +1004,19 @@ function openLoad(no) {
                     throw orderError || new Error('أمر التجهيز غير موجود');
                 }
 
-                const loadNo = String(data.nextLoad).padStart(7, '0');
+                const { data: orderLoads, error: loadsError } = await supabaseClient
+    .from('loads')
+    .select('load_no')
+    .eq('orderId', orderRow.id);
 
-                const {error} = await supabaseClient
-                    .from('loads')
-                    .insert({
-                        load_no: loadNo,
-                        orderId: orderRow.id,
-                        orderNo: String(o.no),
-                        driver: v.driver,
-                        vehicle: v.vehicle,
-                        qty: Number(v.qty),
-                        pump: v.pump || null,
-                        status: 'تم التسجيل'
-                    });
+if (loadsError) throw loadsError;
+
+const lastLoadNo = (orderLoads || []).reduce((max, item) => {
+    const n = parseInt(item.load_no, 10);
+    return Number.isFinite(n) ? Math.max(max, n) : max;
+}, 0);
+
+const loadNo = String(lastLoadNo + 1);
 
                 if (error) throw error;
 
