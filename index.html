@@ -1257,7 +1257,7 @@ printDocA5('وصل أمر تجهيز',`
 </div>`);
 }
 
-function receiptLoad(no) {
+ function receiptLoad(no) {
     let l = data.loads.find(x => String(x.no) === String(no));
     let o = l && data.orders.find(
         x => String(x.no) === String(l.orderNo)
@@ -1269,10 +1269,21 @@ function receiptLoad(no) {
 
     let d = l.date || o.date || '—';
 
+    // جمع كميات جميع الحمولات التابعة لنفس أمر التجهيز
+    let orderLoads = data.loads.filter(
+        x => String(x.orderNo) === String(o.no)
+    );
+
+    let accumulatedQty = orderLoads.reduce(
+        (sum, x) => sum + (Number(x.qty) || 0),
+        0
+    );
+
+    let fmtQty = n => Number(n.toFixed(2)).toString();
+
     printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
     <div class="r">
 
-        <!-- شعار واسم الشركة -->
         <div class="head">
             <img
                 src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
@@ -1288,7 +1299,6 @@ function receiptLoad(no) {
 
         <div class="title">وصل تجهيز حمولة</div>
 
-        <!-- رقم الوصل والتاريخ -->
         <div class="top">
             <div>
                 رقم الوصل / أمر التجهيز
@@ -1303,7 +1313,6 @@ function receiptLoad(no) {
             </div>
         </div>
 
-        <!-- معلومات الحمولة -->
         <table class="data">
             <tr>
                 <td>اسم الزبون</td>
@@ -1336,16 +1345,20 @@ function receiptLoad(no) {
             </tr>
 
             <tr>
-                <td>الكمية (م³)</td>
+                <td>كمية هذه النقلة (م³)</td>
                 <td>${esc(l.qty || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>الكمية المتراكمة للأمر (م³)</td>
+                <td><b>${esc(fmtQty(accumulatedQty))}</b></td>
             </tr>
         </table>
 
-        <!-- الكمية ورقم النقلة -->
         <div class="big">
 
             <div>
-                <b>الكمية المجهزة (م³)</b>
+                <b>كمية هذه النقلة (م³)</b>
                 <strong>${esc(l.qty || '—')}</strong>
             </div>
 
@@ -1356,9 +1369,22 @@ function receiptLoad(no) {
 
         </div>
 
-        <!-- التواقيع -->
-        <div class="sign">
+        <div style="
+            text-align:center;
+            border:2px solid #222;
+            padding:10px;
+            margin-top:10px;
+            font-weight:bold;
+            font-size:18px;
+        ">
+            إجمالي الكمية المجهزة لهذا الأمر
+            <br>
+            <strong style="font-size:27px;">
+                ${esc(fmtQty(accumulatedQty))} م³
+            </strong>
+        </div>
 
+        <div class="sign">
             <div>
                 توقيع المعمل
                 <br><br>
@@ -1370,19 +1396,15 @@ function receiptLoad(no) {
                 <br><br>
                 __________________
             </div>
-
         </div>
 
         <div class="foot">
             شركة صدى الإعمار للكونكريت الجاهز
-            <br>
-            رقم أمر التجهيز: ${esc(o.no)}
-            — رقم النقلة: ${esc(l.no)}
         </div>
 
     </div>
     `);
-}
+ } 
 
 
 function printDailyPlantReport(){
