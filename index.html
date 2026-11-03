@@ -447,10 +447,18 @@ async function handleLogin(e) {
     const p = $('loginPass').value;
     const email = loginAccounts[u] || u;
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password: p
-    });
+    const loginRequest = supabaseClient.auth.signInWithPassword({
+  email,
+  password: p
+});
+
+const timeout = new Promise((_, reject) =>
+  setTimeout(() => reject(new Error('انتهت مهلة الاتصال. تحقق من الإنترنت أو اتصال Supabase.')), 15000)
+);
+
+const { data, error } = await Promise.race([loginRequest, timeout]);
+
+if (error) throw error;
 
     if (error) throw error;
 
