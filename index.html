@@ -757,6 +757,7 @@ if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
 o=>{
+let ls = data.loads.filter(l => String(l.orderId) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 let isOrderClosed = o.status === 'مكتمل ومجهز';
 let stateClass = o.status==='قيد التجهيز' ? 'order-open' : o.status==='قيد العمل' ? 'order-locked' : 'order-invoiced';
