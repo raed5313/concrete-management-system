@@ -474,16 +474,6 @@ window.onload = async function() {
     }
   }
 };
--role', currentRole);
-    localStorage.setItem('sada-logged-user', currentUserName);
-    
-    $('loginScreen').classList.add('hidden');
-    $('mainApp').classList.remove('hidden');
-    initSystem();
-  } else {
-    $('loginError').textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة!';
-  }
-}
 
 function logout(){
   localStorage.removeItem('sada-logged-role');
