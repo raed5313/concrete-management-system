@@ -879,49 +879,80 @@ o.status='مكتمل ومجهز';
 logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: ${no} - الكمية الفعلية: ${q}`);
 save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
 });
-}
-function openLoad(no){
-    if(currentRole !== 'plant' && currentRole !== 'operator'){
+function openLoad(no) {
+    if (currentRole !== 'plant' && currentRole !== 'operator') {
         toast('إضافة الحمولة متاحة لمشغّل المعمل فقط');
         return;
     }
 
-    let o = data.orders.find(x => String(x.no) === String(no));
-    if(!o) return;
+    const o = data.orders.find(x => String(x.no) === String(no));
+    if (!o) return;
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
-        {name:'driver',label:'اسم السائق',required:true},
-        {name:'vehicle',label:'رقم الآلية / الخلاطة',required:true},
-        {name:'pump',label:'رقم المضخة'},
-        {name:'qty',label:'الكمية المجهزة م³',required:true},
-        {name:'note',label:'ملاحظات'}
+        {name:'driver', label:'اسم السائق', required:true},
+        {name:'vehicle', label:'رقم الآلية / الخلاطة', required:true},
+        {name:'pump', label:'رقم المضخة'},
+        {name:'qty', label:'الكمية المجهزة م³', required:true},
+        {name:'note', label:'ملاحظات'}
     ], v => {
-        if(!v.qty || Number(v.qty) <= 0){
+        if (!v.qty || Number(v.qty) <= 0) {
             toast('أدخل كمية صحيحة');
             return;
         }
 
-        v.orderNo = o.no;
+        (async () => {
+            try {
+                const {data: orderRow, error: orderError} =
+                    await supabaseClient
+                    .from('concrete_orders')
+                    .select('id,order_no')
+                    .eq('order_no', String(o.no))
+                    .single();
+
+                if (orderError || !orderRow) {
+                    throw orderError || new Error('أمر التجهيز غير موجود');
+                }
+
+                const loadNo = String(data.nextLoad).padStart(7, '0');
+
+                const {error} = await supabaseClient
+                    .from('loads')
+                    .insert({
+                        load_no: loadNo,
+                        orderId: orderRow.id,
+                        orderNo: String(o.no),
+                        driver: v.driver,
+                        vehicle: v.vehicle,
+                        qty: Number(v.qty),
+                        pump: v.pump || null,
+                        status: 'تم التسجيل'
+                    });
+
+                if (error) throw error;
+
+                v.orderNo = o.no;
                 v.no = loadNo;
-                v.date = new Date().toISOString().slice(0,10);
+                v.date = new Date().toISOString().slice(0, 10);
 
                 data.nextLoad++;
                 data.loads.push(v);
                 o.status = 'قيد العمل';
 
+                logAction(
+                    currentUserName,
+                    'إضافة حمولة',
+                    'رقم الأمر: ' + o.no + ' — رقم الحمولة: ' + loadNo
+                );
+
                 save();
                 closeModal();
-                toast('تم حفظ الحمولة في قاعدة البيانات بنجاح');
+                toast('تم حفظ الحمولة بنجاح');
 
-        data.loads.push(v);
-        o.status = 'قيد العمل';
-
-        logAction(currentUserName,'إضافة حمولة',
-            'رقم الأمر: ' + o.no + ' — رقم الحمولة: ' + v.no);
-
-        save();
-        closeModal();
-        toast('تم إضافة الحمولة بنجاح');
+            } catch (err) {
+                console.error(err);
+                toast('فشل الحفظ: ' + (err.message || 'خطأ غير معروف'));
+            }
+        })();
     });
 }
 
