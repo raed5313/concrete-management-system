@@ -1257,32 +1257,133 @@ printDocA5('وصل أمر تجهيز',`
 </div>`);
 }
 
-function receiptLoad(no){
-let l=data.loads.find(x=>String(x.no)===no);
-let o=l&&data.orders.find(x=>String(x.no)===String(l.orderNo));
-if(!l||!o)return toast('الحمولة أو أمرها غير موجود');
-let d=l.date||o.date||'—';
+function receiptLoad(no) {
+    let l = data.loads.find(x => String(x.no) === String(no));
+    let o = l && data.orders.find(
+        x => String(x.no) === String(l.orderNo)
+    );
 
-printDocA5('وصل تجهيز خرسانة (A5)',`
-<div class="r">
-<div class="head"><h2>شركة صدى الإعمار للكونكريت الجاهز</h2><div class="en">SADA AL-EMAR CONCRETE</div></div>
-<div class="title">وصل تجهيز خرسانة (حمولة)</div>
-<div class="top"><div>التاريخ<br>${esc(d)}</div><div>رقم الحمولة<br><span class="no">${esc(l.no)}</span></div></div>
-<table class="data">
-<tr><td>اسم الزبون</td><td>${esc(o.customer)}</td></tr>
-<tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
-<tr><td>نوع الصب / المقاومة</td><td>${esc(o.pour)} — ${esc(o.grade)}</td></tr>
-<tr><td>رقم الآلية / السائق</td><td>${esc(l.vehicle||'—')} (${esc(l.driver||'—')})</td></tr>
-</table>
-<div class="section">الكمية المجهزة</div>
-<div class="big">
-<div><b>رقم الحمولة</b><strong>${esc(l.no)}</strong></div>
-<div><b>الكمية المجهزة م³</b><strong>${esc(l.qty)}</strong></div>
-</div>
-<div class="sign"><div>توقيع الزبون / المستلم<br><br>________________</div><div>توقيع المعمل / الوزن<br><br>________________</div></div>
-<div class="foot">صدى الإعمار للكونكريت الجاهز — وصل تجهيز رسمي A5 متناسق</div>
-</div>`);
+    if (!l || !o) {
+        return toast('الحمولة أو أمر التجهيز غير موجود');
+    }
+
+    let d = l.date || o.date || '—';
+
+    printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
+    <div class="r">
+
+        <!-- شعار واسم الشركة -->
+        <div class="head">
+            <img
+                src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
+                alt="شعار شركة صدى الإعمار"
+                style="display:block;width:65px;height:65px;object-fit:contain;margin:0 auto 5px;"
+            >
+
+            <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+            <div class="en">
+                SADA ALAAMAR COMPANY FOR READY MIX CONCRETE
+            </div>
+        </div>
+
+        <div class="title">وصل تجهيز حمولة</div>
+
+        <!-- رقم الوصل والتاريخ -->
+        <div class="top">
+            <div>
+                رقم الوصل / أمر التجهيز
+                <br>
+                <span class="no">${esc(o.no)}</span>
+            </div>
+
+            <div>
+                تاريخ التجهيز
+                <br>
+                ${esc(d)}
+            </div>
+        </div>
+
+        <!-- معلومات الحمولة -->
+        <table class="data">
+            <tr>
+                <td>اسم الزبون</td>
+                <td>${esc(o.customer || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>موقع الصب</td>
+                <td>${esc(o.site || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>نوع الصب</td>
+                <td>${esc(o.pour || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>المواصفة</td>
+                <td>${esc(o.grade || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>رقم الآلية</td>
+                <td>${esc(l.vehicle || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>رقم المضخة</td>
+                <td>${esc(l.pump || '—')}</td>
+            </tr>
+
+            <tr>
+                <td>الكمية (م³)</td>
+                <td>${esc(l.qty || '—')}</td>
+            </tr>
+        </table>
+
+        <!-- الكمية ورقم النقلة -->
+        <div class="big">
+
+            <div>
+                <b>الكمية المجهزة (م³)</b>
+                <strong>${esc(l.qty || '—')}</strong>
+            </div>
+
+            <div>
+                <b>رقم النقلة / الحمولة</b>
+                <strong>${esc(l.no)}</strong>
+            </div>
+
+        </div>
+
+        <!-- التواقيع -->
+        <div class="sign">
+
+            <div>
+                توقيع المعمل
+                <br><br>
+                __________________
+            </div>
+
+            <div>
+                توقيع الزبون
+                <br><br>
+                __________________
+            </div>
+
+        </div>
+
+        <div class="foot">
+            شركة صدى الإعمار للكونكريت الجاهز
+            <br>
+            رقم أمر التجهيز: ${esc(o.no)}
+            — رقم النقلة: ${esc(l.no)}
+        </div>
+
+    </div>
+    `);
 }
+
 
 function printDailyPlantReport(){
 let pDate = $('printDateFilter') ? $('printDateFilter').value : new Date().toISOString().slice(0,10);
