@@ -882,23 +882,28 @@ save();closeModal();toast('تم قفل الأمر وتسجيل الكمية ال
 }
 
 function openLoad(no){
-let o=data.orders.find(x=>String(x.no)===String(no));
-if(!o)return;
-openForm('إضافة حمولة جديدة للأمر '+no,[
-{name:'driver',label:'السائق',options:['غير محدد',...data.drivers.map(x=>x.name)]},
-{name:'vehicle',label:'رقم الآلية',options:['غير محدد',...data.vehicles.map(x=>x.name)]},
-{name:'qty',label:'الكمية م³',type:'number',required:true,value:Math.min(9,+o.qty||9)},
-{name:'time',label:'وقت الخروج',type:'time',value:new Date().toTimeString().slice(0,5)},
-{name:'pump',label:'رقم المضخة'}
-],v=>{
-v.orderNo=o.no;
-v.no=String(data.nextLoad++).padStart(7,'0');
-v.date=new Date().toISOString().slice(0,10);
-data.loads.push(v);
-o.status = 'قيد العمل';
-logAction(currentUserName, 'إضافة حمولة', `حمولة: ${v.no} للأمر ${no}`);
-save();closeModal();toast('تم إضافة الحمولة بنجاح');
-});
+
+    // السماح لمشغّل المعمل فقط بإضافة الحمولة
+    if(currentRole !== 'plant' && currentRole !== 'operator'){
+        toast('إضافة الحمولة متاحة لمشغّل المعمل فقط');
+        return;
+    }
+
+    let o = data.orders.find(x => String(x.no) === String(no));
+    if(!o) return;
+
+    openForm('إضافة حمولة', [
+        // اترك حقول النموذج الموجودة عندك كما هي
+    ], v => {
+        v.orderNo = o.no;
+        v.no = String(data.nextLoad++).padStart(7,'0');
+        v.date = new Date().toISOString().slice(0,10);
+        data.loads.push(v);
+        o.status = 'قيد العمل';
+        save();
+        closeModal();
+        toast('تم إضافة الحمولة بنجاح');
+    });
 }
 
 function editOrder(no){
