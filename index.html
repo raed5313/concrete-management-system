@@ -1266,7 +1266,7 @@ printDocA5('وصل أمر تجهيز',`
 </div>`);
 }
 
-async function receiptLoad(no) {
+function receiptLoad(no) {
     const l = data.loads.find(x => String(x.no) === String(no));
     const o = l && data.orders.find(
         x => String(x.no) === String(l.orderNo)
@@ -1276,86 +1276,63 @@ async function receiptLoad(no) {
         return toast('الحمولة أو أمر التجهيز غير موجود');
     }
 
-    try {
-        const { data: orderRow, error: orderError } = await supabaseClient
-            .from('concrete_orders')
-            .select('id')
-            .eq('order_no', String(o.no))
-            .single();
+    const orderLoads = data.loads.filter(x =>
+        String(x.orderNo) === String(l.orderNo) &&
+        Number(x.no) <= Number(l.no)
+    );
 
-        if (orderError || !orderRow) {
-            throw orderError || new Error('لم يتم العثور على الأمر');
-        }
+    const accumulatedQty = orderLoads.reduce(
+        (sum, x) => sum + (Number(x.qty) || 0), 0
+    );
 
-        const { data: orderLoads, error: loadsError } = await supabaseClient
-            .from('loads')
-            .select('qty,load_no')
-            .eq('orderId', orderRow.id);
+    const fmtQty = n => Number(n.toFixed(2)).toString();
+    const d = l.date || o.date || '—';
 
-        if (loadsError) throw loadsError;
+    printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
+        <div class="r">
+            <div class="head">
+                <img src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
+                     style="width:65px;height:65px;object-fit:contain">
+                <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
+                <div class="en">SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</div>
+            </div>
 
-        const accumulatedQty = (orderLoads || [])
-            .filter(x => Number(x.load_no) <= Number(l.no))
-            .reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
+            <div class="title">وصل تجهيز حمولة</div>
 
-        const fmtQty = n => Number(n.toFixed(2)).toString();
-        const d = l.date || o.date || '—';
+            <div class="top" style="direction:rtl">
+                <div>تاريخ التجهيز<br>${esc(d)}</div>
+                <div>رقم أمر التجهيز<br><span class="no">${esc(o.no)}</span></div>
+            </div>
 
-        printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
-            <div class="r">
-                <div class="head">
-                    <img src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.jpg"
-                         style="width:65px;height:65px;object-fit:contain">
-                    <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
-                    <div class="en">SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</div>
+            <table class="data">
+                <tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr>
+                <tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr>
+                <tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr>
+                <tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr>
+                <tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr>
+                <tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr>
+                <tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr>
+                <tr><td>كمية هذه النقلة</td><td>${esc(l.qty)} م³</td></tr>
+            </table>
+
+            <div class="big">
+                <div>
+                    <b>إجمالي الكمية المجهزة</b>
+                    <strong style="color:#D62828">${fmtQty(accumulatedQty)} م³</strong>
                 </div>
-
-                <div class="title">وصل تجهيز حمولة</div>
-
-                <div class="top" style="direction:rtl">
-                    <div>تاريخ التجهيز<br>${esc(d)}</div>
-                    <div>رقم أمر التجهيز<br><span class="no">${esc(o.no)}</span></div>
-                </div>
-
-                <table style="width:100%;border-collapse:collapse;margin-bottom:8px;border:2px solid #000">
-                    <tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr>
-                    <tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr>
-                    <tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr>
-                    <tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr>
-                    <tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr>
-                    <tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr>
-                    <tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr>
-                    <tr><td>كمية هذه النقلة</td><td>${esc(l.qty)} م³</td></tr>
-                </table>
-
-                <div style="display:flex;direction:rtl;gap:8px;margin-top:12px">
-                    <div style="flex:1;border:2px solid #000;text-align:center;padding:10px">
-                        <b>إجمالي الكمية المجهزة</b>
-                        <strong style="display:block;color:#D62828;font-size:27px;margin-top:8px">
-                            ${fmtQty(accumulatedQty)} م³
-                        </strong>
-                    </div>
-                    <div style="flex:1;border:2px solid #000;text-align:center;padding:10px">
-                        <b>رقم النقلة</b>
-                        <strong style="display:block;color:#1672C5;font-size:27px;margin-top:8px">
-                            ${esc(l.no)}
-                        </strong>
-                    </div>
-                </div>
-
-                <div class="sign" style="direction:rtl;margin-top:18px">
-                    <div>توقيع المعمل<br><br>__________________</div>
-                    <div>توقيع الزبون<br><br>__________________</div>
+                <div>
+                    <b>رقم النقلة</b>
+                    <strong style="color:#1672C5">${esc(l.no)}</strong>
                 </div>
             </div>
-        `);
 
-    } catch (err) {
-        console.error('خطأ في طباعة وصل الحمولة:', err);
-        toast('تعذرت طباعة الوصل: ' + (err.message || 'خطأ غير معروف'));
-    }
+            <div class="sign" style="direction:rtl">
+                <div>توقيع المعمل<br><br>__________________</div>
+                <div>توقيع الزبون<br><br>__________________</div>
+            </div>
+        </div>
+    `);
 }
-
 
 function printDailyPlantReport(){
 let pDate = $('printDateFilter') ? $('printDateFilter').value : new Date().toISOString().slice(0,10);
