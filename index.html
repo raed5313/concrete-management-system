@@ -902,8 +902,16 @@ function openLoad(no){
         }
 
         v.orderNo = o.no;
-        v.no = String(data.nextLoad++).padStart(7,'0');
-        v.date = new Date().toISOString().slice(0,10);
+                v.no = loadNo;
+                v.date = new Date().toISOString().slice(0,10);
+
+                data.nextLoad++;
+                data.loads.push(v);
+                o.status = 'قيد العمل';
+
+                save();
+                closeModal();
+                toast('تم حفظ الحمولة في قاعدة البيانات بنجاح');
 
         data.loads.push(v);
         o.status = 'قيد العمل';
