@@ -397,13 +397,13 @@ function handleLogin(e){
   e.preventDefault();
   let u = $('loginUser').value.trim();
   let p = $('loginPass').value.trim();
-  
+  
   if(usersDB[u] && usersDB[u].pass === p){
     currentRole = usersDB[u].role;
     currentUserName = u + ' (' + usersDB[u].title + ')';
     localStorage.setItem('sada-logged-role', currentRole);
     localStorage.setItem('sada-logged-user', currentUserName);
-    
+    
     $('loginScreen').classList.add('hidden');
     $('mainApp').classList.remove('hidden');
     initSystem();
@@ -477,8 +477,7 @@ function initSystem(){
   $('currentUserName').textContent = currentUserName;
   renderNav();
   navigate('dashboard');
-  
-  // مزامنة فورية عند حدوث أي تغيير في تخزين المتصفح بين الصفحات
+  
   window.addEventListener('storage', (e) => {
     if(e.key === KEY){
       loadData();
@@ -486,7 +485,6 @@ function initSystem(){
     }
   });
 
-  // فحص دوري لتحديث البيانات وتنبيه المعمل فوراً
   setInterval(() => {
     loadData();
     render();
@@ -538,7 +536,7 @@ function triggerPlantAlert(order){
     utterance.pitch = 1.2;
     window.speechSynthesis.speak(utterance);
   }
-  
+  
   let toastEl = $('toast');
   toastEl.innerHTML = `
     <div style="font-size:16px;color:#ff8791;margin-bottom:6px">🚨 <b>أمر تجهيز جديد للمعمل!</b></div>
@@ -555,13 +553,13 @@ function checkNewOrdersForPlant(){
   if(data.orders.length === 0) return;
   let latestOrder = data.orders[data.orders.length - 1];
   let latestId = Number(latestOrder.no);
-  
+  
   if(data.lastSeenOrder === undefined) {
     data.lastSeenOrder = latestId;
     save();
     return;
   }
-  
+  
   if(latestId > data.lastSeenOrder){
     data.lastSeenOrder = latestId;
     save();
@@ -647,7 +645,6 @@ o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><
 );
 }
 
-// جدول الأوامر الموحد لكل الأدوار بنفس الترتيب
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
@@ -659,7 +656,7 @@ let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert
                   o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري العمل</span>' :
                   `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
 
-let canManageOrder = isManager || isPlant; // المدير والمعمل يمتلكان الصلاحية الكاملة
+let canManageOrder = isManager || isPlant;
 
 return `
 <tr class="${stateClass}">
@@ -693,7 +690,6 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 );
 }
 
-// جدول المعمل
 if($('plantLoadsBody')){
 $('plantLoadsBody').innerHTML = tableRows(
 data.loads.slice().reverse(),
@@ -713,7 +709,6 @@ return `<tr>
 );
 }
 
-// جدول العملاء والحسابات المرتبطة
 if($('customersBody')){
 $('customersBody').innerHTML = tableRows(data.customers, c=>{
 let custOrders = data.orders.filter(o=>o.customer===c.name);
@@ -733,7 +728,6 @@ return `<tr>
 }, 7);
 }
 
-// باقي الجداول مرتبطة بنفس الترتيب للكل
 [
 ['drivers','driversBody',['name','phone','note']],
 ['vehicles','vehiclesBody',['name','capacity','kind']],
@@ -776,7 +770,6 @@ $('modal').classList.remove('hidden');
 
 function closeModal(){$('modal').classList.add('hidden')}
 
-// إضافة أمر تجهيز (المدير فقط)
 function openOrder(){
 if(currentRole !== 'manager'){
 toast('عذراً، إضافة أمر التجهيز مخصصة للمدير فقط');
@@ -988,7 +981,7 @@ w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="
 *{box-sizing:border-box}
 body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:12px;}
 .r{border:2px double #b28a29;padding:10mm;max-height:185mm;overflow:hidden;}
-.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6px;margin-bottom:8px;}
+.head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6mm;margin-bottom:8px;}
 .head h2{color:#a47b20;margin:0 0 4px 0;font-size:16px;}
 .en{font-size:9px;color:#555;}
 .title{text-align:center;background:#171717;color:#e7c36b;border:1px solid #b28a29;padding:6px;margin:8px 0;font-size:15px;font-weight:bold;}
