@@ -408,6 +408,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
 }[c]));
+const dateOnly=value=>value?String(value).split('T')[0]:'—';
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 
 async function activateUserSession(user) {
@@ -818,7 +819,7 @@ let canManageOrder = isManager || isPlant;
 
 return `
 <tr class="${stateClass}">
-<td>${esc(o.no)}</td><td>${esc(o.date)}</td><td>${statusBadge}</td>
+<td>${esc(o.no)}</td><td>${esc(dateOnly(o.date))}</td><td>${statusBadge}</td>
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td>${esc(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
 <td><div class="actions">
@@ -1342,7 +1343,7 @@ printDocA5('وصل أمر تجهيز',`
 <div class="r">
 <div class="head"><h2>شركة صدى الإعمار للكونكريت الجاهز</h2><div class="en">SADA AL-EMAR CONCRETE</div></div>
 <div class="title">وصل أمر تجهيز رقم ${esc(o.no)}</div>
-<div class="top"><div>التاريخ<br>${esc(o.date)}</div><div>رقم الأمر<br><span class="no">${esc(o.no)}</span></div></div>
+<div class="top"><div>التاريخ<br>${esc(dateOnly(o.date))}</div><div>رقم الأمر<br><span class="no">${esc(o.no)}</span></div></div>
 <table class="data">
 <tr><td>اسم العميل</td><td>${esc(o.customer)}</td></tr>
 <tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
@@ -1374,7 +1375,7 @@ function receiptLoad(no) {
     );
 
     const fmtQty = n => Number(n.toFixed(2)).toString();
-    const d = l.date || o.date || '—';
+    const d = dateOnly(l.date || o.date);
 
     printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
         <div class="r">
@@ -1455,7 +1456,7 @@ w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="
 <h3>كشف حساب العميل: ${esc(custName)}</h3>
 <h4>أوامر التجهيز</h4>
 <table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الموقع</th><th>الكمية م³</th><th>السعر</th><th>الإجمالي</th></tr></thead>
-<tbody>${custOrders.map(o=>`<tr><td>${o.no}</td><td>${o.date}</td><td>${o.site}</td><td>${o.qty}</td><td>${o.price||0}</td><td>${(o.qty*(o.price||0)).toLocaleString()}</td></tr>`).join('')}</tbody></table>
+<tbody>${custOrders.map(o=>`<tr><td>${o.no}</td><td>${dateOnly(o.date)}</td><td>${o.site}</td><td>${o.qty}</td><td>${o.price||0}</td><td>${(o.qty*(o.price||0)).toLocaleString()}</td></tr>`).join('')}</tbody></table>
 <h4>سندات القبض</h4>
 <table><thead><tr><th>رقم السند</th><th>التاريخ</th><th>المبلغ</th><th>طريقة الدفع</th></tr></thead>
 <tbody>${custReceipts.map(r=>`<tr><td>${r.no}</td><td>${r.date}</td><td>${r.amount}</td><td>${r.method}</td></tr>`).join('')}</tbody></table>
