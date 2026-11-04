@@ -1179,9 +1179,9 @@ function openOrder(){
           'رقم الأمر: '+orderNo+' للعميل '+v.customer
         );
 
-        save();
+        const auditSaved = await save();
         closeModal();
-        toast('تم حفظ أمر التجهيز وإرساله للمعمل');
+        toast(auditSaved ? 'تم حفظ أمر التجهيز وإرساله للمعمل' : 'تم حفظ الأمر، لكن تعذر حفظ سجل المتابعة');
 
       }catch(err){
         console.error(err);
@@ -1191,13 +1191,17 @@ function openOrder(){
   });
 }
   
-function startProcessing(no){
-let o = data.orders.find(x=>String(x.no)===String(no));
-if(o){
-o.status = 'قيد العمل';
-logAction(currentUserName, 'بدء تجهيز', `الأمر: ${no}`);
-save();toast('تم تحديث حالة الأمر إلى: جاري العمل');
-}
+async function startProcessing(no){
+if(currentRole!=='manager' && currentRole!=='plant') return;
+let o=data.orders.find(x=>String(x.no)===String(no));
+if(!o || o.status==='مكتمل ومجهز') return;
+try{
+const {error}=await supabaseClient.from('concrete_orders').update({status:'قيد العمل'}).eq('order_no',String(no));
+if(error) throw error;
+o.status='قيد العمل';
+logAction(currentUserName,'بدء تجهيز',`الأمر: ${no}`);
+await save();render();toast('تم تحديث حالة الأمر في قاعدة البيانات');
+}catch(err){console.error(err);toast('تعذر تحديث حالة الأمر: '+(err.message||''));}
 }
 
 async function closeOrder(no){
@@ -1229,7 +1233,7 @@ try {
   return;
 }
 logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: ${no} - الكمية الفعلية: ${q}`);
-save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
+await save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
 });
 } 
 async function openLoad(no) {
@@ -1324,7 +1328,7 @@ async function openLoad(no) {
                     'رقم الأمر: ' + o.no + ' — رقم الحمولة: ' + loadNo
                 );
 
-                save();
+                await save();
                 closeModal();
                 render();
                 toast('تم حفظ الحمولة رقم ' + loadNo + ' بنجاح');
@@ -1369,7 +1373,7 @@ grade:v.grade||'',qty:Number(v.qty),price:Number(v.price||0),date:v.date
 if(error)throw error;
 Object.assign(o,v);
 logAction(currentUserName,'تعديل أمر تجهيز',`رقم الأمر: ${no}`);
-save();closeModal();toast('تم تعديل الأمر وحفظه مركزياً');
+await save();closeModal();toast('تم تعديل الأمر وحفظه مركزياً');
 }catch(err){console.error(err);toast('تعذر حفظ تعديل الأمر: '+(err.message||''));}
 })();
 }
@@ -1418,7 +1422,7 @@ if(error)throw error;
 v.id=saved.id;
 data[c[1]].push(v);
 logAction(currentUserName,'إضافة سجل',c[0]+': '+v.name);
-save();closeModal();toast('تم الحفظ ومشاركة البيانات مع بقية الحسابات');
+const auditSaved=await save();closeModal();toast(auditSaved?'تم الحفظ ومشاركة البيانات مع بقية الحسابات':'تم حفظ السجل، لكن تعذر حفظ سجل المتابعة');
 }catch(err){console.error(err);toast('تعذر حفظ السجل في قاعدة البيانات: '+(err.message||''));}
 });
 }
