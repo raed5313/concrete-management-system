@@ -611,6 +611,11 @@ async function initSystem(){
 
   async function syncCloudData(){
     try {
+      const localSharedBackup = {
+        customers:[...data.customers], drivers:[...data.drivers], vehicles:[...data.vehicles],
+        inventory:[...data.inventory], invoices:[...data.invoices], receipts:[...data.receipts],
+        expenses:[...data.expenses], employees:[...data.employees], audit:[...data.audit]
+      };
       const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
@@ -637,6 +642,8 @@ async function initSystem(){
         price:x.price,
         date:x.date,
         note:x.note,
+        actualQty:x.actual_qty,
+        lockNote:x.lock_note,
         status:x.status
       }));
 
@@ -671,6 +678,7 @@ async function initSystem(){
         if (Number(shared.nextInvNo) > 0) data.nextInvNo = Number(shared.nextInvNo);
         if (Number(shared.nextRecNo) > 0) data.nextRecNo = Number(shared.nextRecNo);
       } else if (currentRole === 'manager') {
+        Object.keys(localSharedBackup).forEach(key => { data[key] = localSharedBackup[key]; });
         const {data: authData} = await supabaseClient.auth.getSession();
         const userId = authData && authData.session && authData.session.user ? authData.session.user.id : null;
         if (userId) {
@@ -1206,7 +1214,7 @@ o.status='مكتمل ومجهز';
 try {
   const {error: closeError} = await supabaseClient
     .from('concrete_orders')
-    .update({status:'مكتمل ومجهز'})
+    .update({status:'مكتمل ومجهز', actual_qty:q, lock_note:o.lockNote})
     .eq('order_no', String(no));
   if(closeError) throw closeError;
 } catch(err) {
@@ -1348,32 +1356,47 @@ openForm('تعديل أمر التجهيز '+no,
 name:k,label:k,value:o[k]||'',required:k==='customer'||k==='site'
 })),
 v=>{
+(async()=>{
+try{
+const {error}=await supabaseClient.from('concrete_orders').update({
+customer:v.customer,phone:v.phone||'',site:v.site,pour:v.pour||'',
+grade:v.grade||'',qty:Number(v.qty),price:Number(v.price||0),date:v.date
+}).eq('order_no',String(no));
+if(error)throw error;
 Object.assign(o,v);
-logAction(currentUserName, 'تعديل أمر تجهيز', `رقم الأمر: ${no}`);
-save();closeModal();toast('تم التعديل بنجاح');
+logAction(currentUserName,'تعديل أمر تجهيز',`رقم الأمر: ${no}`);
+save();closeModal();toast('تم تعديل الأمر وحفظه مركزياً');
+}catch(err){console.error(err);toast('تعذر حفظ تعديل الأمر: '+(err.message||''));}
+})();
 }
 );
 }
 
-function delOrder(no){
-if(currentRole !== 'manager') {toast('الحذف متاح للمدير فقط');return;}
-if(currentRole === 'accountant'){toast('المحاسب لا يمكنه حذف الأوامر');return;}
-if(confirm('حذف الأمر وحمولاته؟')){
-data.orders=data.orders.filter(x=>String(x.no)!==no);
-data.loads=data.loads.filter(x=>String(x.orderNo)!==no);
-logAction(currentUserName, 'حذف أمر تجهيز', `رقم الأمر: ${no}`);
-save();toast('تم الحذف بنجاح');
+async function delOrder(no){
+if(currentRole!=='manager'){toast('الحذف متاح للمدير فقط');return;}
+if(!confirm('حذف الأمر وحمولاته؟'))return;
+const order=data.orders.find(x=>String(x.no)===String(no));if(!order)return;
+try{
+if(order.id){
+const {error:le}=await supabaseClient.from('loads').delete().eq('orderId',order.id);if(le)throw le;
+const {error:oe}=await supabaseClient.from('concrete_orders').delete().eq('id',order.id);if(oe)throw oe;
 }
+data.orders=data.orders.filter(x=>String(x.no)!==String(no));
+data.loads=data.loads.filter(x=>String(x.orderNo)!==String(no));
+logAction(currentUserName,'حذف أمر تجهيز','رقم الأمر: '+no);
+await save();toast('تم حذف الأمر وحمولاته من قاعدة البيانات');
+}catch(err){console.error(err);toast('تعذر حذف الأمر: '+(err.message||''));}
 }
-
-function delLoad(no){
-if(currentRole !== 'manager' && currentRole !== 'plant') {toast('الحذف غير متاح لصلاحيتك');return;}
-if(currentRole === 'accountant'){toast('المحاسب لا يمكنه حذف الحمولات');return;}
-if(confirm('حذف الحمولة؟')){
-data.loads=data.loads.filter(x=>String(x.no)!==no);
-logAction(currentUserName, 'حذف حمولة', `رقم الحمولة: ${no}`);
-save();toast('تم حذف الحمولة بنجاح');
-}
+async function delLoad(no){
+if(currentRole!=='manager'){toast('حذف الحمولة متاح للمدير فقط');return;}
+if(!confirm('حذف الحمولة؟'))return;
+const load=data.loads.find(x=>String(x.no)===String(no));if(!load)return;
+try{
+if(load.id){const {error}=await supabaseClient.from('loads').delete().eq('id',load.id);if(error)throw error;}
+data.loads=data.loads.filter(x=>x!==load);
+logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+no);
+await save();toast('تم حذف الحمولة من قاعدة البيانات');
+}catch(err){console.error(err);toast('تعذر حذف الحمولة: '+(err.message||''));}
 }
 
 async function openSimple(t){
