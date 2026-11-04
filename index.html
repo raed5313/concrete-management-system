@@ -782,8 +782,8 @@ return `
 <td>${esc(o.pour)}</td><td>${esc(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
 <td><div class="actions">
 <button class="btn gold" onclick="startProcessing('${esc(o.no)}')">بدء التجهيز</button>
-<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>
-<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل والكمية</button>
+${!isOrderClosed ? `<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>` : '<span style="color:#f1cc71;font-weight:bold;padding:8px">🔒 الأمر مقفول</span>'}
+${!isOrderClosed ? `<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل والكمية</button>` : ''}
 <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
 <button class="btn" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>تعديل</button>
 <button class="btn danger" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>
@@ -978,9 +978,10 @@ save();toast('تم تحديث حالة الأمر إلى: جاري العمل');
 }
 }
 
-function closeOrder(no){
+async function closeOrder(no){
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o) return;
+if(o.status === 'مكتمل ومجهز'){toast('هذا الأمر مقفول بالفعل');return;}
 let delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((s,x)=>s+(Number(x.qty)||0),0);
 
 openForm('قفل الأمر وتسجيل الكمية الفعلية رقم '+no,[
@@ -992,6 +993,18 @@ if(!Number.isFinite(q)||q<0){toast('أدخل كمية فعلية صحيحة');re
 o.actualQty=q;
 o.lockNote=v.lockNote||'';
 o.status='مكتمل ومجهز';
+try {
+  const {error: closeError} = await supabaseClient
+    .from('concrete_orders')
+    .update({status:'مكتمل ومجهز'})
+    .eq('order_no', String(no));
+  if(closeError) throw closeError;
+} catch(err) {
+  o.status='قيد العمل';
+  toast('تعذر حفظ قفل الأمر في قاعدة البيانات');
+  console.error(err);
+  return;
+}
 logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: ${no} - الكمية الفعلية: ${q}`);
 save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
 });
