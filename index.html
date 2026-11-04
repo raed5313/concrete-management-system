@@ -427,15 +427,26 @@ async function activateUserSession(user) {
 
   currentUserName = profile.display_name || user.email;
 
-  // طلب إذن إشعارات الهاتف لحساب المعمل بعد تسجيل الدخول.
+  // لا ننتظر إذن الإشعارات حتى لا تتعطل عملية فتح النظام على الهاتف.
   if (currentRole === 'plant' && 'Notification' in window && Notification.permission === 'default') {
-    try { await Notification.requestPermission(); } catch(e) { console.warn(e); }
+    try {
+      const permissionRequest = Notification.requestPermission();
+      if (permissionRequest && typeof permissionRequest.catch === 'function') permissionRequest.catch(e => console.warn('Notification permission:', e));
+    } catch(e) { console.warn('Notification permission:', e); }
   }
 
-    $('loginError').textContent = 'تم التحقق، جارٍ فتح النظام...';
+  // إظهار التطبيق فور نجاح التحقق من الحساب والصلاحية.
   $('mainApp').classList.remove('hidden');
-  await initSystem();
   $('loginScreen').classList.add('hidden');
+  $('loginError').textContent = '';
+
+  // تعذر تحميل البيانات لا يجب أن يبقي المستخدم عالقاً في شاشة الدخول.
+  try {
+    await initSystem();
+  } catch (e) {
+    console.error('Sada app initialization:', e);
+    toast('تم تسجيل الدخول، لكن تعذر تحميل بعض البيانات. تحقق من الاتصال ثم حدّث الصفحة.');
+  }
 }
 
 async function handleLogin(e) {
