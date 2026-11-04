@@ -108,6 +108,31 @@ th{color:var(--gold)}
 .sada-alert-go{background:linear-gradient(120deg,#f7d77e,#c7962e);color:#17120a;min-width:260px}
 .sada-alert-dismiss{background:#858b92;color:white;min-width:180px}
 @media(max-width:560px){.sada-alert-card{padding:25px 13px 16px}.sada-alert-info{grid-template-columns:1fr}.sada-alert-info div{padding:8px 10px;font-size:15px}.sada-alert-bell{font-size:65px}.sada-alert-actions button{width:100%;min-width:0}}
+
+/* تصميم التقارير الموحد */
+.report-shell{background:#f2f3f5;color:#17202a;border-radius:12px;padding:14px;direction:rtl}
+.report-filters{display:grid;grid-template-columns:1fr 1fr 1.35fr auto;gap:10px;background:#15151b;border-radius:10px;padding:14px;margin-bottom:18px;align-items:end}
+.report-filters label{display:block;color:#f5f5f5;font-weight:700;margin:0 0 6px}
+.report-filters input{width:100%;box-sizing:border-box;background:#171a20;color:#fff;border:1px solid #aab1bb;border-radius:7px;padding:11px;font-size:15px;min-height:44px}
+.report-search{background:#075be4;color:#fff;border:0;border-radius:8px;padding:12px 24px;font-weight:800;min-height:44px}
+.report-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.report-kpi{background:linear-gradient(145deg,#17191e,#252a31);color:#fff;border-radius:10px;padding:17px;text-align:center;box-shadow:0 3px 10px #0002}
+.report-kpi span{display:block;color:#d4d9df;font-weight:700;margin-bottom:8px}
+.report-kpi strong{font-size:clamp(24px,3vw,36px);font-weight:900}
+.report-kpi:nth-child(2) strong{color:#36d8ef}.report-kpi:nth-child(3) strong{color:#42d78a}
+.report-table-wrap{overflow:auto;border:1px solid #c5cbd2;border-radius:9px;background:#fff}
+.report-table{width:100%;border-collapse:collapse;min-width:850px;color:#17202a}
+.report-table th{background:#e8eaed;color:#171b20;padding:13px 9px;border:1px solid #cbd0d6;text-align:center}
+.report-table td{padding:11px 9px;border:1px solid #d9dde1;text-align:center}
+.report-table .report-main-row{background:#202329;color:#fff}
+.report-table .report-main-row td{border-color:#51565d}
+.report-table .report-customer{color:#1680e8;font-weight:900}
+.report-table .report-qty{font-weight:900}
+.report-table .report-actual{color:#27a968;font-weight:900}
+.report-table .report-load-row{background:#f1f2f4;color:#333;font-size:13px}
+.report-table .report-load-row td{padding:7px}
+.report-empty{text-align:center;padding:24px!important;color:#737b84}
+@media(max-width:700px){.report-filters{grid-template-columns:1fr 1fr}.report-filters .report-customer-filter{grid-column:1/-1}.report-search{grid-column:1/-1}.report-kpis{grid-template-columns:1fr}.report-shell{padding:8px}}
 </style>
 </head>
 <body>
@@ -339,16 +364,28 @@ alt="شعار شركة صدى الإعمار">
 <!-- 14. التقارير -->
 <section id="reports" class="hidden">
 <div class="panel">
-<h3>التقارير الشاملة والطباعة</h3>
-<div class="details">
-<div class="detail">إجمالي أوامر التجهيز<strong id="reportOrders">0</strong></div>
-<div class="detail">إجمالي الحمولات<strong id="reportLoads">0</strong></div>
-<div class="detail">الكمية المجهزة<strong id="reportQty">0 م³</strong></div>
-<div class="detail">الكمية المتبقية<strong id="reportRemaining">0 م³</strong></div>
+<div class="head"><h3>تقارير أوامر التجهيز والحمولات</h3><div class="actions"><button class="btn primary" onclick="printFilteredOrdersReport()">طباعة التقرير</button><button class="btn gold" onclick="printDailyPlantReport()">تقرير الحمولات اليومية</button></div></div>
+<div class="report-shell">
+<div class="report-filters">
+<div><label for="reportFrom">من تاريخ</label><input type="date" id="reportFrom"></div>
+<div><label for="reportTo">إلى تاريخ</label><input type="date" id="reportTo"></div>
+<div class="report-customer-filter"><label for="reportCustomer">اسم الزبون (اختياري)</label><input type="search" id="reportCustomer" placeholder="ابحث باسم الزبون"></div>
+<button class="report-search" type="button" onclick="renderDetailedReports()">بحث　⌕</button>
+</div>
+<div class="report-kpis">
+<div class="report-kpi"><span>عدد الأوامر الرئيسية</span><strong id="reportOrders">0</strong></div>
+<div class="report-kpi"><span>إجمالي الكمية المطلوبة</span><strong id="reportRequired">0.00 م³</strong></div>
+<div class="report-kpi"><span>إجمالي ما تم تجهيزه فعلياً</span><strong id="reportQty">0.00 م³</strong></div>
+</div>
+<div class="report-table-wrap">
+<table class="report-table">
+<thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون والموقع (وتفاصيل الحمولات)</th><th>المواصفة والصب</th><th>الكمية المطلوبة</th><th>إجمالي المجهز</th></tr></thead>
+<tbody id="detailedReportsBody"><tr><td colspan="6" class="report-empty">جاري تحميل التقرير...</td></tr></tbody>
+</table>
 </div>
 <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
 <button class="btn primary" onclick="printReportGeneral()">طباعة تقرير عام</button>
-<button class="btn gold" onclick="printDailyPlantReport()">تقرير الحمولات اليومية</button>
+</div>
 </div>
 </div>
 </section>
@@ -839,6 +876,7 @@ if($('reportOrders')) $('reportOrders').textContent=data.orders.length;
 if($('reportLoads')) $('reportLoads').textContent=data.loads.length;
 if($('reportQty')) $('reportQty').textContent=fmt(qty)+' م³';
 if($('reportRemaining')) $('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' م³';
+renderDetailedReports();
 
 let totalSales = data.orders.reduce((s,o)=>s + ((+o.qty||0) * (+o.price||0)), 0);
 let totalRec = data.receipts.reduce((s,r)=>s + (+r.amount||0), 0);
@@ -1563,6 +1601,47 @@ printDocA5('سند قبض',`
 <div class="sign"><div>توقيع الصندوق<br><br>________________</div><div>توقيع المستلم<br><br>________________</div></div>
 <div class="foot">سند قبض رسمي — صدى الإعمار للكونكريت الجاهز</div>
 </div>`);
+}
+
+function getFilteredReportOrders(){
+  const from=$('reportFrom')?.value || '';
+  const to=$('reportTo')?.value || '';
+  const customer=String($('reportCustomer')?.value || '').trim().toLowerCase();
+  return data.orders.filter(o=>{
+    const d=dateOnly(o.date);
+    if(from && d<from) return false;
+    if(to && d>to) return false;
+    if(customer && !String(o.customer||'').toLowerCase().includes(customer)) return false;
+    return true;
+  }).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+}
+
+function renderDetailedReports(){
+  const orders=getFilteredReportOrders();
+  const required=orders.reduce((s,o)=>s+(Number(o.qty)||0),0);
+  const actual=orders.reduce((s,o)=>s+data.loads.filter(l=>String(l.orderNo)===String(o.no)).reduce((q,l)=>q+(Number(l.qty)||0),0),0);
+  if($('reportOrders')) $('reportOrders').textContent=orders.length;
+  if($('reportRequired')) $('reportRequired').textContent=fmt(required.toFixed(2))+' م³';
+  if($('reportQty')) $('reportQty').textContent=fmt(actual.toFixed(2))+' م³';
+  const body=$('detailedReportsBody');
+  if(!body)return;
+  if(!orders.length){body.innerHTML='<tr><td colspan="6" class="report-empty">لا توجد أوامر مطابقة للبحث</td></tr>';return;}
+  body.innerHTML=orders.map(o=>{
+    const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
+    const actualQty=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
+    const details=loads.length?loads.map((l,i)=>'<tr class="report-load-row"><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>السائق: '+esc(l.driver||'—')+' | الآلية: '+esc(l.vehicle||'—')+'</td><td>وقت/تاريخ: '+esc(l.time||dateOnly(l.date))+'</td><td>'+fmt(l.qty)+' م³</td><td class="report-actual">'+fmt(l.qty)+' م³</td></tr>').join(''):'<tr class="report-load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
+    return '<tr class="report-main-row"><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="report-customer">'+esc(o.customer||'—')+'<br><small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+'<br>'+esc(o.pour||'—')+'</td><td class="report-qty">'+fmt(o.qty)+' م³</td><td class="report-actual">'+fmt(actualQty)+' م³</td></tr>'+details;
+  }).join('');
+}
+
+function printFilteredOrdersReport(){
+  const orders=getFilteredReportOrders();
+  const rows=orders.map(o=>{
+    const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
+    const total=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
+    return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' م³</td><td>'+fmt(total)+' م³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' م³</td></tr>').join('');
+  }).join('');
+  printDocA5('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة صدى الإعمار للكونكريت الجاهز</h2><div class="en">SADA AL-EMAR CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
 }
 
 function printReportGeneral(){
