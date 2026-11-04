@@ -1452,6 +1452,21 @@ save();
 toast('تم مسح وإعادة ضبط النظام بنجاح');
 }
 }
+
+/* استعادة جلسة المستخدم تلقائياً بعد تحديث الصفحة دون طلب تسجيل الدخول مجدداً */
+(async function restoreSadaSession(){
+  try {
+    const { data: sessionData, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+    if (sessionData && sessionData.session && sessionData.session.user) {
+      await activateUserSession(sessionData.session.user);
+    }
+  } catch (err) {
+    console.error('Session restore:', err);
+    const msg = $('loginError');
+    if (msg) msg.textContent = 'تعذر استعادة الجلسة؛ تحقق من الاتصال ثم أعد المحاولة.';
+  }
+})();
 </script>
 </body>
 </html>
