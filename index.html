@@ -1192,7 +1192,7 @@ function openOrder(){
 }
   
 async function startProcessing(no){
-if(currentRole!=='manager' && currentRole!=='plant') return;
+if(currentRole!=='manager') return;
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o || o.status==='مكتمل ومجهز') return;
 try{
