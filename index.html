@@ -1016,7 +1016,7 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 <td>${esc(l.qty)} m</td>
 <td>
 <button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button>
-${!canPrintOnly ? `<button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>` : ''}
+${currentRole === 'manager' ? `<button class="btn danger" onclick="delLoad('${esc(l.id)}')">حذف</button>` : ''}
 </td>
 </tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div></td></tr>`;
@@ -1387,10 +1387,10 @@ logAction(currentUserName,'حذف أمر تجهيز','رقم الأمر: '+no);
 await save();toast('تم حذف الأمر وحمولاته من قاعدة البيانات');
 }catch(err){console.error(err);toast('تعذر حذف الأمر: '+(err.message||''));}
 }
-async function delLoad(no){
+async function delLoad(id){
 if(currentRole!=='manager'){toast('حذف الحمولة متاح للمدير فقط');return;}
 if(!confirm('حذف الحمولة؟'))return;
-const load=data.loads.find(x=>String(x.no)===String(no));if(!load)return;
+const load=data.loads.find(x=>String(x.id)===String(id));if(!load)return;
 try{
 if(load.id){const {error}=await supabaseClient.from('loads').delete().eq('id',load.id);if(error)throw error;}
 data.loads=data.loads.filter(x=>x!==load);
