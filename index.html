@@ -1016,7 +1016,7 @@ let delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((s,x)=
 openForm('قفل الأمر وتسجيل الكمية الفعلية رقم '+no,[
 {name:'actualQty',label:'الكمية الفعلية المجهزة م³',type:'number',required:true,value:delivered},
 {name:'lockNote',label:'ملاحظات الإقفال',full:true}
-],v=>{
+],async v=>{
 let q=Number(v.actualQty);
 if(!Number.isFinite(q)||q<0){toast('أدخل كمية فعلية صحيحة');return;}
 o.actualQty=q;
