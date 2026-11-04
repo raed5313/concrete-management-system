@@ -691,6 +691,18 @@ async function initSystem(){
       {event:'*', schema:'public', table:'loads'},
       syncCloudData
     )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'customers'},
+      syncCloudData
+    )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'drivers'},
+      syncCloudData
+    )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'vehicles'},
+      syncCloudData
+    )
     .subscribe();
 }
   
