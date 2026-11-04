@@ -757,7 +757,7 @@ if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
 o=>{
-let ls = data.loads.filter(l => String(l.orderId) === String(o.no));
+let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 let isOrderClosed = o.status === 'مكتمل ومجهز';
 let stateClass = o.status==='قيد التجهيز' ? 'order-open' : o.status==='قيد العمل' ? 'order-locked' : 'order-invoiced';
@@ -1004,12 +1004,14 @@ async function openLoad(no) {
         {name:'qty', label:'الكمية المجهزة م³', required:true},
         {name:'note', label:'ملاحظات'}
     ], v => {
+        if (o.status === 'مكتمل ومجهز') {
+            toast('هذا الأمر مقفول ولا يمكن إضافة حمولات جديدة');
+            return;
+        }
+
         if (!v.qty || Number(v.qty) <= 0) {
             toast('أدخل كمية صحيحة');
-            return;if (o.status === 'مكتمل ومجهز') {
-    toast('هذا الأمر مقفول ولا يمكن إضافة حمولات جديدة');
-    return;
-            }
+            return;
         }
 
         (async () => {
