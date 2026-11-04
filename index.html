@@ -1508,10 +1508,21 @@ save();closeModal();toast('تم إضافة الموظف');
 });
 }
 
-function delSimple(k,id){
-if(confirm('حذف السجل؟')){
-data[k]=data[k].filter(x=>String(x.id||x.no)!==String(id));
-save();toast('تم الحذف');
+async function delSimple(k,id){
+if(currentRole!=='manager'){toast('الحذف متاح للمدير فقط');return;}
+if(!confirm('حذف السجل؟'))return;
+try{
+  if(['customers','drivers','vehicles'].includes(k) && /^[0-9a-f-]{36}$/i.test(String(id))){
+    const {error}=await supabaseClient.from(k).delete().eq('id',String(id));
+    if(error)throw error;
+  }
+  data[k]=data[k].filter(x=>String(x.id||x.no)!==String(id));
+  const saved=await save();
+  if(saved===false)throw new Error('تعذر حفظ التغيير المركزي');
+  toast('تم حذف السجل من قاعدة البيانات المركزية');
+}catch(err){
+  console.error(err);
+  toast('تعذر حذف السجل: '+(err.message||'تحقق من الاتصال'));
 }
 }
 
