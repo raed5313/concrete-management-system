@@ -672,7 +672,7 @@ async function initSystem(){
       if (companyError) throw companyError;
       if (companyRow && companyRow.payload) {
         const shared = companyRow.payload;
-        ['customers','drivers','vehicles','inventory','invoices','receipts','expenses','employees','audit']
+        ['inventory','invoices','receipts','expenses','employees','audit']
           .forEach(key => { if (Array.isArray(shared[key])) data[key] = shared[key]; });
         if (Number(shared.nextInvNo) > 0) data.nextInvNo = Number(shared.nextInvNo);
         if (Number(shared.nextRecNo) > 0) data.nextRecNo = Number(shared.nextRecNo);
@@ -884,7 +884,6 @@ async function save(){
       const userId = authData && authData.session && authData.session.user ? authData.session.user.id : null;
       if (!userId) throw new Error('انتهت جلسة المدير');
       const payload = {
-        customers:data.customers, drivers:data.drivers, vehicles:data.vehicles,
         inventory:data.inventory, invoices:data.invoices, receipts:data.receipts,
         expenses:data.expenses, employees:data.employees, audit:data.audit,
         nextInvNo:data.nextInvNo, nextRecNo:data.nextRecNo
@@ -1307,7 +1306,6 @@ async function openLoad(no) {
                 v.id = savedLoad.id;
 
                 data.loads.push(v);
-                o.status = 'قيد العمل';
 
                 logAction(
                     currentUserName,
