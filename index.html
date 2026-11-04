@@ -1429,11 +1429,12 @@ openForm('إضافة مادة للمخزون',[
 {name:'unit',label:'الوحدة (طن، كيس، م³)',required:true},
 {name:'current',label:'الرصيد الحالي',type:'number',required:true},
 {name:'min',label:'حد التنبيه الأدنى',type:'number',required:true}
-],v=>{
+],async v=>{
 v.id=Date.now();
 data.inventory.push(v);
 logAction(currentUserName, 'إضافة مخزون', v.name);
-save();closeModal();toast('تم إضافة المادة');
+if(!await save()){data.inventory.pop();data.audit.shift();render();return;}
+closeModal();toast('تم إضافة المادة وحفظها مركزياً');
 });
 }
 
@@ -1444,12 +1445,13 @@ openForm('إصدار فاتورة مبيعات',[
 {name:'total',label:'إجمالي المبلغ',type:'number',required:true},
 {name:'paid',label:'المبلغ المدفوع',type:'number',required:true},
 {name:'discount',label:'الخصم',type:'number',value:0}
-],v=>{
+],async v=>{
 v.no = data.nextInvNo++;
 v.remaining = Number(v.total) - Number(v.paid) - Number(v.discount||0);
 data.invoices.push(v);
 logAction(currentUserName, 'إصدار فاتورة', `رقم الفاتورة: ${v.no}`);
-save();closeModal();toast('تم إصدار الفاتورة بنجاح');
+if(!await save()){data.invoices.pop();data.nextInvNo--;data.audit.shift();render();return;}
+closeModal();toast('تم إصدار الفاتورة وحفظها مركزياً');
 });
 }
 
@@ -1459,12 +1461,13 @@ openForm('إصدار سند قبض',[
 {name:'amount',label:'المبلغ المقبوض',type:'number',required:true},
 {name:'method',label:'طريقة الدفع',options:['نقداً','تحويل مصرفي','صك']},
 {name:'notes',label:'ملاحظات / البيان',type:'textarea'}
-],v=>{
+],async v=>{
 v.no = data.nextRecNo++;
 v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
 logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer}`);
-save();closeModal();toast('تم حفظ سند القبض بنجاح');
+if(!await save()){data.receipts.pop();data.nextRecNo--;data.audit.shift();render();return;}
+closeModal();toast('تم حفظ سند القبض مركزياً');
 });
 }
 
@@ -1474,11 +1477,12 @@ openForm('تسجيل مصروف تشغيلي',[
 {name:'amount',label:'المبلغ',type:'number',required:true},
 {name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)},
 {name:'notes',label:'ملاحظات',type:'textarea'}
-],v=>{
+],async v=>{
 v.id = Date.now();
 data.expenses.push(v);
 logAction(currentUserName, 'تسجيل مصروف', `${v.title}: ${v.amount}`);
-save();closeModal();toast('تم تسجيل المصروف');
+if(!await save()){data.expenses.pop();data.audit.shift();render();return;}
+closeModal();toast('تم تسجيل المصروف وحفظه مركزياً');
 });
 }
 
@@ -1489,11 +1493,12 @@ openForm('إضافة موظف جديد',[
 {name:'job',label:'الوظيفة'},
 {name:'salary',label:'الراتب الأساسي',type:'number',required:true},
 {name:'advances',label:'السلف الحالية',type:'number',value:0}
-],v=>{
+],async v=>{
 v.id = Date.now();
 data.employees.push(v);
 logAction(currentUserName, 'إضافة موظف', v.name);
-save();closeModal();toast('تم إضافة الموظف');
+if(!await save()){data.employees.pop();data.audit.shift();render();return;}
+closeModal();toast('تم إضافة الموظف وحفظه مركزياً');
 });
 }
 
