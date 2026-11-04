@@ -427,6 +427,11 @@ async function activateUserSession(user) {
 
   currentUserName = profile.display_name || user.email;
 
+  // طلب إذن إشعارات الهاتف لحساب المعمل بعد تسجيل الدخول.
+  if (currentRole === 'plant' && 'Notification' in window && Notification.permission === 'default') {
+    try { await Notification.requestPermission(); } catch(e) { console.warn(e); }
+  }
+
     $('loginError').textContent = 'تم التحقق، جارٍ فتح النظام...';
   $('mainApp').classList.remove('hidden');
   await initSystem();
@@ -546,7 +551,7 @@ async function initSystem(){
       if(ordersResult.error) throw ordersResult.error;
       if(loadsResult.error) throw loadsResult.error;
 
-      data.orders = (ordersResult.data || []).map(x => ({
+      const freshOrders = (ordersResult.data || []).map(x => ({
         id:x.id,
         no:x.order_no,
         customer:x.customer,
@@ -560,6 +565,15 @@ async function initSystem(){
         note:x.note,
         status:x.status
       }));
+
+      // اكتشاف الأوامر الجديدة القادمة من حساب المدير دون تنبيه عند أول تحميل.
+      const knownIds = window.sadaKnownOrderIds;
+      if (knownIds && currentRole === 'plant') {
+        const incoming = freshOrders.filter(o => o.id && !knownIds.has(String(o.id)));
+        incoming.forEach(o => triggerPlantAlert(o));
+      }
+      window.sadaKnownOrderIds = new Set(freshOrders.filter(o=>o.id).map(o=>String(o.id)));
+      data.orders = freshOrders;
 
       data.loads = (loadsResult.data || []).map(x => ({
         id:x.id,
@@ -637,14 +651,29 @@ render();
 }
 
 function triggerPlantAlert(order){
-  if('speechSynthesis' in window){
-    let utterance = new SpeechSynthesisUtterance("حبيبي اجاك اوردو جهزه");
-    utterance.lang = 'ar-SA';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.2;
+  const spokenMessage = 'حبيبي، إجاك أوردر، جهّزه';
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(spokenMessage);
+    utterance.lang = 'ar-IQ';
+    utterance.rate = 0.92;
+    utterance.pitch = 1.12;
     window.speechSynthesis.speak(utterance);
   }
-  
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      const notice = new Notification('🚚 أمر تجهيز جديد للمعمل', {
+        body: 'الأمر رقم ' + order.no + ' — ' + (order.customer || '') + ' — ' + (order.qty || '') + ' m³',
+        tag: 'sada-order-' + order.id,
+        renotify: true
+      });
+      notice.onclick = () => { window.focus(); navigate('orders'); notice.close(); };
+    } catch (e) { console.warn('Notification:', e); }
+  }
+
+  if (navigator.vibrate) navigator.vibrate([350,120,350]);
+
   let toastEl = $('toast');
   toastEl.innerHTML = `
     <div style="font-size:16px;color:#ff8791;margin-bottom:6px">🚨 <b>أمر تجهيز جديد للمعمل!</b></div>
