@@ -594,6 +594,7 @@ async function initSystem(){
         vehicle:x.vehicle,
         qty:x.qty,
         pump:x.pump,
+        time:x.time || null,
         status:x.status,
         date:x.created_at
       }));
@@ -914,6 +915,7 @@ $('form').innerHTML=fields.map(f=>`
 <label>${f.label}</label>
 ${f.options?
 `<select name="${f.name}">${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
+f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
 `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} value="${esc(f.value??'')}">`}
 </div>`).join('')+
@@ -1063,6 +1065,8 @@ async function openLoad(no) {
         {name:'vehicle', label:'رقم الآلية / الخلاطة', required:true},
         {name:'pump', label:'رقم المضخة'},
         {name:'qty', label:'الكمية المجهزة م³', required:true},
+        {name:'showTime', label:'إظهار وقت التجهيز في الوصل (اختياري)', type:'checkbox'},
+        {name:'time', label:'وقت التجهيز', type:'time'},
         {name:'note', label:'ملاحظات'}
     ], v => {
         if (o.status === 'مكتمل ومجهز') {
@@ -1117,6 +1121,7 @@ async function openLoad(no) {
                         vehicle: v.vehicle,
                         qty: Number(v.qty),
                         pump: v.pump || null,
+                        time: v.showTime === 'on' ? (v.time || null) : null,
                         status: 'تم التسجيل'
                     })
                     .select()
@@ -1127,6 +1132,7 @@ async function openLoad(no) {
                 v.orderNo = o.no;
                 v.no = loadNo;
                 v.date = new Date().toISOString().slice(0, 10);
+                v.time = savedLoad.time || null;
                 v.id = savedLoad.id;
 
                 data.loads.push(v);
@@ -1148,6 +1154,20 @@ async function openLoad(no) {
                 toast('فشل حفظ الحمولة: ' + (err.message || 'خطأ غير معروف'));
             }
         })();
+    });
+
+    const showTimeBox = $('form').querySelector('[name="showTime"]');
+    const timeInput = $('form').querySelector('[name="time"]');
+    const timeField = timeInput.closest('.field');
+    timeField.style.display = 'none';
+    showTimeBox.addEventListener('change', () => {
+        timeField.style.display = showTimeBox.checked ? '' : 'none';
+        if (showTimeBox.checked) {
+            const now = new Date();
+            timeInput.value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        } else {
+            timeInput.value = '';
+        }
     });
 }
 
@@ -1368,7 +1388,7 @@ function receiptLoad(no) {
             <div class="title">وصل تجهيز حمولة</div>
 
             <div class="top" style="direction:rtl">
-                <div>تاريخ التجهيز<br>${esc(d)}</div>
+                <div>تاريخ التجهيز<br>${esc(d)}${l.time ? `<br>وقت التجهيز<br>${esc(l.time)}` : ''}</div>
                 <div>رقم أمر التجهيز<br><span class="no">${esc(o.no)}</span></div>
             </div>
 
