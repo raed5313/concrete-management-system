@@ -442,12 +442,9 @@ nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 
 let data;
 function loadData(){
-  try{
-    let saved = JSON.parse(localStorage.getItem(KEY));
-    data = saved || blank();
-  }catch(e){
-    data = blank();
-  }
+  // قاعدة البيانات المركزية هي المصدر الوحيد؛ لا نسترجع أي نسخة محلية قديمة.
+  data = blank();
+  try { localStorage.removeItem(KEY); } catch(e) {}
 }
 loadData();
 
@@ -615,11 +612,6 @@ async function initSystem(){
     if (sadaSyncRunning) { sadaSyncPending = true; return; }
     sadaSyncRunning = true;
     try {
-      const localSharedBackup = {
-        customers:[...data.customers], drivers:[...data.drivers], vehicles:[...data.vehicles],
-        inventory:[...data.inventory], invoices:[...data.invoices], receipts:[...data.receipts],
-        expenses:[...data.expenses], employees:[...data.employees], audit:[...data.audit]
-      };
       const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
@@ -672,6 +664,9 @@ async function initSystem(){
         status:x.status,
         date:x.created_at
       }));
+      data.customers = (customersResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',address:x.address||''}));
+      data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
+      data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
       const {data: companyRow, error: companyError} = await supabaseClient
         .from('company_app_data').select('payload').eq('id', true).maybeSingle();
       if (companyError) throw companyError;
@@ -681,23 +676,9 @@ async function initSystem(){
           .forEach(key => { if (Array.isArray(shared[key])) data[key] = shared[key]; });
         if (Number(shared.nextInvNo) > 0) data.nextInvNo = Number(shared.nextInvNo);
         if (Number(shared.nextRecNo) > 0) data.nextRecNo = Number(shared.nextRecNo);
-      } else if (currentRole === 'manager') {
-        Object.keys(localSharedBackup).forEach(key => { data[key] = localSharedBackup[key]; });
-        const {data: authData} = await supabaseClient.auth.getSession();
-        const userId = authData && authData.session && authData.session.user ? authData.session.user.id : null;
-        if (userId) {
-          const payload = {
-            customers:data.customers, drivers:data.drivers, vehicles:data.vehicles,
-            inventory:data.inventory, invoices:data.invoices, receipts:data.receipts,
-            expenses:data.expenses, employees:data.employees, audit:data.audit,
-            nextInvNo:data.nextInvNo, nextRecNo:data.nextRecNo
-          };
-          const {error: seedError} = await supabaseClient.from('company_app_data')
-            .insert({id:true, payload, updated_by:userId});
-          if (seedError) throw seedError;
-        }
+      } else {
+        throw new Error('سجل البيانات المركزية غير مهيأ في قاعدة البيانات');
       }
-      localStorage.setItem(KEY, JSON.stringify(data));
       render();
 
     } catch(err) {
@@ -895,7 +876,6 @@ setTimeout(()=>$('toast').style.display='none',2500);
 }
 
 async function save(){
-    localStorage.setItem(KEY, JSON.stringify(data));
     render();
     if (currentRole !== 'manager') return true;
     const persistCentral = async () => {
