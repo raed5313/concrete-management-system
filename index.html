@@ -76,7 +76,7 @@ th{color:var(--gold)}
 @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
 
 .order-open{background:#fff!important;color:#202020!important;}
-.order-locked{background:#fff0b8!important;color:#493b12!important;}
+.order-locked{background:#f8dce5!important;color:#6b233b!important;}
 .order-invoiced{background:#d9f2df!important;color:#174b2b!important;}
 
 @media(max-width:800px){
@@ -809,7 +809,8 @@ let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
    return groups;
  }, {}));
 let isOrderClosed = o.status === 'مكتمل ومجهز';
-let stateClass = o.status==='قيد التجهيز' ? 'order-open' : o.status==='قيد العمل' ? 'order-locked' : 'order-invoiced';
+let hasInvoice = data.invoices.some(inv => String(inv.orderNo || '') === String(o.no));
+let stateClass = hasInvoice ? 'order-invoiced' : isOrderClosed ? 'order-locked' : 'order-open';
 
 let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
                   o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري العمل</span>' :
