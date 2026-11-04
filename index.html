@@ -89,6 +89,25 @@ th{color:var(--gold)}
 .stats{grid-template-columns:repeat(2,1fr)}
 .layout{grid-template-columns:1fr}
 }
+
+/* نافذة تنبيه أمر جديد للمعمل */
+.sada-alert-overlay{position:fixed;inset:0;z-index:99999;background:rgba(3,8,14,.78);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
+.sada-alert-card{width:min(790px,96vw);background:linear-gradient(145deg,#fff,#edf0f4);color:#101820;border:4px solid #c99b36;border-radius:25px;box-shadow:0 20px 70px #000b;position:relative;padding:30px 26px 22px;text-align:center;direction:rtl;animation:sadaAlertPop .35s ease-out}
+@keyframes sadaAlertPop{from{transform:translateY(25px) scale(.94);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.sada-alert-bell{font-size:82px;line-height:1;color:#d71927;text-shadow:0 0 22px #ff6570;animation:sadaBell .65s infinite alternate}
+@keyframes sadaBell{from{transform:rotate(-13deg)}to{transform:rotate(13deg)}}
+.sada-alert-close{position:absolute;left:18px;top:15px;border:0;border-radius:50%;width:43px;height:43px;background:#c91e2b;color:white;font-size:27px;cursor:pointer}
+.sada-alert-title{font-size:clamp(28px,5vw,48px);font-weight:900;margin:5px 0 3px;color:#111}
+.sada-alert-sub{font-size:clamp(17px,2.8vw,25px);font-weight:700;margin-bottom:18px}
+.sada-alert-info{display:grid;grid-template-columns:1fr 1fr;gap:0;background:#e8ebef;border:1px solid #aab1ba;border-radius:14px;overflow:hidden;text-align:right}
+.sada-alert-info div{padding:11px 14px;border-bottom:1px solid #c7ccd2;font-size:17px}
+.sada-alert-info b{color:#4a5058;margin-left:8px}
+.sada-alert-order{font-size:22px;font-weight:900;color:#171717;background:#f7e7b9;padding:3px 10px;border-radius:7px}
+.sada-alert-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.sada-alert-actions button{border:0;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;cursor:pointer}
+.sada-alert-go{background:linear-gradient(120deg,#f7d77e,#c7962e);color:#17120a;min-width:260px}
+.sada-alert-dismiss{background:#858b92;color:white;min-width:180px}
+@media(max-width:560px){.sada-alert-card{padding:25px 13px 16px}.sada-alert-info{grid-template-columns:1fr}.sada-alert-info div{padding:8px 10px;font-size:15px}.sada-alert-bell{font-size:65px}.sada-alert-actions button{width:100%;min-width:0}}
 </style>
 </head>
 <body>
@@ -665,6 +684,28 @@ render();
 
 function triggerPlantAlert(order){
   const spokenMessage = 'حبيبي، إجاك أوردر، جهّزه';
+
+  // صوت تنبيه قصير ثم نداء صوتي؛ قد يمنع المتصفح الصوت التلقائي إذا لم يسبق للمستخدم التفاعل مع الصفحة.
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtx) {
+      const audio = new AudioCtx();
+      [0, 0.28, 0.56].forEach(delay => {
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001, audio.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.18, audio.currentTime + delay + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + delay + 0.19);
+        osc.connect(gain); gain.connect(audio.destination);
+        osc.start(audio.currentTime + delay);
+        osc.stop(audio.currentTime + delay + 0.2);
+      });
+      setTimeout(() => audio.close().catch(()=>{}), 1300);
+    }
+  } catch(e) { console.warn('Alert sound:', e); }
+
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(spokenMessage);
@@ -677,26 +718,46 @@ function triggerPlantAlert(order){
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
       const notice = new Notification('🚚 أمر تجهيز جديد للمعمل', {
-        body: 'الأمر رقم ' + order.no + ' — ' + (order.customer || '') + ' — ' + (order.qty || '') + ' m³',
+        body: 'الأمر رقم ' + order.no + ' — ' + (order.customer || '') + ' — ' + (order.qty || '') + ' م³',
         tag: 'sada-order-' + order.id,
         renotify: true
       });
       notice.onclick = () => { window.focus(); navigate('orders'); notice.close(); };
     } catch (e) { console.warn('Notification:', e); }
   }
+  if (navigator.vibrate) navigator.vibrate([350,120,350,120,500]);
 
-  if (navigator.vibrate) navigator.vibrate([350,120,350]);
-
-  let toastEl = $('toast');
-  toastEl.innerHTML = `
-    <div style="font-size:16px;color:#ff8791;margin-bottom:6px">🚨 <b>أمر تجهيز جديد للمعمل!</b></div>
-    <div><b>رقم الأمر:</b> ${order.no}</div>
-    <div><b>العميل:</b> ${order.customer}</div>
-    <div><b>الكمية:</b> ${order.qty} م³ | <b>نوع الصب:</b> ${order.pour}</div>
-    <div><b>الموقع:</b> ${order.site}</div>
-  `;
-  toastEl.style.display = 'block';
-  setTimeout(()=> toastEl.style.display = 'none', 8000);
+  const previous = document.getElementById('sadaNewOrderAlert');
+  if (previous) previous.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'sadaNewOrderAlert';
+  overlay.className = 'sada-alert-overlay';
+  overlay.innerHTML = `
+    <div class="sada-alert-card" role="dialog" aria-modal="true" aria-label="أمر تجهيز جديد">
+      <button class="sada-alert-close" type="button" aria-label="إغلاق">×</button>
+      <div class="sada-alert-bell">🔔</div>
+      <div class="sada-alert-title">أمر تجهيز جديد</div>
+      <div class="sada-alert-sub">لديك أمر تجهيز جديد من الإدارة</div>
+      <div class="sada-alert-info">
+        <div><b>رقم الأمر:</b><span class="sada-alert-order">${esc(order.no)}</span></div>
+        <div><b>اسم الزبون:</b>${esc(order.customer || '—')}</div>
+        <div><b>موقع الصب:</b>${esc(order.site || '—')}</div>
+        <div><b>نوع الصب:</b>${esc(order.pour || '—')}</div>
+        <div><b>المواصفة:</b>${esc(order.grade || '—')}</div>
+        <div><b>الكمية التقديرية:</b>${esc(order.qty || '—')} م³</div>
+        <div style="grid-column:1/-1"><b>تاريخ الأمر:</b>${esc(dateOnly(order.date))}</div>
+      </div>
+      <div style="color:#bd2632;font-size:19px;font-weight:900;margin-top:12px">يرجى البدء بالتجهيز...</div>
+      <div class="sada-alert-actions">
+        <button class="sada-alert-dismiss" type="button">🔕 إغلاق</button>
+        <button class="sada-alert-go" type="button">الذهاب إلى أمر التجهيز　❯</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const closeAlert = () => overlay.remove();
+  overlay.querySelector('.sada-alert-close').onclick = closeAlert;
+  overlay.querySelector('.sada-alert-dismiss').onclick = closeAlert;
+  overlay.querySelector('.sada-alert-go').onclick = () => { closeAlert(); navigate('orders'); };
 }
 
 function checkNewOrdersForPlant(){
