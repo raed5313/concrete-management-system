@@ -609,7 +609,11 @@ async function initSystem(){
 
   renderNav();
 
+  let sadaSyncRunning = false;
+  let sadaSyncPending = false;
   async function syncCloudData(){
+    if (sadaSyncRunning) { sadaSyncPending = true; return; }
+    sadaSyncRunning = true;
     try {
       const localSharedBackup = {
         customers:[...data.customers], drivers:[...data.drivers], vehicles:[...data.vehicles],
@@ -699,6 +703,12 @@ async function initSystem(){
     } catch(err) {
       console.error('Supabase sync:', err);
       toast('تعذر تحديث البيانات من قاعدة البيانات');
+    } finally {
+      sadaSyncRunning = false;
+      if (sadaSyncPending) {
+        sadaSyncPending = false;
+        Promise.resolve().then(syncCloudData);
+      }
     }
   }
 
@@ -887,26 +897,31 @@ setTimeout(()=>$('toast').style.display='none',2500);
 async function save(){
     localStorage.setItem(KEY, JSON.stringify(data));
     render();
-    if (currentRole === 'manager') {
-      try {
-        const { data: authData, error: authError } = await supabaseClient.auth.getSession();
-        if (authError) throw authError;
-        const userId = authData && authData.session && authData.session.user ? authData.session.user.id : null;
-        if (!userId) throw new Error('انتهت جلسة المدير');
-        const payload = {
-          customers:data.customers, drivers:data.drivers, vehicles:data.vehicles,
-          inventory:data.inventory, invoices:data.invoices, receipts:data.receipts,
-          expenses:data.expenses, employees:data.employees, audit:data.audit,
-          nextInvNo:data.nextInvNo, nextRecNo:data.nextRecNo
-        };
-        const { error } = await supabaseClient.from('company_app_data')
-          .upsert({id:true, payload, updated_by:userId, updated_at:new Date().toISOString()}, {onConflict:'id'});
-        if (error) throw error;
-      } catch (err) {
+    if (currentRole !== 'manager') return true;
+    const persistCentral = async () => {
+      const {data: authData, error: authError} = await supabaseClient.auth.getSession();
+      if (authError) throw authError;
+      const userId = authData && authData.session && authData.session.user ? authData.session.user.id : null;
+      if (!userId) throw new Error('انتهت جلسة المدير');
+      const payload = {
+        customers:data.customers, drivers:data.drivers, vehicles:data.vehicles,
+        inventory:data.inventory, invoices:data.invoices, receipts:data.receipts,
+        expenses:data.expenses, employees:data.employees, audit:data.audit,
+        nextInvNo:data.nextInvNo, nextRecNo:data.nextRecNo
+      };
+      const {error} = await supabaseClient.from('company_app_data')
+        .upsert({id:true, payload, updated_by:userId, updated_at:new Date().toISOString()}, {onConflict:'id'});
+      if (error) throw error;
+      return true;
+    };
+    window.sadaCentralSaveQueue = (window.sadaCentralSaveQueue || Promise.resolve())
+      .then(persistCentral, persistCentral)
+      .catch(err => {
         console.error('Central save failed:', err);
-        toast('حُفظ محلياً، لكن تعذر الحفظ المركزي: ' + (err.message || 'تحقق من الاتصال'));
-      }
-    }
+        toast('تعذر الحفظ المركزي: ' + (err.message || 'تحقق من الاتصال'));
+        return false;
+      });
+    return window.sadaCentralSaveQueue;
 }
 
 function tableRows(a,fn,n=4){
@@ -1394,7 +1409,7 @@ const load=data.loads.find(x=>String(x.id)===String(id));if(!load)return;
 try{
 if(load.id){const {error}=await supabaseClient.from('loads').delete().eq('id',load.id);if(error)throw error;}
 data.loads=data.loads.filter(x=>x!==load);
-logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+no);
+logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+load.no);
 await save();toast('تم حذف الحمولة من قاعدة البيانات');
 }catch(err){console.error(err);toast('تعذر حذف الحمولة: '+(err.message||''));}
 }
