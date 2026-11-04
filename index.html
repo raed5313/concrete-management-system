@@ -781,7 +781,7 @@ return `
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td>${esc(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
 <td><div class="actions">
-<button class="btn gold" onclick="startProcessing('${esc(o.no)}')">بدء التجهيز</button>
+
 ${!isOrderClosed ? `<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>` : '<span style="color:#f1cc71;font-weight:bold;padding:8px">🔒 الأمر مقفول</span>'}
 ${!isOrderClosed ? `<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل والكمية</button>` : ''}
 <button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
