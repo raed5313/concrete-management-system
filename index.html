@@ -542,10 +542,21 @@ if (error) throw error;
   }
 } 
 
-function logout(){
-  localStorage.removeItem('sada-logged-role');
-  localStorage.removeItem('sada-logged-user');
-  location.reload();
+async function logout(){
+  try {
+    // إنهاء جلسة الحساب الحالي فقط؛ لا يتم تبديل الدور إلى حساب آخر.
+    const { error } = await supabaseClient.auth.signOut({ scope: 'local' });
+    if (error) throw error;
+    currentRole = '';
+    currentUserName = '';
+    $('mainApp').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    $('loginPass').value = '';
+    $('loginError').textContent = 'تم تسجيل الخروج بنجاح.';
+  } catch (err) {
+    console.error('Sada logout:', err);
+    toast('تعذر تسجيل الخروج. تحقق من الاتصال ثم حاول مجدداً.');
+  }
 }
 
 const roleMenus = {
