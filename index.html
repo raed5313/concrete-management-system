@@ -759,6 +759,13 @@ data.orders.slice().reverse(),
 o=>{
 let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
+ let vehicleTotals = Object.values(ls.reduce((groups, l) => {
+   const vehicleName = String(l.vehicle || 'غير محددة');
+   if (!groups[vehicleName]) groups[vehicleName] = { vehicle: vehicleName, qty: 0, count: 0 };
+   groups[vehicleName].qty += Number(l.qty) || 0;
+   groups[vehicleName].count += 1;
+   return groups;
+ }, {}));
 let isOrderClosed = o.status === 'مكتمل ومجهز';
 let stateClass = o.status==='قيد التجهيز' ? 'order-open' : o.status==='قيد العمل' ? 'order-locked' : 'order-invoiced';
 
@@ -784,12 +791,13 @@ return `
 </tr>
 <tr><td colspan="8"><div class="loadbox">
 <b class="goldtext">حمولات الأمر ${esc(o.no)}</b>
+${vehicleTotals.length?`<div style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0">${vehicleTotals.map(v=>`<div style="background:#17232d;border:1px solid #b58b36;border-radius:10px;padding:10px 14px;color:#f4d27a"><b>الخلاطة: ${esc(v.vehicle)}</b><br><strong style="font-size:20px">${fmt(v.qty)} m</strong><small style="display:block;color:#cbd5e1">${v.count} حمولات</small></div>`).join('')}</div>`:'' }
 ${ls.length?`<table><tbody>${ls.map(l=>`
 <tr>
 <td>حمولة ${esc(l.no)}</td>
 <td>السائق: ${esc(l.driver||'—')}</td>
 <td>الآلية: ${esc(l.vehicle||'—')}</td>
-<td>${esc(l.qty)} م³</td>
+<td>${esc(l.qty)} m</td>
 <td>
 <button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button>
 <button class="btn danger" onclick="delLoad('${esc(l.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>
