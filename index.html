@@ -1194,12 +1194,12 @@ setTimeout(()=>$('toast').style.display='none',2500);
 
 async function save(){
     render();
-    if (currentRole !== 'manager') return true;
+    if (!['manager','accountant'].includes(currentRole)) return true;
     const persistCentral = async () => {
       const {data: authData, error: authError} = await supabaseClient.auth.getSession();
       if (authError) throw authError;
       const userId = authData && authData.session && authData.session.user ? authData.session.user.id : null;
-      if (!userId) throw new Error('انتهت جلسة المدير');
+      if (!userId) throw new Error('انتهت جلسة الدخول؛ سجّل الدخول مجدداً');
       const payload = {
         inventory:data.inventory, invoices:data.invoices, receipts:data.receipts,
         expenses:data.expenses, employees:data.employees, audit:data.audit,
