@@ -142,6 +142,28 @@ th{color:var(--gold)}
 .order-loadbox table{min-width:0}
 .order-loadbox td{padding:6px 5px;font-size:13px}
 .order-loadbox .btn{padding:5px 8px}
+
+/* عرض أوامر التجهيز كبطاقات عمودية */
+#orders .tablewrap{overflow-x:visible!important}
+#orders .tablewrap table{width:100%;min-width:0!important;border-collapse:separate;border-spacing:0 8px}
+#orders .tablewrap thead{display:none}
+#orders #ordersBody tr.order-card{display:flex;flex-direction:column;background:var(--p);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:8px}
+#orders #ordersBody tr.order-card td{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;min-height:38px}
+#orders #ordersBody tr.order-card td:before{font-weight:800;color:var(--gold);flex:0 0 38%;content:""}
+#orders #ordersBody tr.order-card td:nth-child(1):before{content:"رقم الأمر"}
+#orders #ordersBody tr.order-card td:nth-child(2):before{content:"التاريخ"}
+#orders #ordersBody tr.order-card td:nth-child(3):before{content:"الحالة"}
+#orders #ordersBody tr.order-card td:nth-child(4):before{content:"اسم الزبون"}
+#orders #ordersBody tr.order-card td:nth-child(5):before{content:"موقع الصب"}
+#orders #ordersBody tr.order-card td:nth-child(6):before{content:"نوع الصب"}
+#orders #ordersBody tr.order-card td:nth-child(7):before{content:"الكمية"}
+#orders #ordersBody tr.order-card td:nth-child(8):before{content:"الإجراءات"}
+#orders #ordersBody tr.order-card td:last-child{border-bottom:0}
+#orders #ordersBody tr.order-card td .actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-start}
+#orders #ordersBody tr:has(>td.order-load-cell){display:block;width:100%;margin-top:-8px}
+#orders #ordersBody td.order-load-cell{display:block;width:100%;padding:4px 6px!important}
+#orders #ordersBody td.order-load-cell:before{content:none}
+#orders #ordersBody .load-details{width:100%}
 </style>
 </head>
 <body>
@@ -1041,7 +1063,7 @@ let canManageOrder = isManager || isPlant;
 let canPrintOnly = isAccountant;
 
 return `
-<tr class="${stateClass}">
+<tr class="${stateClass} order-card">
 <td>${esc(o.no)}</td><td>${esc(dateOnly(o.date))}</td><td>${statusBadge}</td>
 <td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td>${esc(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
