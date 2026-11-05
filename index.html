@@ -419,6 +419,9 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 </section>
 
+<!-- قسم الخلطات المركزية -->
+<section id="mixes" class="hidden"><div class="panel"><div class="head"><h3>الخلطات المعتمدة للمتر المكعب</h3><button class="btn primary" id="addMixBtn" onclick="openMixRecipe()">＋ إضافة خلطة</button></div><p class="muted">تُحفظ الخلطات مركزياً ويمكن للمعمل اختيارها عند تعديل خلطة أمر التجهيز. الصلاحية للمدير والمعمل فقط.</p><div class="tablewrap"><table><thead><tr><th>اسم الخلطة</th><th>المواصفة</th><th>الأسمنت كغم</th><th>الحصى كغم</th><th>الرمل كغم</th><th>الماء لتر</th><th>المادة المضافة لتر</th><th>الإجراءات</th></tr></thead><tbody id="mixesBody"></tbody></table></div></div></section>
+
 <!-- 3. العملاء وحساباتهم -->
 <section id="customers" class="hidden">
 <div class="panel">
@@ -643,7 +646,7 @@ const loginAccounts = {
 
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
-inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],fuel:[],purchases:[],maintenance:[],spare_parts:[],
+inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],mixes:[],fuel:[],purchases:[],maintenance:[],spare_parts:[],
 nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 });
 
@@ -819,6 +822,7 @@ const roleMenus = {
 manager: [
 ['dashboard','الرئيسية'],
 ['orders','أوامر التجهيز'],
+['mixes','الخلطات'],
 ['customers','العملاء'],
 ['drivers','السائقون'],
 ['vehicles','الآليات / الخلاطات'],
@@ -845,6 +849,7 @@ manager: [
 
 plant: [
 ['orders','📋 أوامر التجهيز'],
+['mixes','🧪 الخلطات'],
 ['plants','🚚 الحمولات'],
 ['reports','📊 التقارير']
 ],
@@ -898,12 +903,13 @@ async function initSystem(){
     if (sadaSyncRunning) { sadaSyncPending = true; return; }
     sadaSyncRunning = true;
     try {
-      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult] = await Promise.all([
+      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
         supabaseClient.from('customers').select('*').order('created_at'),
         supabaseClient.from('drivers').select('*').order('created_at'),
-        supabaseClient.from('vehicles').select('*').order('created_at')
+        supabaseClient.from('vehicles').select('*').order('created_at'),
+supabaseClient.from('concrete_mix_recipes').select('*').order('name')
       ]);
 
       if(ordersResult.error) throw ordersResult.error;
@@ -911,6 +917,7 @@ async function initSystem(){
       if(customersResult.error) throw customersResult.error;
       if(driversResult.error) throw driversResult.error;
       if(vehiclesResult.error) throw vehiclesResult.error;
+if(mixesResult.error) throw mixesResult.error;
 
       const freshOrders = (ordersResult.data || []).map(x => ({
         id:x.id,
@@ -964,6 +971,7 @@ async function initSystem(){
       data.customers = (customersResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',address:x.address||''}));
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
       data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
+data.mixes = mixesResult.data || [];
       const {data: companyRow, error: companyError} = await supabaseClient
         .from('company_app_data').select('payload').eq('id', true).maybeSingle();
       if (companyError) throw companyError;
@@ -1048,6 +1056,10 @@ async function initSystem(){
     )
     .on('postgres_changes',
       {event:'*', schema:'public', table:'vehicles'},
+      syncCloudData
+    )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'concrete_mix_recipes'},
       syncCloudData
     )
     .on('postgres_changes',
@@ -1299,6 +1311,11 @@ o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><
 );
 }
 
+if($('mixesBody')){
+ const canEditMixes=isManager||isPlant;
+ if($('addMixBtn')) $('addMixBtn').style.display=canEditMixes?'':'none';
+ $('mixesBody').innerHTML=tableRows(data.mixes||[],m=>`<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.grade||'—')}</td><td>${fmt(m.cement_kg)}</td><td>${fmt(m.gravel_kg)}</td><td>${fmt(m.sand_kg)}</td><td>${fmt(m.water_l)}</td><td>${fmt(m.admixture_l)}</td><td>${canEditMixes?`<button class="btn" onclick="openMixRecipe('${esc(m.id)}')">تعديل</button> <button class="btn danger" onclick="deleteMixRecipe('${esc(m.id)}')">حذف</button>`:'عرض فقط'}</td></tr>`,8);
+}
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
 data.orders.slice().reverse(),
@@ -1856,6 +1873,7 @@ try{
  const {data:mix,error}=await supabaseClient.from('concrete_order_mix_recipes').select('*').eq('order_no',String(no)).maybeSingle();
  if(error)throw error;
  const fields=[
+  {name:'recipe_template',label:'اختيار خلطة معتمدة (اختياري)',options:['',...(data.mixes||[]).map(x=>x.name)]},
   {name:'cement_kg',label:'الأسمنت (كغم / للمتر المكعب)',type:'number',step:'0.01',min:0,value:mix?.cement_kg??0,required:true},
   {name:'gravel_kg',label:'الحصى (كغم / للمتر المكعب)',type:'number',step:'0.01',min:0,value:mix?.gravel_kg??0,required:true},
   {name:'sand_kg',label:'الرمل (كغم / للمتر المكعب)',type:'number',step:'0.01',min:0,value:mix?.sand_kg??0,required:true},
@@ -1874,7 +1892,42 @@ try{
    closeModal();toast('تم حفظ كميات مكونات الخلطة للمتر المكعب مركزياً');
   }catch(err){console.error(err);toast('تعذر حفظ الخلطة: '+(err.message||''));}})();
  });
+ const templateSelect=$('form')?.elements?.recipe_template;
+ if(templateSelect)templateSelect.addEventListener('change',()=>{const selected=(data.mixes||[]).find(x=>x.name===templateSelect.value);if(selected)['cement_kg','gravel_kg','sand_kg','water_l','admixture_l'].forEach(k=>{if($('form').elements[k])$('form').elements[k].value=selected[k]??0;});});
 }catch(err){console.error(err);toast('تعذر تحميل مكونات الخلطة: '+(err.message||''));}
+}
+
+async function openMixRecipe(id=''){
+ if(currentRole!=='manager'&&currentRole!=='plant'){toast('إدارة الخلطات متاحة للمدير والمعمل فقط');return;}
+ const existing=(data.mixes||[]).find(x=>String(x.id)===String(id));
+ const fields=[
+ {name:'name',label:'اسم الخلطة',value:existing?.name||'',required:true},
+ {name:'grade',label:'المواصفة (اختياري)',value:existing?.grade||''},
+ {name:'cement_kg',label:'الأسمنت (كغم / للمتر المكعب)',type:'number',step:'0.01',min:0,value:existing?.cement_kg??0,required:true},
+ {name:'gravel_kg',label:'الحصى (كغم / للمتر المكعب)',type:'number',step:'0.01',min:0,value:existing?.gravel_kg??0,required:true},
+ {name:'sand_kg',label:'الرمل (كغم / للمتر المكعب)',type:'number',step:'0.01',min:0,value:existing?.sand_kg??0,required:true},
+ {name:'water_l',label:'الماء (لتر / للمتر المكعب)',type:'number',step:'0.01',min:0,value:existing?.water_l??0,required:true},
+ {name:'admixture_l',label:'المادة المضافة (لتر / للمتر المكعب)',type:'number',step:'0.01',min:0,value:existing?.admixture_l??0,required:true},
+ {name:'notes',label:'ملاحظات',type:'textarea',value:existing?.notes||'',full:true}
+ ];
+ openForm(existing?'تعديل الخلطة المعتمدة':'إضافة خلطة معتمدة',fields,async v=>{
+ try{
+ const keys=['cement_kg','gravel_kg','sand_kg','water_l','admixture_l'];
+ const row={name:v.name.trim(),grade:v.grade.trim(),notes:v.notes.trim(),...Object.fromEntries(keys.map(k=>[k,Number(v[k])])),updated_at:new Date().toISOString()};
+ if(!row.name||keys.some(k=>!Number.isFinite(row[k])||row[k]<0))throw new Error('تحقق من الاسم والكميات المدخلة');
+ const {data:authData}=await supabaseClient.auth.getSession();row.updated_by=authData?.session?.user?.id||null;
+ if(existing){const {error}=await supabaseClient.from('concrete_mix_recipes').update(row).eq('id',existing.id);if(error)throw error;}
+ else{row.created_by=row.updated_by;const {error}=await supabaseClient.from('concrete_mix_recipes').insert(row);if(error)throw error;}
+ closeModal();toast('تم حفظ الخلطة مركزياً');const {data:rows,error}=await supabaseClient.from('concrete_mix_recipes').select('*').order('name');if(error)throw error;data.mixes=rows||[];render();
+ }catch(err){console.error(err);toast('تعذر حفظ الخلطة: '+(err.message||''));}
+ });
+}
+async function deleteMixRecipe(id){
+ if(currentRole!=='manager'&&currentRole!=='plant'){toast('حذف الخلطات متاح للمدير والمعمل فقط');return;}
+ const item=(data.mixes||[]).find(x=>String(x.id)===String(id));if(!item)return;
+ if(!confirm('حذف الخلطة «'+item.name+'»؟ لن تتأثر الخلطات المحفوظة سابقاً داخل أوامر التجهيز.'))return;
+ const {error}=await supabaseClient.from('concrete_mix_recipes').delete().eq('id',id);if(error){console.error(error);toast('تعذر حذف الخلطة: '+error.message);return;}
+ data.mixes=data.mixes.filter(x=>String(x.id)!==String(id));render();toast('تم حذف الخلطة');
 }
 function editOrder(no){
 if(currentRole!=='manager'){toast('المحاسب يملك صلاحية المشاهدة والطباعة فقط');return;}
