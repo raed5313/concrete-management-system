@@ -195,6 +195,34 @@ th{color:var(--gold)}
 #orders #ordersBody .order-loadbox table td{color:#24170f!important;border-bottom:1px solid rgba(80,35,5,.22)!important}
 #orders #ordersBody .load-details summary{background:#f08a36!important;color:#351b0a!important;border-color:#b95612!important}
 @media(max-width:800px){.side{position:sticky;top:0;height:auto;max-height:40vh;overflow:visible;z-index:100}.side .nav{flex:none;max-height:100px;overflow-x:auto;overflow-y:hidden}.app{grid-template-columns:1fr}}
+
+/* تحسينات أطلس: شريط جانبي ثابت، أحجام متوازنة، وحمولات برتقالية فاتحة */
+@media(min-width:801px){
+  .app{grid-template-columns:220px minmax(0,1fr)}
+  .side{position:sticky;top:0;height:100vh;max-height:100vh;overflow-y:auto;align-self:start}
+}
+.nav{gap:4px}
+.nav button{padding:7px 8px;font-size:11px}
+.brand,.user-info{padding:10px}
+.brand img{width:68px;height:68px}
+#orders #ordersBody tr.order-card td{font-size:10.5px!important;padding:6px 8px!important;line-height:1.2!important;min-height:26px!important}
+#orders #ordersBody tr.order-card td:before{font-size:10px!important}
+#orders #ordersBody tr.order-card .actions .btn{font-size:9.5px!important;padding:5px 6px!important}
+#orders #ordersBody tr.order-card{border-radius:10px}
+#orders #ordersBody .order-loadbox{background:#ffe0bd!important;color:#38200e!important;border:1px solid #e9a15c!important}
+#orders #ordersBody .order-loadbox,
+#orders #ordersBody .order-loadbox *{color:#38200e}
+#orders #ordersBody .order-loadbox .goldtext{color:#6b350f!important}
+#orders #ordersBody .order-loadbox .order-accumulated{background:#fff1f2!important;color:#991b1b!important;border-color:#991b1b!important}
+#orders #ordersBody .order-loadbox table td{color:#38200e!important;border-bottom:1px solid #e8bd96!important}
+#orders #ordersBody .load-details summary{background:#ffd2a3!important;color:#38200e!important;border-color:#df9956!important}
+@media(max-width:800px){
+ .side{position:sticky;top:0;z-index:100;max-height:30vh;overflow-y:auto}
+ .nav{gap:3px}
+ .nav button{padding:6px 7px;font-size:10px}
+ .brand img{width:54px;height:54px}
+}
+
 </style>
 </head>
 <body>
