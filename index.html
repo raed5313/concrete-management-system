@@ -265,6 +265,11 @@ th{color:var(--gold)}
 /* تصغير أزرار القائمة الجانبية لمشغل المعمل فقط */
 body.plant-role .side .nav button{font-size:10px!important;padding:6px 7px!important;min-height:28px!important;line-height:1.15!important}
 
+
+/* قائمة المعمل أصغر قليلاً مع إبقاء بقية الأدوار دون تغيير */
+body.plant-role .side .nav button{font-size:9px!important;padding:5px 6px!important;min-height:26px!important;line-height:1.1!important}
+body.plant-role .side .nav{gap:3px!important}
+
 </style>
 </head>
 <body>
@@ -1184,7 +1189,7 @@ return `
 ${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
 ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
 <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
-${!canPrintOnly && canManageOrder && currentRole !== 'plant' ? '<button class="btn primary" title="تعديل الخلطة المسجلة" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪</button>' : ''}
+${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
 ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
