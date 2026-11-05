@@ -281,7 +281,8 @@ body.plant-role .side .nav{gap:2px!important}
 <div id="loginScreen">
 <div class="login-card">
 <h2>تسجيل الدخول الموحد</h2>
-<p class="muted" style="text-align:center;margin-bottom:20px">نظام أطلس للكونكريت للكونكريت الجاهز</p>
+<p class="muted" style="text-align:center;margin-bottom:12px">نظام أطلس للكونكريت الجاهز</p>
+<p id="roleEntryHint" class="muted" style="text-align:center;margin:0 0 18px;color:var(--gold);font-weight:bold">تسجيل الدخول الموحد لجميع الحسابات</p>
 <form id="loginForm" onsubmit="handleLogin(event)">
 <div class="field">
 <label>اسم المستخدم</label>
@@ -615,6 +616,16 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
 const dateOnly=value=>value?String(value).split('T')[0]:'—';
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 
+// روابط دخول مستقلة حسب الدور: ?role=plant أو ?role=accountant أو ?role=manager
+const roleEntry = new URLSearchParams(location.search).get('role');
+const roleEntryNames = { plant:'المعمل', accountant:'المحاسب', manager:'المدير' };
+const roleEntryHint = document.getElementById('roleEntryHint');
+if (roleEntryHint) {
+  roleEntryHint.textContent = roleEntryNames[roleEntry]
+    ? 'رابط دخول مخصص: ' + roleEntryNames[roleEntry]
+    : 'تسجيل الدخول الموحد لجميع الحسابات';
+}
+
 async function activateUserSession(user) {
   const { data: profile, error } = await supabaseClient
     .from('user_profiles')
@@ -626,9 +637,12 @@ async function activateUserSession(user) {
     throw new Error('لم يتم العثور على صلاحية المستخدم.');
   }
 
-  currentRole = profile.app_role === 'operator'
-    ? 'plant'
-    : profile.app_role;
+  const authenticatedRole = profile.app_role === 'operator' ? 'plant' : profile.app_role;
+  if (roleEntry && ['plant','accountant','manager'].includes(roleEntry) && authenticatedRole !== roleEntry) {
+    await supabaseClient.auth.signOut({ scope: 'local' });
+    throw new Error('هذا الرابط مخصص لحساب ' + (roleEntryNames[roleEntry] || '') + '. استخدم حسابه الصحيح.');
+  }
+  currentRole = authenticatedRole;
 
   currentUserName = profile.display_name || user.email;
 
