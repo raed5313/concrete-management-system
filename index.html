@@ -1571,7 +1571,7 @@ function openOrder(){
     {name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
     {name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
     {name:'pump',label:'رقم المضخة'},
-    {name:'admixture_type',label:'نوع المادة المضافة',options:['','ملدن (مقلل ماء)','ملدن فائق','مسرّع شك','مبطئ شك','ألياف','أخرى']},
+    {name:'admixture_type',label:'اسم المادة المضافة (يدخله المدير)',type:'text'},
     {name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
     {name:'price',label:'سعر المتر',type:'number',required:true,value:75000},
     {name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
@@ -1701,7 +1701,6 @@ async function openLoad(no) {
         {name:'driver', label:'اسم السائق', required:true,options:['',...(data.drivers||[]).map(x=>x.name)]},
         {name:'vehicle', label:'رقم الآلية / الخلاطة', required:true,options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'pump', label:'رقم المضخة (من أمر التجهيز)',value:o.pump||''},
-        {name:'admixture_type',label:'نوع المادة المضافة',value:o.admixture_type||''},
         {name:'qty', label:'الكمية المجهزة م³', required:true},
         {name:'showTime', label:'إظهار وقت التجهيز في الوصل (اختياري)', type:'checkbox'},
         {name:'time', label:'وقت التجهيز', type:'time'},
