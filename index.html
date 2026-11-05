@@ -860,7 +860,9 @@ async function initSystem(){
 
   await syncCloudData();
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
-  const firstAllowedPage = (roleMenus[currentRole] || roleMenus.manager)[0]?.[0] || 'orders';
+  const allowedPages = roleMenus[currentRole] || roleMenus.manager;
+  const requestedPage = decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);
+  const firstAllowedPage = allowedPages.some(item => item[0] === requestedPage) ? requestedPage : (allowedPages[0]?.[0] || 'orders');
   navigate(firstAllowedPage);
   if (currentRole === 'plant') {
     const dashboard = $('dashboard');
@@ -938,7 +940,9 @@ document.querySelectorAll('[data-page]').forEach(b=>
 b.classList.toggle('active', b.dataset.page===p)
 );
 render();
+if(location.hash !== '#'+p) history.replaceState(null,'','#'+p);
 }
+window.addEventListener('hashchange',()=>{if(currentRole){const p=decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);if(p)navigate(p);}});
 
 function triggerPlantAlert(order){
   const spokenMessage = 'حبيبي، إجاك أوردر، جهّزه';
@@ -1173,8 +1177,8 @@ return `
 ${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
 ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
 <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
-${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل الخلطة المسجلة" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪</button>' : ''}
-${!canPrintOnly ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
+${!canPrintOnly && canManageOrder && currentRole !== 'plant' ? '<button class="btn primary" title="تعديل الخلطة المسجلة" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪</button>' : ''}
+${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
 <tr class="order-load-row"><td colspan="8" class="order-load-cell">
