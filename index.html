@@ -1483,6 +1483,8 @@ function operationalFormFields(type,record={}){
  return operationalConfig[type].fields.map(([name,label,kind])=>({
   name,label,type:kind==='date'?'date':kind==='month'?'month':kind==='number'?'number':kind==='textarea'?'textarea':'text',
   options:Array.isArray(kind)?kind:
+    type==='inventory_items' && name==='name'?['','أسمنت','رمل','حصى','مضاف']:
+    type==='inventory_items' && name==='unit'?['','طن','كغم','م³','لتر']:
     name==='employee'?['',...(data.employees||[]).map(e=>e.name)]:
     name==='supplier'?['',...(data.suppliers||[]).map(e=>e.name)]:
     ['driver','driver_name','السائق'].includes(name)?['',...(data.drivers||[]).map(e=>e.name)]:
@@ -1606,7 +1608,7 @@ $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
 ${f.options?
-`<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${i===0&&v===''?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
+`<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
 `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.step?`step="${f.step}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} value="${esc(f.value??'')}">`}
