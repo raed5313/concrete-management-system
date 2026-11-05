@@ -1022,6 +1022,18 @@ data.mixes = mixesResult.data || [];
   }
 
   await syncCloudData();
+  // مزامنة تلقائية بين حسابات المدير والمحاسب والمعمل حتى تظهر التغييرات الحديثة دون إعادة تسجيل الدخول.
+  if (window.sadaCloudSyncTimer) clearInterval(window.sadaCloudSyncTimer);
+  window.sadaCloudSyncTimer = setInterval(() => {
+    if (document.visibilityState === 'visible' && navigator.onLine) syncCloudData();
+  }, 20000);
+  if (!window.sadaCloudFocusSyncBound) {
+    window.sadaCloudFocusSyncBound = true;
+    window.addEventListener('focus', () => {
+      if (navigator.onLine && typeof window.sadaCloudSyncNow === 'function') window.sadaCloudSyncNow();
+    });
+  }
+  window.sadaCloudSyncNow = syncCloudData;
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
   const allowedPages = roleMenus[currentRole] || roleMenus.manager;
   const requestedPage = decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);
