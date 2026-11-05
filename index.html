@@ -543,6 +543,7 @@ body.plant-role .side .nav{gap:2px!important}
 <section id="attendance" class="hidden"><div class="panel"><div class="head"><h3>الحضور والغياب</h3><button class="btn primary" onclick="openOperationalForm('attendance')">＋ تسجيل حضور / غياب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الحالة</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="attendanceBody"></tbody></table></div></div></section>
 <section id="payroll" class="hidden"><div class="panel"><div class="head"><h3>الرواتب</h3><button class="btn primary" onclick="openOperationalForm('payroll')">＋ تسجيل استلام راتب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الشهر</th><th>الراتب المستحق حسب الحضور</th><th>المبلغ المستلم</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="payrollBody"></tbody></table></div></div></section>
 <section id="advances" class="hidden"><div class="panel"><div class="head"><h3>سلف الموظفين</h3><button class="btn primary" onclick="openOperationalForm('advances')">＋ تسجيل سلفة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>المبلغ</th><th>المستقطع</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="advancesBody"></tbody></table></div></div></section>
+<section id="bonuses" class="hidden"><div class="panel"><div class="head"><h3>مكافآت الموظفين</h3><button class="btn primary" onclick="openOperationalForm('bonuses')">＋ صرف مكافأة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>سبب المكافأة</th><th>المبلغ</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="bonusesBody"></tbody></table></div></div></section>
 <!-- 13. المتابعة والأرشفة -->
 <section id="audit" class="hidden">
 <div class="panel">
@@ -828,6 +829,7 @@ manager: [
 ['attendance','الحضور والغياب'],
 ['payroll','الرواتب'],
 ['advances','السلف'],
+['bonuses','المكافآت'],
 ['audit','المتابعة والأرشفة'],
 ['reports','التقارير'],
 ['fuel','الوقود والگاز'],
@@ -856,6 +858,7 @@ accountant: [
 ['attendance','الحضور والغياب'],
 ['payroll','الرواتب'],
 ['advances','السلف'],
+['bonuses','المكافآت'],
 ['inventory','المخزون'],
 ['drivers','السائقون'],
 ['vehicles','الآليات / الخلاطات'],
@@ -953,7 +956,7 @@ async function initSystem(){
       ]);
       if (operationalResult.error) throw operationalResult.error;
       if (auditResult.error) throw auditResult.error;
-      ['fuel','purchases','maintenance','spare_parts','attendance','payroll','advances','inventory_items'].forEach(k => data[k] = []);
+      ['fuel','purchases','maintenance','spare_parts','attendance','payroll','advances','bonuses','inventory_items'].forEach(k => data[k] = []);
       (operationalResult.data || []).forEach(row => {
         if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
       });
@@ -1411,6 +1414,7 @@ const operationalConfig = {
  attendance:{title:'تسجيل حضور / غياب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['status','حالة الدوام',['حاضر','غائب']],['notes','ملاحظات','textarea']]},
  payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر بصيغة YYYY-MM'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
  advances:{title:'تسجيل سلفة موظف',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['amount','مبلغ السلفة','number'],['deducted','المبلغ المستقطع','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
+ bonuses:{title:'صرف مكافأة موظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['reason','سبب المكافأة'],['amount','مبلغ المكافأة','number'],['notes','ملاحظات','textarea']]},
  inventory_items:{title:'تسجيل مادة مخزون',fields:[['name','اسم المادة'],['unit','الوحدة'],['current','الرصيد الحالي','number'],['min','الحد الأدنى','number']]}
 };
 function renderOperationalTables(canManage){
