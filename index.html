@@ -256,6 +256,11 @@ th{color:var(--gold)}
   border-bottom:0!important;
 }
 
+
+/* إعادة حجم أزرار القائمة الجانبية إلى الحجم السابق */
+.side .nav button{font-size:11px!important;padding:7px 8px!important;min-height:32px!important;line-height:1.25!important}
+@media(max-width:800px){.side .nav button{font-size:10px!important;padding:6px 7px!important;min-height:30px!important}}
+
 </style>
 </head>
 <body>
@@ -1084,7 +1089,7 @@ let isAccountant = currentRole === 'accountant';
 if($('globalAddOrderBtn')) $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('addCustBtn')) $('addCustBtn').style.display = isManager ? 'inline-block' : 'none';
-['drivers','vehicles','inventory'].forEach(id=>{const sec=$(id);const btn=sec&&sec.querySelector('.head .btn');if(btn)btn.style.display=isManager?'':'none';});
+['drivers','vehicles','inventory'].forEach(id=>{const sec=$(id);const btn=sec&&sec.querySelector('.head .btn');if(btn)btn.style.display=(isManager || (isAccountant && ['drivers','vehicles'].includes(id)))?'':'none';});
 
 let lowInv = data.inventory.filter(i => Number(i.current) <= Number(i.min));
 if(lowInv.length > 0 && $('inventoryAlerts')){
@@ -1247,7 +1252,7 @@ $(id).innerHTML=tableRows(data[k],x=>
 `<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
 <td>${k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
-(!isAccountant && !isPlant)?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
+(!isAccountant && !isPlant) || (isAccountant && ['drivers','vehicles'].includes(k))?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
 );
 }
 });
@@ -1621,7 +1626,7 @@ await save();closeModal();toast('تم تعديل الأمر وحفظه مركز�
 }
 
 async function delOrder(no){
-if(currentRole!=='manager'){toast('الحذف متاح للمدير فقط');return;}
+if(currentRole!=='manager' && !(currentRole==='accountant' && ['drivers','vehicles'].includes(k))){toast('الحذف متاح للمدير فقط في هذا القسم');return;}
 if(!confirm('حذف الأمر وحمولاته؟'))return;
 const order=data.orders.find(x=>String(x.no)===String(no));if(!order)return;
 try{
@@ -1648,7 +1653,7 @@ await save();toast('تم حذف الحمولة من قاعدة البيانات'
 }
 
 async function openSimple(t){
-if(currentRole!=='manager'){toast('الإضافة متاحة للمدير فقط');return;}
+if(currentRole!=='manager' && !(currentRole==='accountant' && ['driver','vehicle'].includes(t))){toast('لا تملك صلاحية الإضافة');return;}
 let c={
 customer:['العملاء','customers',[['name','اسم العميل'],['phone','الهاتف'],['address','العنوان']]],
 driver:['السائقون','drivers',[['name','اسم السائق'],['phone','الهاتف'],['note','ملاحظات']]],
