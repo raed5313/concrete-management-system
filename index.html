@@ -1306,6 +1306,7 @@ function renderWorkshop(){
  (data.maintenance||[]).forEach(x=>add('maintenance','صيانة',belongs(x),x.fault+' — '+(x.repair||''),'',x.cost,x.date));
  (data.purchases||[]).forEach(x=>add('purchases','مشتريات',belongs(x),x.item,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
  (data.spare_parts||[]).forEach(x=>add('spare_parts','قطعة غيار',belongs(x),x.name+' '+(x.part_no||''),x.quantity,Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ (data.expenses||[]).filter(x=>x.vehicle||x.vehicle_id).forEach(x=>add('expenses','مصروف آلية',belongs(x),x.title||x.notes,'',x.amount,x.date));
  const total=records.reduce((n,x)=>n+x.cost,0);
  totals.innerHTML='<div class="detail">عدد السجلات<strong>'+records.length+'</strong></div><div class="detail">إجمالي الوقود والصيانة والقطع<strong>'+fmt(total)+' د.ع</strong></div>';
  body.innerHTML=records.sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.vehicle)+'</td><td>'+esc(x.detail)+'</td><td>'+esc(x.qty)+'</td><td>'+fmt(x.cost)+'</td></tr>').join('')||'<tr><td colspan="6">لا توجد سجلات مرتبطة بالآليات المختارة بعد.</td></tr>';
@@ -2141,6 +2142,7 @@ orderNo.addEventListener('input',updatePreview);
 function openExpenseModal(){
 openForm('تسجيل مصروف تشغيلي',[
 {name:'title',label:'بيان المصروف',required:true},
+{name:'vehicle',label:'الآلية المرتبطة (اختياري)',options:['',...(data.vehicles||[]).map(x=>x.name)]},
 {name:'amount',label:'المبلغ',type:'number',required:true},
 {name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)},
 {name:'notes',label:'ملاحظات',type:'textarea'}
