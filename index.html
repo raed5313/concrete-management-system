@@ -588,7 +588,6 @@ manager: [
 ],
 
 plant: [
-['dashboard','🏠 الرئيسية'],
 ['orders','📋 أوامر التجهيز'],
 ['plants','🚚 الحمولات'],
 ['reports','📊 التقارير']
@@ -1028,10 +1027,10 @@ return `
 <td>${esc(o.pour)}</td><td>${esc(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
 <td><div class="actions">
 
-${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" onclick="openLoad('${esc(o.no)}')">＋ حمولة (${ls.length})</button>` : (isOrderClosed ? '<span style="color:#f1cc71;font-weight:bold;padding:8px">🔒 الأمر مقفول</span>' : '')}
-${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" onclick="closeOrder('${esc(o.no)}')">قفل والكمية</button>` : ''}
-<button class="btn gold" onclick="receiptOrder('${esc(o.no)}')">وصل الأمر</button>
-${!canPrintOnly ? `<button class="btn" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>تعديل</button><button class="btn danger" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>حذف</button>` : ''}
+${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
+${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
+<button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
+${!canPrintOnly ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
 <tr><td colspan="8"><div class="loadbox">
@@ -1044,8 +1043,8 @@ ${ls.length?`<table><tbody>${ls.map(l=>`
 <td>الآلية: ${esc(l.vehicle||'—')}</td>
 <td>${esc(l.qty)} m</td>
 <td>
-<button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button>
-${currentRole === 'manager' ? `<button class="btn danger" onclick="delLoad('${esc(l.id)}')">حذف</button>` : ''}
+<button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">🖨️</button>
+${currentRole === 'manager' ? `<button class="btn danger" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">❌</button>` : ''}
 </td>
 </tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div></td></tr>`;
@@ -1066,7 +1065,7 @@ return `<tr>
 <td>${esc(l.vehicle||'—')}</td>
 <td>${esc(l.qty)} م³</td>
 <td>${esc(l.time||'—')}</td>
-<td><button class="btn gold" onclick="receiptLoad('${esc(l.no)}')">طباعة A5</button></td>
+<td><button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">🖨️</button></td>
 </tr>`;
 }, 8
 );
