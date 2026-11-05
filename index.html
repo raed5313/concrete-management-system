@@ -858,7 +858,6 @@ manager: [
 ['maintenance','الصيانة والإصلاح'],
 ['spare_parts','قطع الغيار'],
 ['workshop','الورشة'],
-['workshop','الورشة'],
 ['settings','الإعدادات']
 ],
 
@@ -893,7 +892,8 @@ accountant: [
 ['purchases','المشتريات'],
 ['suppliers','الموردون'],
 ['maintenance','الصيانة والإصلاح'],
-['spare_parts','قطع الغيار']
+['spare_parts','قطع الغيار'],
+['workshop','الورشة']
 ]
 };
 
@@ -1296,10 +1296,16 @@ function renderWorkshop(){
  }
  const records=[];
  const add=(type,label,vehicle,detail,qty,cost,date)=>{if(!selected||String(vehicle||'')===selected)records.push({type:label,vehicle:vehicle||'—',detail:detail||'—',qty:qty??'',cost:Number(cost)||0,date:date||''});};
- (data.fuel||[]).forEach(x=>add('fuel','وقود / گاز',x.vehicle,x.fuel_type, x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
- (data.maintenance||[]).forEach(x=>add('maintenance','صيانة',x.asset,x.fault+' — '+(x.repair||''), '',x.cost,x.date));
- (data.purchases||[]).forEach(x=>add('purchases','مشتريات',x.vehicle||x.asset,x.item,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
- (data.spare_parts||[]).forEach(x=>add('spare_parts','قطعة غيار',x.vehicle||x.asset,x.name+' '+(x.part_no||''),x.quantity,Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ const normalizeVehicle=v=>String(v||'').trim().toLowerCase().replace(/[\sـ-]/g,'');
+ const belongs=x=>{
+   const name=x.vehicle||x.asset||'';
+   const vehicle=(data.vehicles||[]).find(v=>(x.vehicle_id&&String(v.id)===String(x.vehicle_id))||normalizeVehicle(v.name)===normalizeVehicle(name));
+   return vehicle?String(vehicle.name):String(name||'');
+ };
+ (data.fuel||[]).forEach(x=>add('fuel','وقود / گاز',belongs(x),x.fuel_type,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ (data.maintenance||[]).forEach(x=>add('maintenance','صيانة',belongs(x),x.fault+' — '+(x.repair||''),'',x.cost,x.date));
+ (data.purchases||[]).forEach(x=>add('purchases','مشتريات',belongs(x),x.item,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ (data.spare_parts||[]).forEach(x=>add('spare_parts','قطعة غيار',belongs(x),x.name+' '+(x.part_no||''),x.quantity,Number(x.quantity||0)*Number(x.unit_price||0),x.date));
  const total=records.reduce((n,x)=>n+x.cost,0);
  totals.innerHTML='<div class="detail">عدد السجلات<strong>'+records.length+'</strong></div><div class="detail">إجمالي الوقود والصيانة والقطع<strong>'+fmt(total)+' د.ع</strong></div>';
  body.innerHTML=records.sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.vehicle)+'</td><td>'+esc(x.detail)+'</td><td>'+esc(x.qty)+'</td><td>'+fmt(x.cost)+'</td></tr>').join('')||'<tr><td colspan="6">لا توجد سجلات مرتبطة بالآليات المختارة بعد.</td></tr>';
@@ -1489,9 +1495,9 @@ k==='inventory' && x.created_at?`<button class="btn" onclick="editOperationalRec
 
 const operationalConfig = {
  fuel:{title:'تسجيل وقود / گاز',fields:[['date','التاريخ','date'],['vehicle','المركبة / الجهة'],['fuel_type','نوع الوقود',['گاز','كاز','بنزين','ديزل','أخرى']],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['notes','ملاحظات','textarea']]},
- purchases:{title:'تسجيل مشتريات',fields:[['date','التاريخ','date'],['item','المادة / القطعة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
+ purchases:{title:'تسجيل مشتريات',fields:[['date','التاريخ','date'],['vehicle','الآلية المرتبطة'],['item','المادة / القطعة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
  maintenance:{title:'تسجيل صيانة وإصلاح',fields:[['date','التاريخ','date'],['asset','المركبة / معدّة المعمل'],['fault','نوع العطل'],['repair','تفاصيل الإصلاح','textarea'],['parts','القطع المستخدمة','textarea'],['cost','الكلفة','number'],['notes','ملاحظات','textarea']]},
- spare_parts:{title:'تسجيل قطعة غيار',fields:[['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
+ spare_parts:{title:'تسجيل قطعة غيار',fields:[['date','التاريخ','date'],['vehicle','الآلية المرتبطة'],['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
  suppliers:{title:'إضافة مورد جديد',fields:[['name','اسم المورد'],['phone','رقم الهاتف'],['address','العنوان'],['account','الرصيد / الحساب','number'],['notes','ملاحظات','textarea']]},
  attendance:{title:'تسجيل حضور / غياب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['status','حالة الدوام',['حاضر','غائب']],['notes','ملاحظات','textarea']]},
  payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر','month'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
@@ -1570,6 +1576,14 @@ function openOperationalForm(type,id){
     payload.net_due=Number((payload.base_salary+monthBonuses-monthFines-monthAdvances).toFixed(2));
     payload.paid=Number(payload.paid||0);
     payload.remaining=Number((payload.net_due-payload.paid).toFixed(2));
+  }
+  if(['fuel','maintenance','purchases','spare_parts'].includes(type)){
+    const vehicleName=String(payload.vehicle||payload.asset||'').trim();
+    const linkedVehicle=(data.vehicles||[]).find(v=>String(v.name||'').trim()===vehicleName);
+    if(vehicleName && !linkedVehicle) throw new Error('اختر آلية مسجلة من قائمة الآليات');
+    payload.vehicle=vehicleName;
+    payload.asset=type==='maintenance'?vehicleName:(payload.asset||'');
+    payload.vehicle_id=linkedVehicle?String(linkedVehicle.id):'';
   }
   if((payload.total===undefined||payload.total==='')&&payload.quantity!==undefined&&payload.unit_price!==undefined)payload.total=Number(payload.quantity||0)*Number(payload.unit_price||0);
   try{
