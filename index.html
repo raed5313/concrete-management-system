@@ -1125,7 +1125,7 @@ let isAccountant = currentRole === 'accountant';
 
 if($('globalAddOrderBtn')) $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
-if($('addCustBtn')) $('addCustBtn').style.display = isManager ? 'inline-block' : 'none';
+if($('addCustBtn')) $('addCustBtn').style.display = (isManager || isAccountant) ? 'inline-block' : 'none';
 ['drivers','vehicles','inventory'].forEach(id=>{const sec=$(id);const btn=sec&&sec.querySelector('.head .btn');if(btn)btn.style.display=(isManager || (isAccountant && ['inventory','drivers','vehicles'].includes(id)))?'':'none';});
 
 let lowInv = data.inventory.filter(i => Number(i.current) <= Number(i.min));
