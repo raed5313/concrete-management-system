@@ -1754,7 +1754,8 @@ async function openLoad(no) {
     }
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
-        {name:'driver', label:'اسم السائق (اختياري)', required:false,options:['',...(data.drivers||[]).map(x=>x.name)]},
+        {name:'driver', label:'اسم السائق من قائمة السائقين (اختياري)', required:false,options:['',...(data.drivers||[]).map(x=>x.name)]},
+        {name:'driverNew', label:'أو اكتب اسم سائق آخر (اختياري)', type:'text'},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true}
     ], v => {
@@ -1806,7 +1807,7 @@ async function openLoad(no) {
                         load_no: loadNo,
                         orderId: orderRow.id,
                         orderNo: String(o.no),
-                        driver: v.driver || null,
+                        driver: (v.driverNew || '').trim() || v.driver || null,
                         vehicle: v.vehicle || null,
                         qty: Number(v.qty),
                         pump: o.pump || null,
@@ -1819,6 +1820,8 @@ async function openLoad(no) {
 
                 if (saveError) throw saveError;
 
+                v.driver = (v.driverNew || '').trim() || v.driver || '';
+                delete v.driverNew;
                 v.orderNo = o.no;
                 v.no = loadNo;
                 v.date = new Date().toISOString().slice(0, 10);
