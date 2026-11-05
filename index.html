@@ -1530,13 +1530,13 @@ function openOperationalForm(type,id){
   const paidField=form.querySelector('[name="paid"]');
   const preview=document.createElement('div');
   preview.className='full';
-  preview.style.cssText='padding:12px;border:1px solid #c9a34a;border-radius:10px;background:#f8f5ec;margin:8px 0;font-weight:700;line-height:2';
-  preview.innerHTML='اختر الموظف والشهر لعرض أيام الحضور والراتب المستحق تلقائياً';
+  preview.style.cssText='padding:14px;border:1px solid #c9a34a;border-radius:10px;background:#f8f5ec;color:#17212b;margin:8px 0;font-weight:700;line-height:2;font-size:15px;white-space:normal;display:block;width:100%;box-sizing:border-box';
+  preview.innerHTML='<span style="color:#17212b">اختر الموظف والشهر لعرض تفاصيل الحساب والراتب المستحق تلقائياً</span>';
   form.insertBefore(preview,form.querySelector('button[type="submit"]').parentElement);
   const updatePreview=()=>{
    const emp=(data.employees||[]).find(e=>String(e.name)===String(employeeField?.value));
    const month=String(monthField?.value||'');
-   if(!emp||/^\d{4}-\d{2}$/.test(month)===false){preview.textContent='اختر الموظف والشهر لعرض الحساب التلقائي';return;}
+   if(!emp||/^\d{4}-\d{2}$/.test(month)===false){preview.innerHTML='<span style="color:#17212b">اختر الموظف والشهر لعرض الحساب التلقائي</span>';return;}
    const [yy,mm]=month.split('-').map(Number);
    const days=new Date(yy,mm,0).getDate();
    const records=(data.attendance||[]).filter(a=>a.employee===emp.name&&String(a.date||'').slice(0,7)===month);
@@ -1588,7 +1588,10 @@ f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</te
 
 $('form').onsubmit=e=>{
 e.preventDefault();
-cb(Object.fromEntries(new FormData(e.currentTarget)));
+try{
+ const result=cb(Object.fromEntries(new FormData(e.currentTarget)));
+ if(result&&typeof result.then==='function')result.catch(err=>{console.error(err);toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'))});
+}catch(err){console.error(err);toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'))}
 };
 $('modal').classList.remove('hidden');
 }
