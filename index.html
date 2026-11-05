@@ -619,7 +619,16 @@ const SUPABASE_ANON_KEY = 'sb_publishable_N_nx0pUqoOFCGsrsPjK4Uw_6LgY9ZjL';
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_ANON_KEY
+  SUPABASE_ANON_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage,
+      storageKey: 'atlas-concrete-auth-session'
+    }
+  }
 );
 
 const loginAccounts = {
@@ -1324,7 +1333,11 @@ return `<tr>
 <td class="goldtext">${fmt(custTotal)}</td>
 <td style="color:#42d8e8">${fmt(custRec)}</td>
 <td style="color:#ff8791">${fmt(custRem)}</td>
-<td><button class="btn" onclick="printCustomerStatement('${esc(c.name)}')">كشف حساب</button></td>
+<td><div class="actions">
+<button class="btn" onclick="printCustomerStatement('${esc(c.name)}')">كشف حساب</button>
+<button class="btn primary" onclick="editCustomer('${esc(c.id)}')">تعديل</button>
+<button class="btn danger" onclick="deleteCustomer('${esc(c.id)}')">حذف</button>
+</div></td>
 </tr>`;
 }, 7);
 }
@@ -1869,6 +1882,59 @@ logAction(currentUserName, 'إضافة موظف', v.name);
 if(!await save()){data.employees.pop();data.audit.shift();render();return;}
 closeModal();toast('تم إضافة الموظف وحفظه مركزياً');
 });
+}
+
+async function writeCustomerAudit(action, details){
+  const {data:authData,error:authError}=await supabaseClient.auth.getSession();
+  if(authError) throw authError;
+  const user=authData?.session?.user;
+  if(!user) throw new Error('انتهت جلسة تسجيل الدخول');
+  const {error}=await supabaseClient.from('audit_logs').insert({
+    user_name:currentUserName,
+    action,
+    details
+  });
+  if(error) throw error;
+}
+
+async function editCustomer(id){
+  if(!['manager','accountant'].includes(currentRole)){toast('تعديل العملاء متاح للمدير والمحاسب فقط');return;}
+  const customer=data.customers.find(x=>String(x.id)===String(id));
+  if(!customer)return;
+  openForm('تعديل بيانات العميل',[
+    {name:'name',label:'اسم العميل',value:customer.name||'',required:true},
+    {name:'phone',label:'الهاتف',value:customer.phone||''},
+    {name:'address',label:'العنوان',value:customer.address||''}
+  ],async values=>{
+    try{
+      const payload={name:String(values.name||'').trim(),phone:String(values.phone||'').trim(),address:String(values.address||'').trim()};
+      if(!payload.name)throw new Error('اسم العميل مطلوب');
+      const {error}=await supabaseClient.from('customers').update(payload).eq('id',id);
+      if(error)throw error;
+      Object.assign(customer,payload);
+      render();
+      closeModal();
+      try{await writeCustomerAudit('تعديل بيانات عميل','العميل: '+payload.name);}
+      catch(auditError){console.error('Customer audit failed:',auditError);}
+      toast('تم تعديل بيانات العميل مركزياً');
+    }catch(err){console.error(err);toast('تعذر تعديل العميل: '+(err.message||''));}
+  });
+}
+
+async function deleteCustomer(id){
+  if(!['manager','accountant'].includes(currentRole)){toast('حذف العملاء متاح للمدير والمحاسب فقط');return;}
+  const customer=data.customers.find(x=>String(x.id)===String(id));
+  if(!customer)return;
+  if(!confirm('هل أنت متأكد من حذف العميل «'+customer.name+'»؟'))return;
+  try{
+    const {error}=await supabaseClient.from('customers').delete().eq('id',id);
+    if(error)throw error;
+    data.customers=data.customers.filter(x=>String(x.id)!==String(id));
+    render();
+    try{await writeCustomerAudit('حذف عميل','العميل: '+customer.name);}
+    catch(auditError){console.error('Customer audit failed:',auditError);}
+    toast('تم حذف العميل من قاعدة البيانات المركزية');
+  }catch(err){console.error(err);toast('تعذر حذف العميل: '+(err.message||''));}
 }
 
 async function delSimple(k,id){
