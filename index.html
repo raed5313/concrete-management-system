@@ -724,7 +724,15 @@ async function initSystem(){
   }
 
   await syncCloudData();
-  navigate('dashboard');
+  // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
+  const firstAllowedPage = (roleMenus[currentRole] || roleMenus.manager)[0]?.[0] || 'orders';
+  navigate(firstAllowedPage);
+  if (currentRole === 'plant') {
+    const dashboard = $('dashboard');
+    if (dashboard) dashboard.classList.add('hidden');
+    const dashboardNav = document.querySelector('[data-page="dashboard"]');
+    if (dashboardNav) dashboardNav.remove();
+  }
 
   if(window.sadaRealtimeChannel){
     await supabaseClient.removeChannel(window.sadaRealtimeChannel);
