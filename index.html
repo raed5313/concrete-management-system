@@ -1713,7 +1713,7 @@ await save();toast('تم حذف الحمولة من قاعدة البيانات'
 }
 
 async function openSimple(t){
-if(currentRole!=='manager' && !(currentRole==='accountant' && ['driver','vehicle'].includes(t))){toast('لا تملك صلاحية الإضافة');return;}
+if(currentRole!=='manager' && !(currentRole==='accountant' && ['customer','driver','vehicle'].includes(t))){toast('لا تملك صلاحية الإضافة');return;}
 let c={
 customer:['العملاء','customers',[['name','اسم العميل'],['phone','الهاتف'],['address','العنوان']]],
 driver:['السائقون','drivers',[['name','اسم السائق'],['phone','الهاتف'],['note','ملاحظات']]],
