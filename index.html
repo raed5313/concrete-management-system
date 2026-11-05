@@ -489,6 +489,17 @@ body.plant-role .side .nav{gap:2px!important}
 <section id="maintenance" class="hidden"><div class="panel"><div class="head"><h3>صيانة وإصلاح المركبات والمعمل</h3><button class="btn primary" onclick="openOperationalForm('maintenance')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الجهة / الآلية</th><th>نوع العطل</th><th>الإصلاح</th><th>القطع المستخدمة</th><th>الكلفة</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="maintenanceBody"></tbody></table></div></div></section>
 <section id="spare_parts" class="hidden"><div class="panel"><div class="head"><h3>قطع الغيار</h3><button class="btn primary" onclick="openOperationalForm('spare_parts')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>اسم القطعة</th><th>رقم القطعة</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>المجهّز</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="spare_partsBody"></tbody></table></div></div></section>
 
+<section id="workshop" class="hidden">
+<div class="panel">
+<div class="head"><h3>الورشة — ملف الآلية ومصاريفها</h3></div>
+<div class="formgrid" style="padding:12px">
+<div class="field"><label>اختر الآلية</label><select id="workshopVehicle" onchange="renderWorkshop()"><option value="">كل الآليات</option></select></div>
+</div>
+<div id="workshopTotals" class="details"></div>
+<div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>نوع السجل</th><th>الآلية</th><th>التفاصيل</th><th>الكمية</th><th>المبلغ</th></tr></thead><tbody id="workshopBody"></tbody></table></div>
+</div>
+</section>
+
 <!-- 8. الحسابات -->
 <section id="accounts" class="hidden">
 <div class="panel">
@@ -846,6 +857,8 @@ manager: [
 ['suppliers','الموردون'],
 ['maintenance','الصيانة والإصلاح'],
 ['spare_parts','قطع الغيار'],
+['workshop','الورشة'],
+['workshop','الورشة'],
 ['settings','الإعدادات']
 ],
 
@@ -1271,7 +1284,28 @@ return a.length?a.map(fn).join(''):
 `<tr><td colspan="${n}" style="text-align:center;color:#93a7b3;padding:18px">لا توجد بيانات متاحة</td></tr>`;
 }
 
+function renderWorkshop(){
+ const sel=$('workshopVehicle'),body=$('workshopBody'),totals=$('workshopTotals');
+ if(!sel||!body||!totals)return;
+ const selected=sel.value;
+ const vehicles=data.vehicles||[];
+ const current=selected?vehicles.filter(v=>String(v.name)===selected):vehicles;
+ if(sel.options.length!==vehicles.length+1 || [...sel.options].some((o,i)=>i>0&&o.value!==String(vehicles[i-1].name))){
+  sel.innerHTML='<option value="">كل الآليات</option>'+vehicles.map(v=>'<option value="'+esc(v.name)+'">'+esc(v.name)+'</option>').join('');
+  sel.value=selected;
+ }
+ const records=[];
+ const add=(type,label,vehicle,detail,qty,cost,date)=>{if(!selected||String(vehicle||'')===selected)records.push({type:label,vehicle:vehicle||'—',detail:detail||'—',qty:qty??'',cost:Number(cost)||0,date:date||''});};
+ (data.fuel||[]).forEach(x=>add('fuel','وقود / گاز',x.vehicle,x.fuel_type, x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ (data.maintenance||[]).forEach(x=>add('maintenance','صيانة',x.asset,x.fault+' — '+(x.repair||''), '',x.cost,x.date));
+ (data.purchases||[]).forEach(x=>add('purchases','مشتريات',x.vehicle||x.asset,x.item,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ (data.spare_parts||[]).forEach(x=>add('spare_parts','قطعة غيار',x.vehicle||x.asset,x.name+' '+(x.part_no||''),x.quantity,Number(x.quantity||0)*Number(x.unit_price||0),x.date));
+ const total=records.reduce((n,x)=>n+x.cost,0);
+ totals.innerHTML='<div class="detail">عدد السجلات<strong>'+records.length+'</strong></div><div class="detail">إجمالي الوقود والصيانة والقطع<strong>'+fmt(total)+' د.ع</strong></div>';
+ body.innerHTML=records.sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.vehicle)+'</td><td>'+esc(x.detail)+'</td><td>'+esc(x.qty)+'</td><td>'+fmt(x.cost)+'</td></tr>').join('')||'<tr><td colspan="6">لا توجد سجلات مرتبطة بالآليات المختارة بعد.</td></tr>';
+}
 function render(){
+if($('workshop')) renderWorkshop();
 let isManager = currentRole === 'manager';
 let isPlant = currentRole === 'plant';
 let isAccountant = currentRole === 'accountant';
