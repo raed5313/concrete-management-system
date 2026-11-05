@@ -2207,8 +2207,8 @@ function receiptLoad(no) {
     const fmtQty = n => Number(n.toFixed(2)).toString();
     const d = dateOnly(l.date || o.date);
     // في وصل التجهيز يظهر رمز الآلية المختصر فقط: حرف M متبوعاً بالرقم
-    const vehicleDigits = String(l.vehicle || '').match(/\\d+/g);
-    const vehicleReceiptCode = vehicleDigits ? 'M-' + vehicleDigits.join('') : (l.vehicle ? 'M' : '—');
+    const vehiclePrefix = String(l.vehicle || '').trim().match(/^M\d+/i);
+    const vehicleReceiptCode = vehiclePrefix ? vehiclePrefix[0].toUpperCase() : (l.vehicle ? 'M' : '—');
     const loadNumber = Number(l.no);
     const loadWords = {1:'النقلة الأولى',2:'النقلة الثانية',3:'النقلة الثالثة',4:'النقلة الرابعة',5:'النقلة الخامسة',6:'النقلة السادسة',7:'النقلة السابعة',8:'النقلة الثامنة',9:'النقلة التاسعة',10:'النقلة العاشرة',11:'النقلة الحادية عشرة',12:'النقلة الثانية عشرة',13:'النقلة الثالثة عشرة',14:'النقلة الرابعة عشرة',15:'النقلة الخامسة عشرة',16:'النقلة السادسة عشرة',17:'النقلة السابعة عشرة',18:'النقلة الثامنة عشرة',19:'النقلة التاسعة عشرة',20:'النقلة العشرون'};
     const loadLabel = loadWords[loadNumber] || ('النقلة رقم ' + esc(l.no));
