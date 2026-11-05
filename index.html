@@ -1714,33 +1714,28 @@ if(currentRole!=='plant' && currentRole!=='manager'){toast('لا تملك صلا
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o) return;
 if(o.status === 'مكتمل ومجهز'){toast('هذا الأمر مقفول بالفعل');return;}
-let delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((s,x)=>s+(Number(x.qty)||0),0);
-
-openForm('قفل الأمر وتسجيل الكمية الفعلية رقم '+no,[
-{name:'actualQty',label:'الكمية الفعلية المجهزة م³',type:'number',required:true,value:delivered},
+const delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((sum,x)=>sum+(Number(x.qty)||0),0);
+if(delivered<=0){toast('لا يمكن قفل الأمر قبل تسجيل حمولة واحدة على الأقل');return;}
+openForm('تأكيد قفل الأمر رقم '+no,[
+{name:'deliveredDisplay',label:'إجمالي الكمية المجهزة فعلياً (م³) — ستعتمد عند القفل',value:delivered.toFixed(2),required:true},
 {name:'lockNote',label:'ملاحظات الإقفال',full:true}
 ],async v=>{
-let q=Number(v.actualQty);
-if(!Number.isFinite(q)||q<0){toast('أدخل كمية فعلية صحيحة');return;}
-o.actualQty=q;
+o.actualQty=delivered;
 o.lockNote=v.lockNote||'';
 o.status='مكتمل ومجهز';
-try {
-  const {error: closeError} = await supabaseClient
-    .from('concrete_orders')
-    .update({status:'مكتمل ومجهز', actual_qty:q, lock_note:o.lockNote})
-    .eq('order_no', String(no));
-  if(closeError) throw closeError;
-} catch(err) {
-  o.status='قيد العمل';
-  toast('تعذر حفظ قفل الأمر في قاعدة البيانات');
-  console.error(err);
-  return;
+try{
+ const {error:closeError}=await supabaseClient.from('concrete_orders')
+ .update({status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote})
+ .eq('order_no',String(no));
+ if(closeError)throw closeError;
+}catch(err){
+ o.status='قيد العمل';delete o.actualQty;
+ toast('تعذر حفظ قفل الأمر في قاعدة البيانات');console.error(err);return;
 }
-logAction(currentUserName, 'قفل أمر وتسجيل كمية', `الأمر: ${no} - الكمية الفعلية: ${q}`);
-await save();closeModal();toast('تم قفل الأمر وتسجيل الكمية الفعلية بنجاح');
+logAction(currentUserName,'قفل أمر وتسجيل كمية',`الأمر: ${no} - الكمية الفعلية المجهزة: ${delivered}`);
+await save();closeModal();toast('تم قفل الأمر على إجمالي الكمية المجهزة فعلياً');
 });
-} 
+}
 async function openLoad(no) {
     if (currentRole !== 'plant' && currentRole !== 'operator') {
         toast('إضافة الحمولة متاحة لمشغّل المعمل فقط');
@@ -2043,12 +2038,13 @@ openForm('إصدار سند قبض — ربط بأمر تجهيز',[
 ],async v=>{
 const order=data.orders.find(o=>String(o.no).trim()===String(v.orderNo).trim() && String(o.customer)===String(v.customer));
 if(!order){toast('لم يتم العثور على أمر بهذا الرقم لهذا العميل');return;}
-const orderTotal=(Number(order.qty)||0)*(Number(order.price)||0);
+const deliveredQty=order.status==='مكتمل ومجهز' && Number.isFinite(Number(order.actualQty)) ? Number(order.actualQty) : data.loads.filter(l=>String(l.orderNo)===String(order.no)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+const orderTotal=deliveredQty*(Number(order.price)||0);
 if(Number(v.amount)<=0){toast('أدخل مبلغ قبض صحيح');return;}
 v.orderNo=order.no;
 v.orderTotal=orderTotal;
 v.orderSite=order.site||'';
-v.orderQty=Number(order.qty)||0;
+v.orderQty=deliveredQty;
 v.no = data.nextRecNo++;
 v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
@@ -2070,8 +2066,9 @@ const updatePreview=()=>{
  const o=data.orders.find(x=>String(x.no).trim()===String(orderNo.value).trim() && String(x.customer)===String(customer.value));
  if(!customer.value||!orderNo.value){preview.textContent='اختر العميل واكتب رقم الأمر لعرض تفاصيله والمبلغ الكلي.';return;}
  if(!o){preview.textContent='لا يوجد أمر تجهيز مطابق لهذا العميل ورقم الأمر.';return;}
- const total=(Number(o.qty)||0)*(Number(o.price)||0);
- preview.innerHTML='<div>العميل: '+esc(o.customer)+'</div><div>رقم الأمر: '+esc(o.no)+'</div><div>موقع الصب: '+esc(o.site||'—')+'</div><div>نوع الصب والمواصفة: '+esc(o.pour||'—')+' — '+esc(o.grade||'—')+'</div><div>الكمية: '+fmt(o.qty)+' م³</div><div>سعر المتر: '+fmt(o.price)+'</div><div style="font-size:18px;color:#9b6410">المبلغ الكلي للأمر: '+fmt(total)+' دينار</div>';
+ const delivered=o.status==='مكتمل ومجهز' && Number.isFinite(Number(o.actualQty)) ? Number(o.actualQty) : data.loads.filter(l=>String(l.orderNo)===String(o.no)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+ const total=delivered*(Number(o.price)||0);
+ preview.innerHTML='<div>العميل: '+esc(o.customer)+'</div><div>رقم الأمر: '+esc(o.no)+'</div><div>موقع الصب: '+esc(o.site||'—')+'</div><div>نوع الصب والمواصفة: '+esc(o.pour||'—')+' — '+esc(o.grade||'—')+'</div><div>الكمية المجهزة فعلياً: '+fmt(delivered)+' م³</div><div>سعر المتر: '+fmt(o.price)+'</div><div style="font-size:18px;color:#9b6410">المبلغ الكلي للكمية المجهزة: '+fmt(total)+' دينار</div>';
 };
 customer.addEventListener('change',updatePreview);
 orderNo.addEventListener('input',updatePreview);
