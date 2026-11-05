@@ -133,6 +133,15 @@ th{color:var(--gold)}
 .report-table .report-load-row td{padding:7px}
 .report-empty{text-align:center;padding:24px!important;color:#737b84}
 @media(max-width:700px){.report-filters{grid-template-columns:1fr 1fr}.report-filters .report-customer-filter{grid-column:1/-1}.report-search{grid-column:1/-1}.report-kpis{grid-template-columns:1fr}.report-shell{padding:8px}}
+
+/* تحسين عرض الأمر والحمولات */
+.order-load-cell{padding:3px 6px!important;background:#0c141b}
+.order-load-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.order-accumulated{color:#991b1b;background:#fff1f2;border:1px solid #991b1b;border-radius:7px;padding:5px 10px;font-size:17px;font-weight:900}
+.order-loadbox{padding:7px!important}
+.order-loadbox table{min-width:0}
+.order-loadbox td{padding:6px 5px;font-size:13px}
+.order-loadbox .btn{padding:5px 8px}
 </style>
 </head>
 <body>
@@ -1041,13 +1050,13 @@ ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل �
 ${!canPrintOnly ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
-<tr><td colspan="8">
-<details class="load-details" style="margin:4px 0">
+<tr><td colspan="8" class="order-load-cell">
+<details class="load-details" style="margin:3px 0">
 <summary style="cursor:pointer;list-style:none;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(212,175,55,.07);color:var(--gold);font-weight:700">
 📦 عرض معلومات الحمولات (${ls.length})　⌄
 </summary>
-<div class="loadbox" style="margin-top:8px">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px"><b class="goldtext">الكمية الفعلية والحمولات</b><strong style="color:#42d8e8;font-size:20px">${fmt(totalLoadQty)} m</strong></div>
+<div class="loadbox order-loadbox" style="margin-top:6px">
+<div class="order-load-head"><b class="goldtext">الحمولات المسجلة داخل الأمر</b><strong class="order-accumulated">${fmt(totalLoadQty)} م³</strong></div>
 ${ls.length?`<table><tbody>${ls.map(l=>`
 <tr>
 <td>حمولة ${esc(l.no)}</td>
@@ -1647,7 +1656,7 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 .top div{border:1px solid #777;flex:1;text-align:center;padding:5px;font-weight:bold;font-size:11px;}
 .no{color:#a51d20;font-size:16px;}
 .data{width:100%;border-collapse:collapse;margin-bottom:8px;}
- .data td{border:1px solid #777;padding:3px 5px;font-size:9px;}
+ .data td{border:1px solid #777;padding:3px 5px;font-size:10px;}
 .data td:first-child{background:#eee;font-weight:bold;width:32%;}
 .section{text-align:center;background:#171717;color:#e7c36b;padding:5px;border:1px solid #b28a29;font-size:11px;font-weight:bold;margin-bottom:6px;}
  .big{display:flex;gap:4px;border:1px solid #b28a29;padding:3px;margin-bottom:4px;}
@@ -1702,7 +1711,7 @@ function receiptLoad(no) {
         <table class="data"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td style="color:#7f1d1d;font-weight:700">${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td style="color:#1565c0;font-weight:700">${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td style="font-weight:bold;font-size:15px">${esc(l.qty)} م³</td></tr></table>
         <div class="section" style="font-size:13px;padding:4px">تفاصيل التجهيز</div>
         <div class="big" style="padding:4px;gap:5px"><div><b>الكمية المجهزة (م³)</b><strong style="font-size:26px;padding:3px">${fmtQty(Number(l.qty)||0)}</strong></div><div><b>رقم الحمولة</b><strong style="font-size:17px;padding:3px;color:#a47b20">${loadLabel}</strong></div></div>
-        <div style="text-align:center;font-size:13px;font-weight:800;color:#9f1239;border:2px solid #9f1239;padding:5px;margin:5px 0">إجمالي الكمية المجهزة المتراكمة: ${fmtQty(accumulatedQty)} م³</div>
+        <div class="big" style="padding:4px;gap:5px"><div><b>الكمية المجهزة في هذا الوصل (م³)</b><strong style="font-size:24px;padding:3px">${fmtQty(Number(l.qty)||0)}</strong></div><div><b>الكمية المجهزة المتراكمة (م³)</b><strong style="font-size:24px;padding:3px;color:#991b1b">${fmtQty(accumulatedQty)}</strong></div></div>
         <div class="sign" style="direction:rtl;margin-top:3px"><div style="padding:6px 4px 12px">توقيع الزبون<br><br>....................</div><div style="padding:6px 4px 12px">توقيع المعمل<br><br>....................</div></div>
         <div class="foot">شركة صدى الإعمار للخرسانة والكونكريت الجاهز</div>
       </div>`);
