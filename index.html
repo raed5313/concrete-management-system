@@ -1216,9 +1216,12 @@ async function save(){
         expenses:data.expenses, employees:data.employees, audit:data.audit,
         nextInvNo:data.nextInvNo, nextRecNo:data.nextRecNo
       };
-      const {error} = await supabaseClient.from('company_app_data')
-        .upsert({id:true, payload, updated_by:userId, updated_at:new Date().toISOString()}, {onConflict:'id'});
+      const {data: savedRow, error} = await supabaseClient.from('company_app_data')
+        .upsert({id:true, payload, updated_by:userId, updated_at:new Date().toISOString()}, {onConflict:'id'})
+        .select('id,updated_at')
+        .single();
       if (error) throw error;
+      if (!savedRow || savedRow.id !== true) throw new Error('لم تؤكد قاعدة البيانات حفظ السجل المركزي');
       return true;
     };
     window.sadaCentralSaveQueue = (window.sadaCentralSaveQueue || Promise.resolve())
