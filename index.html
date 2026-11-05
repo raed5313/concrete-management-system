@@ -489,6 +489,8 @@ body.plant-role .side .nav button{font-size:10px!important;padding:6px 7px!impor
 </div>
 </section>
 
+<section id="payroll" class="hidden"><div class="panel"><div class="head"><h3>الرواتب</h3><button class="btn primary" onclick="openOperationalForm('payroll')">＋ تسجيل استلام راتب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الشهر</th><th>الراتب الأساسي</th><th>المبلغ المستلم</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="payrollBody"></tbody></table></div></div></section>
+<section id="advances" class="hidden"><div class="panel"><div class="head"><h3>سلف الموظفين</h3><button class="btn primary" onclick="openOperationalForm('advances')">＋ تسجيل سلفة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>المبلغ</th><th>المستقطع</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="advancesBody"></tbody></table></div></div></section>
 <!-- 13. المتابعة والأرشفة -->
 <section id="audit" class="hidden">
 <div class="panel">
@@ -713,6 +715,8 @@ manager: [
 ['receipts','القبض'],
 ['expenses','المصروفات'],
 ['employees','الموظفون'],
+['payroll','الرواتب'],
+['advances','السلف'],
 ['audit','المتابعة والأرشفة'],
 ['reports','التقارير'],
 ['fuel','الوقود والگاز'],
@@ -738,6 +742,8 @@ accountant: [
 ['expenses','المصروفات'],
 ['accounts','الحسابات'],
 ['employees','الموظفون'],
+['payroll','الرواتب'],
+['advances','السلف'],
 ['inventory','المخزون'],
 ['drivers','السائقون'],
 ['vehicles','الآليات / الخلاطات'],
@@ -831,7 +837,7 @@ async function initSystem(){
       if (companyError) throw companyError;
       const operationalResult = await supabaseClient.from('company_operational_records').select('*').order('created_at');
       if (operationalResult.error) throw operationalResult.error;
-      ['fuel','purchases','maintenance','spare_parts'].forEach(k => data[k] = []);
+      ['fuel','purchases','maintenance','spare_parts','payroll','advances','inventory_items'].forEach(k => data[k] = []);
       (operationalResult.data || []).forEach(row => {
         if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
       });
@@ -1097,7 +1103,7 @@ let isAccountant = currentRole === 'accountant';
 if($('globalAddOrderBtn')) $('globalAddOrderBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('orderSecAddBtn')) $('orderSecAddBtn').style.display = isManager ? 'inline-block' : 'none';
 if($('addCustBtn')) $('addCustBtn').style.display = isManager ? 'inline-block' : 'none';
-['drivers','vehicles','inventory'].forEach(id=>{const sec=$(id);const btn=sec&&sec.querySelector('.head .btn');if(btn)btn.style.display=(isManager || (isAccountant && ['drivers','vehicles'].includes(id)))?'':'none';});
+['drivers','vehicles','inventory'].forEach(id=>{const sec=$(id);const btn=sec&&sec.querySelector('.head .btn');if(btn)btn.style.display=(isManager || (isAccountant && ['inventory','drivers','vehicles'].includes(id)))?'':'none';});
 
 let lowInv = data.inventory.filter(i => Number(i.current) <= Number(i.min));
 if(lowInv.length > 0 && $('inventoryAlerts')){
@@ -1270,7 +1276,10 @@ const operationalConfig = {
  fuel:{title:'تسجيل وقود / گاز',fields:[['date','التاريخ','date'],['vehicle','المركبة / الجهة'],['fuel_type','نوع الوقود',['گاز','كاز','بنزين','ديزل','أخرى']],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['notes','ملاحظات','textarea']]},
  purchases:{title:'تسجيل مشتريات',fields:[['date','التاريخ','date'],['item','المادة / القطعة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
  maintenance:{title:'تسجيل صيانة وإصلاح',fields:[['date','التاريخ','date'],['asset','المركبة / معدّة المعمل'],['fault','نوع العطل'],['repair','تفاصيل الإصلاح','textarea'],['parts','القطع المستخدمة','textarea'],['cost','الكلفة','number'],['notes','ملاحظات','textarea']]},
- spare_parts:{title:'تسجيل قطعة غيار',fields:[['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]}
+ spare_parts:{title:'تسجيل قطعة غيار',fields:[['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
+ payroll:{title:'تسجيل استلام راتب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['month','الشهر'],['base_salary','الراتب الأساسي','number'],['paid','المبلغ المستلم','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
+ advances:{title:'تسجيل سلفة موظف',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['amount','مبلغ السلفة','number'],['deducted','المبلغ المستقطع','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
+ inventory_items:{title:'تسجيل مادة مخزون',fields:[['name','اسم المادة'],['unit','الوحدة'],['current','الرصيد الحالي','number'],['min','الحد الأدنى','number']]}
 };
 function renderOperationalTables(canManage){
  Object.keys(operationalConfig).forEach(type=>{
@@ -1288,7 +1297,7 @@ function renderOperationalTables(canManage){
 function operationalFormFields(type,record={}){
  return operationalConfig[type].fields.map(([name,label,kind])=>({
   name,label,type:kind==='date'?'date':kind==='number'?'number':kind==='textarea'?'textarea':'text',
-  options:Array.isArray(kind)?kind:undefined,
+  options:Array.isArray(kind)?kind:(name==='employee'?data.employees.map(e=>e.name):undefined),
   required:['date','item','name','quantity'].includes(name),
   value:record[name]??(name==='date'?new Date().toISOString().slice(0,10):'')
  }));
@@ -1299,7 +1308,7 @@ function openOperationalForm(type,id){
  if(id&&!old)return;
  openForm((old?'تعديل ':'')+operationalConfig[type].title,operationalFormFields(type,old||{}),async values=>{
   const payload={...values};
-  ['quantity','unit_price','total','cost'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
+  ['quantity','unit_price','total','cost','base_salary','paid','remaining','amount','deducted','current','min'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
   if((payload.total===undefined||payload.total==='')&&payload.quantity!==undefined&&payload.unit_price!==undefined)payload.total=Number(payload.quantity||0)*Number(payload.unit_price||0);
   try{
    const {data:auth,error:authError}=await supabaseClient.auth.getUser();
@@ -1701,18 +1710,8 @@ const auditSaved=await save();closeModal();toast(auditSaved?'تم الحفظ و�
 }
 
 function openInventoryModal(){
-openForm('إضافة مادة للمخزون',[
-{name:'name',label:'اسم المادة (إسمنت، رمل...)',required:true},
-{name:'unit',label:'الوحدة (طن، كيس، م³)',required:true},
-{name:'current',label:'الرصيد الحالي',type:'number',required:true},
-{name:'min',label:'حد التنبيه الأدنى',type:'number',required:true}
-],async v=>{
-v.id=Date.now();
-data.inventory.push(v);
-logAction(currentUserName, 'إضافة مخزون', v.name);
-if(!await save()){data.inventory.pop();data.audit.shift();render();return;}
-closeModal();toast('تم إضافة المادة وحفظها مركزياً');
-});
+ if(!['manager','accountant'].includes(currentRole)){toast('المخزون غير متاح لصلاحيتك');return;}
+ openOperationalForm('inventory_items');
 }
 
 function openInvoiceModal(){
