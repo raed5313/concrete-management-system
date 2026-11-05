@@ -1682,14 +1682,14 @@ function receiptLoad(no) {
     const loadLabel = loadWords[loadNumber] || ('النقلة رقم ' + esc(l.no));
     printDocA5('وصل تجهيز ' + loadLabel + ' - أمر ' + o.no, `
       <div class="r">
-        <div class="head"><img src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.png" style="width:90px;height:70px;object-fit:contain;display:block;margin:0 auto 5px"><h2 style="font-size:20px;color:#a47b20">شركة صدى الإعمار</h2><div style="font-weight:bold;font-size:15px">للخرسانة والكونكريت الجاهز</div><div class="en">SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</div></div>
-        <div class="title" style="font-size:22px;padding:10px">وصل تجهيز خرسانة</div>
+        <div class="head"><img src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.png" style="width:66px;height:48px;object-fit:contain;display:block;margin:0 auto 3px"><h2 style="font-size:16px;color:#a47b20">شركة صدى الإعمار</h2><div style="font-weight:bold;font-size:12px">للخرسانة والكونكريت الجاهز</div><div class="en">SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</div></div>
+        <div class="title" style="font-size:16px;padding:5px">وصل تجهيز خرسانة</div>
         <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>رقم الوصل<br><span class="no">${esc(o.no)}</span></div></div>
-        <table class="data"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td style="font-weight:bold;font-size:15px">${esc(l.qty)} م³</td></tr></table>
-        <div class="section" style="font-size:17px;padding:8px">تفاصيل التجهيز</div>
-        <div class="big" style="padding:8px;gap:8px"><div><b>الكمية المجهزة (م³)</b><strong style="font-size:34px">${fmtQty(Number(l.qty)||0)}</strong></div><div><b>رقم الحمولة</b><strong style="font-size:21px;color:#a47b20">${loadLabel}</strong></div></div>
-        <div style="text-align:center;font-size:11px;font-weight:bold;margin:6px 0">إجمالي الكمية المجهزة حتى هذه النقلة: ${fmtQty(accumulatedQty)} م³</div>
-        <div class="sign" style="direction:rtl"><div>توقيع الزبون<br><br>................................</div><div>توقيع المعمل<br><br>................................</div></div>
+        <table class="data"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td style="color:#7f1d1d;font-weight:700">${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td style="color:#1565c0;font-weight:700">${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td style="font-weight:bold;font-size:15px">${esc(l.qty)} م³</td></tr></table>
+        <div class="section" style="font-size:13px;padding:4px">تفاصيل التجهيز</div>
+        <div class="big" style="padding:4px;gap:5px"><div><b>الكمية المجهزة (م³)</b><strong style="font-size:26px;padding:3px">${fmtQty(Number(l.qty)||0)}</strong></div><div><b>رقم الحمولة</b><strong style="font-size:17px;padding:3px;color:#a47b20">${loadLabel}</strong></div></div>
+        <div style="text-align:center;font-size:13px;font-weight:800;color:#9f1239;border:2px solid #9f1239;padding:5px;margin:5px 0">إجمالي الكمية المجهزة المتراكمة: ${fmtQty(accumulatedQty)} م³</div>
+        <div class="sign" style="direction:rtl;margin-top:3px"><div style="padding:6px 4px 12px">توقيع الزبون<br><br>....................</div><div style="padding:6px 4px 12px">توقيع المعمل<br><br>....................</div></div>
         <div class="foot">شركة صدى الإعمار للخرسانة والكونكريت الجاهز</div>
       </div>`);
 }
