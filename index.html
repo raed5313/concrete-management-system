@@ -850,6 +850,7 @@ async function initSystem(){
       } else {
         throw new Error('سجل البيانات المركزية غير مهيأ في قاعدة البيانات');
       }
+      data.inventory = [...(data.inventory||[]), ...(data.inventory_items||[])];
       render();
 
     } catch(err) {
@@ -1266,7 +1267,7 @@ $(id).innerHTML=tableRows(data[k],x=>
 `<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
 <td>${k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
-(!isAccountant && !isPlant) || (isAccountant && ['drivers','vehicles'].includes(k))?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
+k==='inventory' && x.created_at?`<button class="btn" onclick="editOperationalRecord('inventory_items','${esc(x.id)}')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord('inventory_items','${esc(x.id)}')">حذف</button>`:((!isAccountant && !isPlant) || (isAccountant && ['drivers','vehicles'].includes(k)))?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
 );
 }
 });
