@@ -1707,15 +1707,31 @@ function receiptLoad(no) {
     const loadWords = {1:'النقلة الأولى',2:'النقلة الثانية',3:'النقلة الثالثة',4:'النقلة الرابعة',5:'النقلة الخامسة',6:'النقلة السادسة',7:'النقلة السابعة',8:'النقلة الثامنة',9:'النقلة التاسعة',10:'النقلة العاشرة',11:'النقلة الحادية عشرة',12:'النقلة الثانية عشرة',13:'النقلة الثالثة عشرة',14:'النقلة الرابعة عشرة',15:'النقلة الخامسة عشرة',16:'النقلة السادسة عشرة',17:'النقلة السابعة عشرة',18:'النقلة الثامنة عشرة',19:'النقلة التاسعة عشرة',20:'النقلة العشرون'};
     const loadLabel = loadWords[loadNumber] || ('النقلة رقم ' + esc(l.no));
     printDocA5('وصل تجهيز ' + loadLabel + ' - أمر ' + o.no, `
-      <div class="r">
-        <div class="head"><div style="width:150px;height:56px;margin:0 auto 3px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" role="img" aria-label="أطلس للكونكريت ATLAS" style="width:100%;height:100%;display:block">
+      <div class="r atlas-load-receipt">
+        <div class="head"><div style="width:145px;height:46px;margin:0 auto 2px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" role="img" aria-label="أطلس للكونكريت ATLAS" style="width:100%;height:100%;display:block">
   <defs><linearGradient id="atlasGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F9D77A"/><stop offset="0.5" stop-color="#C69A36"/><stop offset="1" stop-color="#8B641B"/></linearGradient></defs>
   <g transform="translate(35 20)"><path d="M105 12 L205 245 L165 245 L105 98 L45 245 L5 245 Z" fill="#20252B" stroke="url(#atlasGold)" stroke-width="8" stroke-linejoin="round"/><path d="M62 183 H148" stroke="url(#atlasGold)" stroke-width="12"/><path d="M20 255 H190" stroke="#20252B" stroke-width="5"/></g>
   <g transform="translate(260 65)"><text x="500" y="65" text-anchor="end" font-family="Arial,sans-serif" font-size="62" font-weight="bold" fill="#20252B" direction="rtl">أطلس للكونكريت</text><path d="M0 88 H500" stroke="url(#atlasGold)" stroke-width="4"/><text x="250" y="160" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="bold" letter-spacing="9" fill="#20252B">ATLAS</text><text x="250" y="195" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" letter-spacing="4" fill="#A17B2C">READY MIX CONCRETE</text></g>
 </svg></div><h2 style="font-size:16px;color:#a47b20">شركة أطلس للكونكريت</h2><div style="font-weight:bold;font-size:12px">للخرسانة والكونكريت الجاهز</div><div class="en">ATLAS COMPANY FOR READY MIX CONCRETE</div></div>
         <div class="title" style="font-size:16px;padding:5px">وصل تجهيز خرسانة</div>
         <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>رقم الوصل<br><span class="no">${esc(o.no)}</span></div></div>
-        <style>.atlas-load-info td{font-size:12px!important;font-weight:700!important;padding:5px 6px!important;color:#20252b!important}.atlas-load-info td:last-child{font-size:12px!important;font-weight:800!important}.atlas-load-info tr:nth-child(4) td:last-child{color:#7f1d1d!important}.atlas-load-info tr:nth-child(7) td:last-child{color:#1565c0!important}.atlas-load-info tr:last-child td:last-child{font-size:15px!important;font-weight:900!important}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td>${esc(l.qty)} م³</td></tr></table>
+        <style>.atlas-load-info td{font-size:13px!important;font-weight:700!important;padding:3px 5px!important;color:#20252b!important;line-height:1.15!important}.atlas-load-info td:last-child{font-size:13px!important;font-weight:800!important}.atlas-load-info tr:nth-child(4) td:last-child{color:#7f1d1d!important}.atlas-load-info tr:nth-child(7) td:last-child{color:#1565c0!important}.atlas-load-info tr:last-child td:last-child{font-size:15px!important;font-weight:900!important}
+@media print{
+ @page{size:A5 portrait;margin:3mm}
+ .atlas-load-receipt{padding:2mm!important;break-inside:avoid!important;page-break-inside:avoid!important}
+ .atlas-load-receipt .head{padding-bottom:1mm!important;margin-bottom:2px!important}
+ .atlas-load-receipt .title{padding:3px!important;margin:2px 0!important}
+ .atlas-load-receipt .top{margin-bottom:2px!important}
+ .atlas-load-receipt .top div{padding:3px!important}
+ .atlas-load-receipt .data{margin-bottom:3px!important}
+ .atlas-load-receipt .section{padding:3px!important;margin-bottom:3px!important}
+ .atlas-load-receipt .big{padding:2px!important;margin-bottom:2px!important}
+ .atlas-load-receipt .big b{padding:3px!important}
+ .atlas-load-receipt .big strong{padding:3px!important;font-size:20px!important}
+ .atlas-load-receipt .sign{margin-top:2px!important}
+ .atlas-load-receipt .sign div{padding:6px 4px 10px!important}
+ .atlas-load-receipt .foot{margin-top:3px!important;padding-top:2px!important}
+}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td>${esc(l.qty)} م³</td></tr></table>
         <div class="section" style="font-size:13px;padding:4px">تفاصيل التجهيز</div>
         <div class="big" style="padding:4px;gap:5px"><div style="margin-right:auto"><b>رقم الحمولة</b><strong style="font-size:17px;padding:3px;color:#a47b20">${loadLabel}</strong></div></div>
         <div class="big" style="padding:4px;gap:5px;direction:rtl"><div style="width:48%;margin-right:0;text-align:center"><b style="font-size:12px;font-weight:800">إجمالي الكمية المتراكمة (م³)</b><strong style="display:block;font-size:25px;font-weight:900;padding:3px;color:#991b1b">${fmtQty(accumulatedQty)}</strong></div></div>
