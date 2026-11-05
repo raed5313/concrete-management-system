@@ -1355,10 +1355,6 @@ ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعد�
 </div></td>
 </tr>
 <tr class="order-load-row"><td colspan="8" class="order-load-cell">
-<details class="load-details" style="margin:3px 0">
-<summary style="cursor:pointer;list-style:none;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(212,175,55,.07);color:var(--gold);font-weight:700">
-📦 عرض معلومات الحمولات (${ls.length})　⌄
-</summary>
 <div class="loadbox order-loadbox" style="margin-top:6px">
 <div class="order-load-head"><b class="goldtext">الحمولات المسجلة داخل الأمر</b><strong class="order-accumulated">${fmt(totalLoadQty)} م³</strong></div>
 ${ls.length?`<table><tbody>${ls.map(l=>`
@@ -1373,7 +1369,7 @@ ${currentRole === 'manager' ? `<button class="btn danger" title="حذف الحم
 </td>
 </tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div>
-</details>
+
 </td></tr>`;
 },8
 );
