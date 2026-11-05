@@ -1264,8 +1264,8 @@ renderOperationalTables(isManager || isAccountant);
 ].forEach(([k,id,fs])=>{
 if($(id)){
 $(id).innerHTML=tableRows(data[k],x=>
-`<tr>${fs.map(f=>`<td>${esc(x[f]||'—')}</td>`).join('')}
-<td>${k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
+`<tr>${fs.map(f=>`<td>${esc(k==='employees'&&f==='advances'?fmt((data.advances||[]).filter(a=>a.employee===x.name).reduce((n,a)=>n+Number(a.remaining??a.amount??0),0)):k==='employees'&&f==='salary'?fmt(x.salary):x[f]||'—')}</td>`).join('')}
+<td>${k==='employees'?`<button class="btn primary" onclick="openOperationalForm('payroll')">صرف راتب</button> <button class="btn" onclick="openOperationalForm('advances')">سلفة</button>`:k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
 k==='inventory' && x.created_at?`<button class="btn" onclick="editOperationalRecord('inventory_items','${esc(x.id)}')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord('inventory_items','${esc(x.id)}')">حذف</button>`:((!isAccountant && !isPlant) || (isAccountant && ['drivers','vehicles'].includes(k)))?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
 );
