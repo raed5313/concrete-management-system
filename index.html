@@ -2034,19 +2034,47 @@ closeModal();toast('تم إصدار الفاتورة وحفظها مركزياً
 }
 
 function openReceiptModal(){
-openForm('إصدار سند قبض',[
-{name:'customer',label:'العميل',options:['',...data.customers.map(x=>x.name)]},
-{name:'amount',label:'المبلغ المقبوض',type:'number',required:true},
+openForm('إصدار سند قبض — ربط بأمر تجهيز',[
+{name:'customer',label:'اختيار اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
+{name:'orderNo',label:'اكتب رقم أمر التجهيز',required:true},
+{name:'amount',label:'المبلغ المقبوض فعلياً (دينار)',type:'number',required:true},
 {name:'method',label:'طريقة الدفع',options:['نقداً','تحويل مصرفي','صك']},
 {name:'notes',label:'ملاحظات / البيان',type:'textarea'}
 ],async v=>{
+const order=data.orders.find(o=>String(o.no).trim()===String(v.orderNo).trim() && String(o.customer)===String(v.customer));
+if(!order){toast('لم يتم العثور على أمر بهذا الرقم لهذا العميل');return;}
+const orderTotal=(Number(order.qty)||0)*(Number(order.price)||0);
+if(Number(v.amount)<=0){toast('أدخل مبلغ قبض صحيح');return;}
+v.orderNo=order.no;
+v.orderTotal=orderTotal;
+v.orderSite=order.site||'';
+v.orderQty=Number(order.qty)||0;
 v.no = data.nextRecNo++;
 v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
-logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer}`);
+logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer} للأمر ${v.orderNo}`);
 if(!await save()){data.receipts.pop();data.nextRecNo--;data.audit.shift();render();return;}
-closeModal();toast('تم حفظ سند القبض مركزياً');
+closeModal();toast('تم حفظ سند القبض وربطه بأمر التجهيز');
 });
+const form=$('form');
+const customer=form.querySelector('[name="customer"]');
+const orderNo=form.querySelector('[name="orderNo"]');
+const amount=form.querySelector('[name="amount"]');
+const preview=document.createElement('div');
+preview.className='field full';
+preview.id='receiptOrderPreview';
+preview.style.cssText='background:#eef6fb;color:#17384b;border:1px solid #b8d2e0;border-radius:10px;padding:12px;line-height:1.9;font-weight:700';
+preview.textContent='اختر العميل واكتب رقم الأمر لعرض تفاصيله والمبلغ الكلي.';
+form.insertBefore(preview,form.querySelector('button[type="submit"]').parentElement);
+const updatePreview=()=>{
+ const o=data.orders.find(x=>String(x.no).trim()===String(orderNo.value).trim() && String(x.customer)===String(customer.value));
+ if(!customer.value||!orderNo.value){preview.textContent='اختر العميل واكتب رقم الأمر لعرض تفاصيله والمبلغ الكلي.';return;}
+ if(!o){preview.textContent='لا يوجد أمر تجهيز مطابق لهذا العميل ورقم الأمر.';return;}
+ const total=(Number(o.qty)||0)*(Number(o.price)||0);
+ preview.innerHTML='<div>العميل: '+esc(o.customer)+'</div><div>رقم الأمر: '+esc(o.no)+'</div><div>موقع الصب: '+esc(o.site||'—')+'</div><div>نوع الصب والمواصفة: '+esc(o.pour||'—')+' — '+esc(o.grade||'—')+'</div><div>الكمية: '+fmt(o.qty)+' م³</div><div>سعر المتر: '+fmt(o.price)+'</div><div style="font-size:18px;color:#9b6410">المبلغ الكلي للأمر: '+fmt(total)+' دينار</div>';
+};
+customer.addEventListener('change',updatePreview);
+orderNo.addEventListener('input',updatePreview);
 }
 
 function openExpenseModal(){
@@ -2378,7 +2406,11 @@ printDocA5('سند قبض',`
 <table class="data">
 <tr><td>التاريخ</td><td>${esc(rec.date)}</td></tr>
 <tr><td>استلمنا من السيد / الشركة</td><td><strong>${esc(rec.customer)}</strong></td></tr>
-<tr><td>المبلغ وقدره</td><td><span style="font-size:16px;color:#a51d20">${fmt(rec.amount)}</span></td></tr>
+${rec.orderNo?'<tr><td>رقم أمر التجهيز</td><td>'+esc(rec.orderNo)+'</td></tr>':''}
+${rec.orderSite?'<tr><td>موقع الصب</td><td>'+esc(rec.orderSite)+'</td></tr>':''}
+${rec.orderQty?'<tr><td>كمية الأمر</td><td>'+fmt(rec.orderQty)+' م³</td></tr>':''}
+${rec.orderTotal!==undefined?'<tr><td>المبلغ الكلي للأمر</td><td><strong>'+fmt(rec.orderTotal)+'</strong></td></tr>':''}
+<tr><td>المبلغ المقبوض</td><td><span style="font-size:16px;color:#a51d20">${fmt(rec.amount)}</span></td></tr>
 <tr><td>طريقة الدفع</td><td>${esc(rec.method)}</td></tr>
 <tr><td>البيان والملاحظات</td><td>${esc(rec.notes||'—')}</td></tr>
 </table>
@@ -2469,3 +2501,10 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
 </script>
 </body>
 </html>
+
+<style>
+/* عرض الحمولات مباشرة أسفل كل أمر دون طيّ أو مسافة فاصلة كبيرة */
+#orders #ordersBody tr.order-load-row{display:block!important;width:100%!important;margin:0 0 16px!important;padding:0!important;border:1px solid #e9a15c!important;border-top:0!important;border-bottom:1px solid #e9a15c!important;border-radius:0 0 12px 12px!important;background:#fff0df!important}
+#orders #ordersBody tr.order-load-row td.order-load-cell{display:block!important;width:100%!important;padding:6px 8px!important;background:transparent!important}
+#orders #ordersBody .order-loadbox{display:block!important;visibility:visible!important}
+</style>
