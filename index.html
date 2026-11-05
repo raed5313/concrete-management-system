@@ -925,11 +925,19 @@ async function initSystem(){
         status:x.status
       }));
 
-      // اكتشاف الأوامر الجديدة القادمة من حساب المدير دون تنبيه عند أول تحميل.
-      const knownIds = window.sadaKnownOrderIds;
-      if (knownIds && currentRole === 'plant') {
-        const incoming = freshOrders.filter(o => o.id && !knownIds.has(String(o.id)));
-        incoming.forEach(o => triggerPlantAlert(o));
+      // تذكّر آخر أمر تم استلامه على هذا الجهاز حتى لا تضيع نافذة التنبيه بعد إغلاق الموقع أو إعادة تحميله.
+      // عند أول تشغيل فقط نضع خط أساس، ثم نعرض أحدث أمر وصل أثناء غياب المعمل.
+      if (currentRole === 'plant' && freshOrders.length) {
+        const markerKey = 'atlas-plant-last-order-no';
+        const latestNo = Math.max(...freshOrders.map(o => Number(o.no) || 0));
+        let lastNotifiedNo = 0;
+        try { lastNotifiedNo = Number(localStorage.getItem(markerKey) || 0); } catch(e) {}
+        if (lastNotifiedNo > 0 && latestNo > lastNotifiedNo) {
+          const pendingOrders = freshOrders.filter(o => (Number(o.no) || 0) > lastNotifiedNo);
+          const newestPending = pendingOrders[pendingOrders.length - 1];
+          if (newestPending) triggerPlantAlert(newestPending);
+        }
+        try { localStorage.setItem(markerKey, String(Math.max(lastNotifiedNo, latestNo))); } catch(e) {}
       }
       window.sadaKnownOrderIds = new Set(freshOrders.filter(o=>o.id).map(o=>String(o.id)));
       data.orders = freshOrders;
