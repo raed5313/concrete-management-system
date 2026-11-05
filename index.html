@@ -1730,13 +1730,9 @@ async function openLoad(no) {
     if (!o) return;
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
-        {name:'driver', label:'اسم السائق', required:true,options:['',...(data.drivers||[]).map(x=>x.name)]},
-        {name:'vehicle', label:'رقم الآلية / الخلاطة', required:true,options:['',...(data.vehicles||[]).map(x=>x.name)]},
-        {name:'pump', label:'رقم المضخة (من أمر التجهيز)',value:o.pump||''},
-        {name:'qty', label:'الكمية المجهزة م³', required:true},
-        {name:'showTime', label:'إظهار وقت التجهيز في الوصل (اختياري)', type:'checkbox'},
-        {name:'time', label:'وقت التجهيز', type:'time'},
-        {name:'note', label:'ملاحظات'}
+        {name:'driver', label:'اسم السائق (اختياري)', required:false,options:['',...(data.drivers||[]).map(x=>x.name)]},
+        {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
+        {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true}
     ], v => {
         if (o.status === 'مكتمل ومجهز') {
             toast('هذا الأمر مقفول ولا يمكن إضافة حمولات جديدة');
@@ -1786,12 +1782,12 @@ async function openLoad(no) {
                         load_no: loadNo,
                         orderId: orderRow.id,
                         orderNo: String(o.no),
-                        driver: v.driver,
-                        vehicle: v.vehicle,
+                        driver: v.driver || null,
+                        vehicle: v.vehicle || null,
                         qty: Number(v.qty),
                         pump: o.pump || null,
                         admixture_type: o.admixture_type || null,
-                        time: v.showTime === 'on' ? (v.time || null) : null,
+                        
                         status: 'تم التسجيل'
                     })
                     .select()
@@ -1802,7 +1798,7 @@ async function openLoad(no) {
                 v.orderNo = o.no;
                 v.no = loadNo;
                 v.date = new Date().toISOString().slice(0, 10);
-                v.time = savedLoad.time || null;
+                
                 v.id = savedLoad.id;
 
                 data.loads.push(v);
@@ -1823,20 +1819,6 @@ async function openLoad(no) {
                 toast('فشل حفظ الحمولة: ' + (err.message || 'خطأ غير معروف'));
             }
         })();
-    });
-
-    const showTimeBox = $('form').querySelector('[name="showTime"]');
-    const timeInput = $('form').querySelector('[name="time"]');
-    const timeField = timeInput.closest('.field');
-    timeField.style.display = 'none';
-    showTimeBox.addEventListener('change', () => {
-        timeField.style.display = showTimeBox.checked ? '' : 'none';
-        if (showTimeBox.checked) {
-            const now = new Date();
-            timeInput.value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-        } else {
-            timeInput.value = '';
-        }
     });
 }
 
