@@ -665,7 +665,11 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
 }[c]));
 const dateOnly=value=>value?String(value).split('T')[0]:'—';
-const fmt=n=>Number(n||0).toLocaleString('en-US');
+const fmt=n=>{
+ const value=Number(n??0);
+ if(!Number.isFinite(value))return String(n??'—');
+ return value.toLocaleString('en-US',{maximumFractionDigits:3}).replace(/,/g,'،');
+};
 
 // روابط دخول مستقلة حسب الدور: ?role=plant أو ?role=accountant أو ?role=manager
 const roleEntry = new URLSearchParams(location.search).get('role');
