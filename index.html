@@ -164,6 +164,10 @@ th{color:var(--gold)}
 #orders #ordersBody td.order-load-cell{display:block;width:100%;padding:4px 6px!important}
 #orders #ordersBody td.order-load-cell:before{content:none}
 #orders #ordersBody .load-details{width:100%}
+/* فواصل واضحة بين أوامر التجهيز */
+#orders #ordersBody tr.order-card{margin-bottom:0;border:1px solid var(--line);border-bottom:3px solid #b88b2c;border-radius:12px 12px 0 0;box-shadow:0 3px 9px rgba(0,0,0,.12)}
+#orders #ordersBody tr.order-load-row{display:block;width:100%;margin:0 0 18px!important;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;background:rgba(184,139,44,.045);padding-bottom:5px}
+#orders #ordersBody tr.order-load-row td.order-load-cell{border:0!important;border-radius:0 0 12px 12px}
 </style>
 </head>
 <body>
@@ -1072,10 +1076,11 @@ return `
 ${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
 ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
 <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
+${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل الخلطة المسجلة" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪</button>' : ''}
 ${!canPrintOnly ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
-<tr><td colspan="8" class="order-load-cell">
+<tr class="order-load-row"><td colspan="8" class="order-load-cell">
 <details class="load-details" style="margin:3px 0">
 <summary style="cursor:pointer;list-style:none;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(212,175,55,.07);color:var(--gold);font-weight:700">
 📦 عرض معلومات الحمولات (${ls.length})　⌄
@@ -1495,6 +1500,13 @@ async function openLoad(no) {
     });
 }
 
+function editOrderMix(no){
+if(currentRole!=='manager'){toast('تعديل الخلطة متاح للمدير فقط');return;}
+const o=data.orders.find(x=>String(x.no)===String(no));if(!o)return;
+openForm('تعديل الخلطة المسجلة للأمر '+no,[{name:'grade',label:'المواصفة / الخلطة',value:o.grade||'',required:true,options:['C-20','C-25','C-30','C-35','C-40','C-45','C-50','خلطة خاصة']}],v=>{
+(async()=>{try{const {error}=await supabaseClient.from('concrete_orders').update({grade:v.grade}).eq('order_no',String(no));if(error)throw error;o.grade=v.grade;logAction(currentUserName,'تعديل خلطة أمر تجهيز','رقم الأمر: '+no+'، الخلطة: '+v.grade);await save();closeModal();toast('تم تحديث الخلطة المسجلة للأمر وحفظها مركزياً');}catch(err){console.error(err);toast('تعذر تعديل الخلطة: '+(err.message||''));}})();
+});
+}
 function editOrder(no){
 if(currentRole!=='manager'){toast('المحاسب يملك صلاحية المشاهدة والطباعة فقط');return;}
 let o=data.orders.find(x=>String(x.no)===String(no));
