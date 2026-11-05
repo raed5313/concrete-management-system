@@ -853,6 +853,7 @@ accountant: [
 ['expenses','المصروفات'],
 ['accounts','الحسابات'],
 ['employees','الموظفون'],
+['attendance','الحضور والغياب'],
 ['payroll','الرواتب'],
 ['advances','السلف'],
 ['inventory','المخزون'],
@@ -1429,7 +1430,7 @@ function operationalFormFields(type,record={}){
  return operationalConfig[type].fields.map(([name,label,kind])=>({
   name,label,type:kind==='date'?'date':kind==='number'?'number':kind==='textarea'?'textarea':'text',
   options:Array.isArray(kind)?kind:(name==='employee'?data.employees.map(e=>e.name):undefined),
-  required:['date','item','name','quantity'].includes(name),
+  required:['date','item','name','quantity','employee','status','month'].includes(name),
   value:record[name]??(name==='date'?new Date().toISOString().slice(0,10):'')
  }));
 }
