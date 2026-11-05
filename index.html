@@ -2139,13 +2139,9 @@ function atlasDocumentBrand(){
  <div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE</div></div>`;
 }
 
-function atlasManagerSignature(){
- return '<div class="atlas-signatures"><div class="atlas-signature"><strong>توقيع المحاسب</strong><span>________________________</span></div><div class="atlas-signature"><strong>توقيع المدير</strong><span>________________________</span></div></div>';
-}
 function printDocA5(title,content){
  const brand=atlasDocumentBrand();
  content=content.replace(/<div class="r([^"]*)">/, (match)=>match+brand);
-  if(/<\/div>\s*$/.test(content)) content=content.replace(/<\/div>\s*$/,atlasManagerSignature()+'</div>');
  let w=window.open('','_blank','width=700,height=900');
 if(!w){toast('اسمح بالنوافذ المنبثقة');return}
 w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title></title>
