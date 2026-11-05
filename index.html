@@ -175,6 +175,13 @@ th{color:var(--gold)}
 /* تصغير عرض واجهة النظام قليلاً */
 .app{zoom:.96}
 @media(max-width:700px){.app{zoom:.98}}
+/* مسافة 5 سم بين أوامر التجهيز وتصغير بطاقة الأمر 25 بالمئة */
+#orders #ordersBody tr.order-load-row{margin-bottom:5cm!important}
+#orders #ordersBody tr.order-card td{font-size:11.25px!important;padding:7.5px 9px!important;line-height:1.25!important;min-height:28.5px!important}
+#orders #ordersBody tr.order-card td:before{font-size:10.5px!important}
+#orders #ordersBody tr.order-card .actions .btn{font-size:10px!important;padding:6px 7px!important;border-radius:6px!important}
+#orders #ordersBody tr.order-card{border-radius:9px 9px 0 0}
+#orders #ordersBody tr.order-load-row td.order-load-cell{padding:3px 5px!important}
 </style>
 </head>
 <body>
@@ -1508,7 +1515,7 @@ async function openLoad(no) {
 }
 
 function editOrderMix(no){
-if(currentRole!=='manager'){toast('تعديل الخلطة متاح للمدير فقط');return;}
+if(currentRole!=='manager' && currentRole!=='plant'){toast('تعديل الخلطة متاح للمدير ومشغل المعمل فقط');return;}
 const o=data.orders.find(x=>String(x.no)===String(no));if(!o)return;
 openForm('تعديل الخلطة المسجلة للأمر '+no,[{name:'grade',label:'المواصفة / الخلطة',value:o.grade||'',required:true,options:['C-20','C-25','C-30','C-35','C-40','C-45','C-50','خلطة خاصة']}],v=>{
 (async()=>{try{const {error}=await supabaseClient.from('concrete_orders').update({grade:v.grade}).eq('order_no',String(no));if(error)throw error;o.grade=v.grade;logAction(currentUserName,'تعديل خلطة أمر تجهيز','رقم الأمر: '+no+'، الخلطة: '+v.grade);await save();closeModal();toast('تم تحديث الخلطة المسجلة للأمر وحفظها مركزياً');}catch(err){console.error(err);toast('تعذر تعديل الخلطة: '+(err.message||''));}})();
