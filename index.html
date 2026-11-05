@@ -540,7 +540,8 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 </section>
 
-<section id="payroll" class="hidden"><div class="panel"><div class="head"><h3>الرواتب</h3><button class="btn primary" onclick="openOperationalForm('payroll')">＋ تسجيل استلام راتب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الشهر</th><th>الراتب الأساسي</th><th>المبلغ المستلم</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="payrollBody"></tbody></table></div></div></section>
+<section id="attendance" class="hidden"><div class="panel"><div class="head"><h3>الحضور والغياب</h3><button class="btn primary" onclick="openOperationalForm('attendance')">＋ تسجيل حضور / غياب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الحالة</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="attendanceBody"></tbody></table></div></div></section>
+<section id="payroll" class="hidden"><div class="panel"><div class="head"><h3>الرواتب</h3><button class="btn primary" onclick="openOperationalForm('payroll')">＋ تسجيل استلام راتب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الشهر</th><th>الراتب المستحق حسب الحضور</th><th>المبلغ المستلم</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="payrollBody"></tbody></table></div></div></section>
 <section id="advances" class="hidden"><div class="panel"><div class="head"><h3>سلف الموظفين</h3><button class="btn primary" onclick="openOperationalForm('advances')">＋ تسجيل سلفة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>المبلغ</th><th>المستقطع</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="advancesBody"></tbody></table></div></div></section>
 <!-- 13. المتابعة والأرشفة -->
 <section id="audit" class="hidden">
@@ -824,6 +825,7 @@ manager: [
 ['receipts','القبض'],
 ['expenses','المصروفات'],
 ['employees','الموظفون'],
+['attendance','الحضور والغياب'],
 ['payroll','الرواتب'],
 ['advances','السلف'],
 ['audit','المتابعة والأرشفة'],
@@ -950,7 +952,7 @@ async function initSystem(){
       ]);
       if (operationalResult.error) throw operationalResult.error;
       if (auditResult.error) throw auditResult.error;
-      ['fuel','purchases','maintenance','spare_parts','payroll','advances','inventory_items'].forEach(k => data[k] = []);
+      ['fuel','purchases','maintenance','spare_parts','attendance','payroll','advances','inventory_items'].forEach(k => data[k] = []);
       (operationalResult.data || []).forEach(row => {
         if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
       });
@@ -1405,7 +1407,8 @@ const operationalConfig = {
  purchases:{title:'تسجيل مشتريات',fields:[['date','التاريخ','date'],['item','المادة / القطعة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
  maintenance:{title:'تسجيل صيانة وإصلاح',fields:[['date','التاريخ','date'],['asset','المركبة / معدّة المعمل'],['fault','نوع العطل'],['repair','تفاصيل الإصلاح','textarea'],['parts','القطع المستخدمة','textarea'],['cost','الكلفة','number'],['notes','ملاحظات','textarea']]},
  spare_parts:{title:'تسجيل قطعة غيار',fields:[['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
- payroll:{title:'تسجيل استلام راتب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['month','الشهر'],['base_salary','الراتب الأساسي','number'],['paid','المبلغ المستلم','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
+ attendance:{title:'تسجيل حضور / غياب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['status','حالة الدوام',['حاضر','غائب']],['notes','ملاحظات','textarea']]},
+ payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر بصيغة YYYY-MM'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
  advances:{title:'تسجيل سلفة موظف',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['amount','مبلغ السلفة','number'],['deducted','المبلغ المستقطع','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
  inventory_items:{title:'تسجيل مادة مخزون',fields:[['name','اسم المادة'],['unit','الوحدة'],['current','الرصيد الحالي','number'],['min','الحد الأدنى','number']]}
 };
@@ -1437,6 +1440,24 @@ function openOperationalForm(type,id){
  openForm((old?'تعديل ':'')+operationalConfig[type].title,operationalFormFields(type,old||{}),async values=>{
   const payload={...values};
   ['quantity','unit_price','total','cost','base_salary','paid','remaining','amount','deducted','current','min'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
+  if(type==='attendance'){
+    const duplicate=(data.attendance||[]).find(a=>a.employee===payload.employee&&a.date===payload.date&&(!old||String(a.id)!==String(old.id)));
+    if(duplicate)throw new Error('تم تسجيل دوام هذا الموظف لهذا اليوم مسبقاً');
+  }
+  if(type==='payroll'){
+    const emp=data.employees.find(e=>String(e.name)===String(payload.employee));
+    const month=String(payload.month||'').trim();
+    if(!emp)throw new Error('اختر موظفاً مسجلاً');
+    if(!/^\\d{4}-\\d{2}$/.test(month))throw new Error('أدخل الشهر بصيغة YYYY-MM');
+    const [yy,mm]=month.split('-').map(Number);
+    const daysInMonth=new Date(yy,mm,0).getDate();
+    const presentDays=(data.attendance||[]).filter(a=>a.employee===payload.employee&&String(a.date||'').slice(0,7)===month&&a.status==='حاضر').length;
+    const absentDays=(data.attendance||[]).filter(a=>a.employee===payload.employee&&String(a.date||'').slice(0,7)===month&&a.status==='غائب').length;
+    payload.present_days=presentDays; payload.absent_days=absentDays;
+    payload.base_salary=Number((Number(emp.salary||0)/daysInMonth*presentDays).toFixed(2));
+    payload.paid=Number(payload.paid||0);
+    payload.remaining=Number((payload.base_salary-payload.paid).toFixed(2));
+  }
   if((payload.total===undefined||payload.total==='')&&payload.quantity!==undefined&&payload.unit_price!==undefined)payload.total=Number(payload.quantity||0)*Number(payload.unit_price||0);
   try{
    const {data:auth,error:authError}=await supabaseClient.auth.getUser();
