@@ -1487,6 +1487,33 @@ function openOperationalForm(type,id){
    render();closeModal();toast('تم حفظ السجل مركزياً ومشاركته مع الحسابات المخوّلة');
   }catch(err){console.error(err);toast('تعذر الحفظ المركزي: '+(err.message||''));}
  });
+ if(type==='payroll'){
+  const form=$('form');
+  const employeeField=form.querySelector('[name="employee"]');
+  const monthField=form.querySelector('[name="month"]');
+  const paidField=form.querySelector('[name="paid"]');
+  const preview=document.createElement('div');
+  preview.className='full';
+  preview.style.cssText='padding:12px;border:1px solid #c9a34a;border-radius:10px;background:#f8f5ec;margin:8px 0;font-weight:700;line-height:2';
+  preview.innerHTML='اختر الموظف والشهر لعرض أيام الحضور والراتب المستحق تلقائياً';
+  form.insertBefore(preview,form.querySelector('button[type="submit"]').parentElement);
+  const updatePreview=()=>{
+   const emp=(data.employees||[]).find(e=>String(e.name)===String(employeeField?.value));
+   const month=String(monthField?.value||'');
+   if(!emp||!/^\\d{4}-\\d{2}$/.test(month)){preview.textContent='اختر الموظف والشهر لعرض الحساب التلقائي';return;}
+   const [yy,mm]=month.split('-').map(Number);
+   const days=new Date(yy,mm,0).getDate();
+   const records=(data.attendance||[]).filter(a=>a.employee===emp.name&&String(a.date||'').slice(0,7)===month);
+   const present=records.filter(a=>a.status==='حاضر').length;
+   const absent=records.filter(a=>a.status==='غائب').length;
+   const salary=Number(emp.salary||0);
+   const amount=Number((salary/days*present).toFixed(2));
+   preview.innerHTML='أيام الشهر: '+days+'<br>أيام الحضور: '+present+'<br>أيام الغياب: '+absent+'<br>الراتب الشهري: '+salary.toLocaleString('en-US')+'<br>**الراتب المستحق: '+amount.toLocaleString('en-US')+' دينار**';
+  };
+  employeeField?.addEventListener('change',updatePreview);
+  monthField?.addEventListener('change',updatePreview);
+  updatePreview();
+ }
 }
 function editOperationalRecord(type,id){openOperationalForm(type,id);}
 async function deleteOperationalRecord(type,id){
