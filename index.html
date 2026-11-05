@@ -77,7 +77,9 @@ th{color:var(--gold)}
 
 .order-open{background:#fff!important;color:#202020!important;}
 .order-locked{background:#f8dce5!important;color:#6b233b!important;}
-.order-invoiced{background:#d9f2df!important;color:#174b2b!important;}
+.order-invoiced{background:#075b2e!important;color:#ffffff!important;border-color:#03451f!important;}
+.order-invoiced td{color:#ffffff!important;font-weight:800!important;}
+.order-invoiced .goldtext{color:#ffe08a!important;}
 
 @media(max-width:800px){
 .app{grid-template-columns:1fr}
@@ -1330,7 +1332,7 @@ let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
    return groups;
  }, {}));
 let isOrderClosed = o.status === 'مكتمل ومجهز';
-let hasInvoice = data.invoices.some(inv => String(inv.orderNo || '') === String(o.no));
+let hasInvoice = data.invoices.some(inv => String(inv.orderNo || '') === String(o.no)) || data.receipts.some(rec => String(rec.orderNo || '') === String(o.no) && Number(rec.amount || 0) > 0);
 let stateClass = hasInvoice ? 'order-invoiced' : isOrderClosed ? 'order-locked' : 'order-open';
 
 let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
@@ -1583,7 +1585,7 @@ async function deleteOperationalRecord(type,id){
 function printOperationalRecord(type,id){
  const r=(data[type]||[]).find(x=>String(x.id)===String(id));if(!r)return;
  const labels=operationalConfig[type].fields.map(([key,label])=>'<tr><td>'+esc(label)+'</td><td>'+esc(r[key]??'—')+'</td></tr>').join('');
- printDocA5(operationalConfig[type].title,'<div class="r"><div class="head"><h2>شركة أطلس للكونكريت</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">'+esc(operationalConfig[type].title)+'</div><table class="data">'+labels+'</table></div>');
+ printDocA4(operationalConfig[type].title,'<div class="r"><div class="head"><h2>شركة أطلس للكونكريت</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">'+esc(operationalConfig[type].title)+'</div><table class="data">'+labels+'</table></div>');
 }
 
 function openForm(title,fields,cb){
@@ -2256,6 +2258,47 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 w.document.close();
 }
 
+function printDocA4(title,content){
+ const brand=atlasDocumentBrand();
+ content=content.replace(/<div class="r([^"]*)">/, (match)=>match+brand);
+ let w=window.open('','_blank','width=900,height=1100');
+if(!w){toast('اسمح بالنوافذ المنبثقة');return}
+w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title></title>
+<style>
+@page{size:A4 portrait;margin:10mm;}
+*{box-sizing:border-box}
+body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+ .r{width:100%;border:3px double #b28a29;padding:4mm;min-height:277mm;display:flex;flex-direction:column;max-height:none;overflow:visible;break-inside:avoid;} .atlas-doc-brand{display:block;text-align:center;margin:0 auto 3mm;padding:0;border:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important;break-inside:avoid}
+ .atlas-doc-brand svg{display:block;width:min(100%,190mm);height:35mm;margin:auto;filter:drop-shadow(0 2px 2px #0008)}
+ .atlas-doc-tagline{font-size:7px;font-weight:900;letter-spacing:.6px;color:#f0d17a;text-shadow:0 1px 2px #000} .atlas-signatures{display:flex;align-items:flex-start;justify-content:space-between;gap:18mm;width:100%;margin-top:22mm!important;padding-top:3mm;border-top:0!important;font-size:10px;font-weight:800;break-inside:avoid;flex-shrink:0}.atlas-signature{display:flex;flex-direction:column;align-items:center;gap:8mm;min-width:48mm;text-align:center}.atlas-signature span{display:inline-block;min-width:48mm;text-align:center;color:#333;letter-spacing:1px}
+ .r>.head{display:none!important}
+
+ .head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:2mm;margin-bottom:4px;}
+.head h2{color:#a47b20;margin:0 0 4px 0;font-size:16px;}
+.en{font-size:9px;color:#555;}
+ .title{text-align:center;background:#171717;color:#e7c36b;border:1px solid #b28a29;padding:4px;margin:4px 0;font-size:13px;font-weight:bold;}
+ .top{display:flex;gap:4px;margin-bottom:4px;}
+.top div{border:1px solid #777;flex:1;text-align:center;padding:5px;font-weight:bold;font-size:11px;}
+.no{color:#a51d20;font-size:16px;}
+.data{width:100%;border-collapse:collapse;margin-bottom:8px;}
+ .data td{border:1px solid #777;padding:3px 5px;font-size:10px;}
+.data td:first-child{background:#eee;font-weight:bold;width:32%;}
+.section{text-align:center;background:#171717;color:#e7c36b;padding:5px;border:1px solid #b28a29;font-size:11px;font-weight:bold;margin-bottom:6px;}
+ .big{display:flex;gap:4px;border:1px solid #b28a29;padding:3px;margin-bottom:4px;}
+.big div{flex:1;border:1px solid #777;text-align:center;}
+.big b{display:block;background:#eee;padding:4px;font-size:10px;}
+.big strong{display:block;font-size:22px;padding:6px;color:#111;}
+ .sign{display:flex;gap:5px;margin-top:5px;}
+.sign div{border:1px solid #777;flex:1;text-align:center;padding:10px 5px 20px;font-weight:bold;font-size:11px;}
+.foot{text-align:center;border-top:1px solid #b28a29;margin-top:8px;padding-top:4px;font-size:9px;color:#555;}
+</style>
+</head><body>${content}
+<script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);};<\/script>
+</body></html>`);
+w.document.close();
+}
+
+
 function receiptOrder(no){
 let o=data.orders.find(x=>String(x.no)===no);
 if(!o)return;
@@ -2377,7 +2420,7 @@ w.document.close();
 function printInvoice(no){
 let inv = data.invoices.find(i=>String(i.no)===String(no));
 if(!inv) return;
-printDocA5('فاتورة مبيعات A4',`
+printDocA4('فاتورة مبيعات A4',`
 <div class="r">
 <div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE - INVOICE</div></div>
 <div class="title">فاتورة مبيعات رقم ${esc(inv.no)}</div>
@@ -2396,7 +2439,7 @@ printDocA5('فاتورة مبيعات A4',`
 function printReceipt(no){
 let rec = data.receipts.find(r=>String(r.no)===String(no));
 if(!rec) return;
-printDocA5('سند قبض',`
+printDocA4('سند قبض',`
 <div class="r">
 <div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">RECEIPT VOUCHER</div></div>
 <div class="title">سند قبض رقم ${esc(rec.no)}</div>
@@ -2454,11 +2497,11 @@ function printFilteredOrdersReport(){
     const total=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
     return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' م³</td><td>'+fmt(total)+' م³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' م³</td></tr>').join('');
   }).join('');
-  printDocA5('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
+  printDocA4('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
 }
 
 function printReportGeneral(){
-printDocA5('التقرير العام للنظام',`
+printDocA4('التقرير العام للنظام',`
 <div class="r">
 <div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">GENERAL SYSTEM REPORT</div></div>
 <div class="title">التقرير العام للعمليات</div>
