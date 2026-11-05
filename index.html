@@ -291,6 +291,12 @@ alt="شعار شركة صدى الإعمار">
 </div>
 </section>
 
+<!-- الأقسام الإدارية الإضافية -->
+<section id="fuel" class="hidden"><div class="panel"><div class="head"><h3>الوقود والگاز</h3><button class="btn primary" onclick="openOperationalForm('fuel')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المركبة / الجهة</th><th>نوع الوقود</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="fuelBody"></tbody></table></div></div></section>
+<section id="purchases" class="hidden"><div class="panel"><div class="head"><h3>المشتريات</h3><button class="btn primary" onclick="openOperationalForm('purchases')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المادة / القطعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>المجهّز</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="purchasesBody"></tbody></table></div></div></section>
+<section id="maintenance" class="hidden"><div class="panel"><div class="head"><h3>صيانة وإصلاح المركبات والمعمل</h3><button class="btn primary" onclick="openOperationalForm('maintenance')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الجهة / الآلية</th><th>نوع العطل</th><th>الإصلاح</th><th>القطع المستخدمة</th><th>الكلفة</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="maintenanceBody"></tbody></table></div></div></section>
+<section id="spare_parts" class="hidden"><div class="panel"><div class="head"><h3>قطع الغيار</h3><button class="btn primary" onclick="openOperationalForm('spare_parts')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>اسم القطعة</th><th>رقم القطعة</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>المجهّز</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="spare_partsBody"></tbody></table></div></div></section>
+
 <!-- 8. الحسابات -->
 <section id="accounts" class="hidden">
 <div class="panel">
@@ -436,7 +442,7 @@ const loginAccounts = {
 
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
-inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],
+inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],fuel:[],purchases:[],maintenance:[],spare_parts:[],
 nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 });
 
@@ -574,6 +580,10 @@ manager: [
 ['employees','الموظفون'],
 ['audit','المتابعة والأرشفة'],
 ['reports','التقارير'],
+['fuel','الوقود والگاز'],
+['purchases','المشتريات'],
+['maintenance','الصيانة والإصلاح'],
+['spare_parts','قطع الغيار'],
 ['settings','الإعدادات']
 ],
 
@@ -598,7 +608,11 @@ accountant: [
 ['drivers','السائقون'],
 ['vehicles','الآليات / الخلاطات'],
 ['reports','التقارير'],
-['audit','المتابعة والأرشفة']
+['audit','المتابعة والأرشفة'],
+['fuel','الوقود والگاز'],
+['purchases','المشتريات'],
+['maintenance','الصيانة والإصلاح'],
+['spare_parts','قطع الغيار']
 ]
 };
 
@@ -681,6 +695,12 @@ async function initSystem(){
       const {data: companyRow, error: companyError} = await supabaseClient
         .from('company_app_data').select('payload').eq('id', true).maybeSingle();
       if (companyError) throw companyError;
+      const operationalResult = await supabaseClient.from('company_operational_records').select('*').order('created_at');
+      if (operationalResult.error) throw operationalResult.error;
+      ['fuel','purchases','maintenance','spare_parts'].forEach(k => data[k] = []);
+      (operationalResult.data || []).forEach(row => {
+        if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
+      });
       if (companyRow && companyRow.payload) {
         const shared = companyRow.payload;
         ['inventory','invoices','receipts','expenses','employees','audit']
@@ -735,6 +755,10 @@ async function initSystem(){
     )
     .on('postgres_changes',
       {event:'*', schema:'public', table:'company_app_data'},
+      syncCloudData
+    )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'company_operational_records'},
       syncCloudData
     )
     .subscribe();
@@ -1067,6 +1091,7 @@ return `<tr>
 }, 7);
 }
 
+renderOperationalTables(isManager || isAccountant);
 [
 ['drivers','driversBody',['name','phone','note']],
 ['vehicles','vehiclesBody',['name','capacity','kind']],
@@ -1086,6 +1111,74 @@ k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">
 );
 }
 });
+}
+
+const operationalConfig = {
+ fuel:{title:'تسجيل وقود / گاز',fields:[['date','التاريخ','date'],['vehicle','المركبة / الجهة'],['fuel_type','نوع الوقود',['گاز','كاز','بنزين','ديزل','أخرى']],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['notes','ملاحظات','textarea']]},
+ purchases:{title:'تسجيل مشتريات',fields:[['date','التاريخ','date'],['item','المادة / القطعة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['total','الإجمالي','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
+ maintenance:{title:'تسجيل صيانة وإصلاح',fields:[['date','التاريخ','date'],['asset','المركبة / معدّة المعمل'],['fault','نوع العطل'],['repair','تفاصيل الإصلاح','textarea'],['parts','القطع المستخدمة','textarea'],['cost','الكلفة','number'],['notes','ملاحظات','textarea']]},
+ spare_parts:{title:'تسجيل قطعة غيار',fields:[['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]}
+};
+function renderOperationalTables(canManage){
+ Object.keys(operationalConfig).forEach(type=>{
+  const body=$(type+'Body'); if(!body)return;
+  const fields=operationalConfig[type].fields;
+  body.innerHTML=tableRows(data[type]||[],r=>{
+   const cells=fields.map(([key])=>'<td>'+esc(r[key]??'—')+'</td>').join('');
+   const actions=canManage
+    ? '<button class="btn" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
+    : '<button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>';
+   return '<tr>'+cells+'<td><div class="actions">'+actions+'</div></td></tr>';
+  },fields.length+1);
+ });
+}
+function operationalFormFields(type,record={}){
+ return operationalConfig[type].fields.map(([name,label,kind])=>({
+  name,label,type:kind==='date'?'date':kind==='number'?'number':kind==='textarea'?'textarea':'text',
+  options:Array.isArray(kind)?kind:undefined,
+  required:['date','item','name','quantity'].includes(name),
+  value:record[name]??(name==='date'?new Date().toISOString().slice(0,10):'')
+ }));
+}
+function openOperationalForm(type,id){
+ if(!['manager','accountant'].includes(currentRole)){toast('هذا القسم غير متاح لصلاحيتك');return;}
+ const old=id?(data[type]||[]).find(x=>String(x.id)===String(id)):null;
+ if(id&&!old)return;
+ openForm((old?'تعديل ':'')+operationalConfig[type].title,operationalFormFields(type,old||{}),async values=>{
+  const payload={...values};
+  ['quantity','unit_price','total','cost'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
+  if((payload.total===undefined||payload.total==='')&&payload.quantity!==undefined&&payload.unit_price!==undefined)payload.total=Number(payload.quantity||0)*Number(payload.unit_price||0);
+  try{
+   const {data:auth,error:authError}=await supabaseClient.auth.getUser();
+   if(authError)throw authError;
+   const uid=auth.user&&auth.user.id;if(!uid)throw new Error('انتهت جلسة الدخول');
+   let result;
+   if(old) result=await supabaseClient.from('company_operational_records').update({payload,updated_by:uid,updated_at:new Date().toISOString()}).eq('id',old.id).select().single();
+   else result=await supabaseClient.from('company_operational_records').insert({record_type:type,payload,created_by:uid,updated_by:uid}).select().single();
+   if(result.error)throw result.error;
+   const saved={id:result.data.id,...(result.data.payload||{}),created_at:result.data.created_at,updated_at:result.data.updated_at};
+   if(old){const idx=data[type].findIndex(x=>x.id===old.id);data[type][idx]=saved;}else data[type].push(saved);
+   logAction(currentUserName,old?'تعديل':'إضافة',operationalConfig[type].title);
+   render();closeModal();toast('تم حفظ السجل مركزياً ومشاركته مع الحسابات المخوّلة');
+  }catch(err){console.error(err);toast('تعذر الحفظ المركزي: '+(err.message||''));}
+ });
+}
+function editOperationalRecord(type,id){openOperationalForm(type,id);}
+async function deleteOperationalRecord(type,id){
+ if(!['manager','accountant'].includes(currentRole))return;
+ if(!confirm('تأكيد حذف السجل؟'))return;
+ try{
+  const {error}=await supabaseClient.from('company_operational_records').delete().eq('id',id);
+  if(error)throw error;
+  data[type]=(data[type]||[]).filter(x=>String(x.id)!==String(id));
+  logAction(currentUserName,'حذف',operationalConfig[type].title);
+  render();toast('تم حذف السجل من قاعدة البيانات المركزية');
+ }catch(err){console.error(err);toast('تعذر الحذف: '+(err.message||''));}
+}
+function printOperationalRecord(type,id){
+ const r=(data[type]||[]).find(x=>String(x.id)===String(id));if(!r)return;
+ const labels=operationalConfig[type].fields.map(([key,label])=>'<tr><td>'+esc(label)+'</td><td>'+esc(r[key]??'—')+'</td></tr>').join('');
+ printDocA5(operationalConfig[type].title,'<div class="r"><div class="head"><h2>شركة صدى الإعمار للكونكريت الجاهز</h2><div class="en">SADA AL-EMAR CONCRETE</div></div><div class="title">'+esc(operationalConfig[type].title)+'</div><table class="data">'+labels+'</table></div>');
 }
 
 function openForm(title,fields,cb){
