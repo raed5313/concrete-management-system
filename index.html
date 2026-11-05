@@ -1415,7 +1415,7 @@ renderOperationalTables(isManager || isAccountant);
 if($(id)){
 $(id).innerHTML=tableRows(data[k],x=>
 `<tr>${fs.map(f=>`<td>${esc(k==='employees'&&f==='advances'?fmt((data.advances||[]).filter(a=>a.employee===x.name).reduce((n,a)=>n+Number(a.remaining??a.amount??0),0)):k==='employees'&&f==='daily_wage'?fmt(x.daily_wage):x[f]||'—')}</td>`).join('')}
-<td>${k==='employees'?`<button class="btn primary" onclick="openOperationalForm('payroll')">صرف راتب</button> <button class="btn" onclick="openOperationalForm('advances')">سلفة</button>`:k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
+<td>${k==='employees'?`<button class="btn primary" onclick="openEmployeeEdit('${esc(x.id)}')">تعديل</button> <button class="btn primary" onclick="openOperationalForm('payroll')">صرف راتب</button> <button class="btn" onclick="openOperationalForm('advances')">سلفة</button>`:k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
 k==='inventory' && x.created_at?`<button class="btn" onclick="editOperationalRecord('inventory_items','${esc(x.id)}')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord('inventory_items','${esc(x.id)}')">حذف</button>`:((!isAccountant && !isPlant) || (isAccountant && ['drivers','vehicles'].includes(k)))?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
 );
@@ -1438,7 +1438,7 @@ const operationalConfig = {
 function renderOperationalTables(canManage){
  Object.keys(operationalConfig).forEach(type=>{
   const body=$(type+'Body'); if(!body)return;
-  const fields=operationalConfig[type].fields;
+  const fields=type==='payroll'?[...operationalConfig[type].fields,['present_days','أيام الحضور'],['absent_days','أيام الغياب'],['base_salary','أجور الحضور'],['bonuses_total','المكافآت'],['advances_deducted','السلف المستقطعة'],['fines_total','الغرامات'],['net_due','صافي المستحق'],['remaining','المتبقي']]:operationalConfig[type].fields;
   body.innerHTML=tableRows(data[type]||[],r=>{
    const cells=fields.map(([key])=>'<td>'+esc(r[key]??'—')+'</td>').join('');
    const actions=canManage
@@ -1469,6 +1469,11 @@ function openOperationalForm(type,id){
  openForm((old?'تعديل ':'')+operationalConfig[type].title,operationalFormFields(type,old||{}),async values=>{
   const payload={...values};
   ['quantity','unit_price','total','cost','base_salary','paid','remaining','amount','deducted','current','min'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
+  if(type==='advances'){
+    payload.amount=Number(payload.amount||0); payload.deducted=Number(payload.deducted||0);
+    if(payload.amount<0||payload.deducted<0||payload.deducted>payload.amount)throw new Error('قيمة الاستقطاع يجب ألا تتجاوز مبلغ السلفة');
+    payload.remaining=Number((payload.amount-payload.deducted).toFixed(2));
+  }
   if(type==='attendance'){
     if(!payload.employee || !payload.date || !['حاضر','غائب'].includes(payload.status))throw new Error('يرجى اختيار الموظف والتاريخ وحالة الدوام');
     const duplicate=(data.attendance||[]).find(a=>a.employee===payload.employee&&a.date===payload.date&&(!old||String(a.id)!==String(old.id)));
@@ -2015,6 +2020,24 @@ logAction(currentUserName, 'إضافة موظف', v.name);
 if(!await save()){data.employees.pop();data.audit.shift();render();return;}
 closeModal();toast('تم إضافة الموظف وحفظه مركزياً');
 });
+}
+
+function openEmployeeEdit(id){
+ const emp=data.employees.find(x=>String(x.id)===String(id)); if(!emp)return;
+ openForm('تعديل بيانات الموظف',[
+  {name:'name',label:'اسم الموظف',value:emp.name||'',required:true},
+  {name:'dept',label:'القسم',value:emp.dept||''},
+  {name:'job',label:'الوظيفة',value:emp.job||''},
+  {name:'daily_wage',label:'الأجرة اليومية الثابتة (دينار)',type:'number',value:emp.daily_wage||'',required:true},
+  {name:'advances',label:'السلف الحالية',type:'number',value:emp.advances||0}
+ ],async values=>{
+  const wage=Number(values.daily_wage||0); if(wage<=0){toast('أدخل أجرة يومية صحيحة');return;}
+  const oldName=emp.name; Object.assign(emp,values,{daily_wage:wage,advances:Number(values.advances||0)});
+  if(oldName!==emp.name){['attendance','payroll','advances','bonuses','fines'].forEach(k=>(data[k]||[]).forEach(r=>{if(r.employee===oldName)r.employee=emp.name;}));}
+  logAction(currentUserName,'تعديل بيانات موظف',emp.name);
+  if(!await save())return;
+  closeModal();toast('تم تحديث بيانات الموظف واليومية الثابتة');
+ });
 }
 
 async function writeCustomerAudit(action, details){
