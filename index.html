@@ -1531,7 +1531,7 @@ function openOperationalForm(type,id){
   const updatePreview=()=>{
    const emp=(data.employees||[]).find(e=>String(e.name)===String(employeeField?.value));
    const month=String(monthField?.value||'');
-   if(!emp||!/^\\d{4}-\\d{2}$/.test(month)){preview.textContent='اختر الموظف والشهر لعرض الحساب التلقائي';return;}
+   if(!emp||/^\d{4}-\d{2}$/.test(month)===false){preview.textContent='اختر الموظف والشهر لعرض الحساب التلقائي';return;}
    const [yy,mm]=month.split('-').map(Number);
    const days=new Date(yy,mm,0).getDate();
    const records=(data.attendance||[]).filter(a=>a.employee===emp.name&&String(a.date||'').slice(0,7)===month);
