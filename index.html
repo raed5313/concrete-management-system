@@ -1412,7 +1412,7 @@ const operationalConfig = {
  maintenance:{title:'تسجيل صيانة وإصلاح',fields:[['date','التاريخ','date'],['asset','المركبة / معدّة المعمل'],['fault','نوع العطل'],['repair','تفاصيل الإصلاح','textarea'],['parts','القطع المستخدمة','textarea'],['cost','الكلفة','number'],['notes','ملاحظات','textarea']]},
  spare_parts:{title:'تسجيل قطعة غيار',fields:[['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
  attendance:{title:'تسجيل حضور / غياب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['status','حالة الدوام',['حاضر','غائب']],['notes','ملاحظات','textarea']]},
- payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر بصيغة YYYY-MM'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
+ payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر','month'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
  advances:{title:'تسجيل سلفة موظف',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['amount','مبلغ السلفة','number'],['deducted','المبلغ المستقطع','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
  bonuses:{title:'صرف مكافأة موظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['reason','سبب المكافأة'],['amount','مبلغ المكافأة','number'],['notes','ملاحظات','textarea']]},
  inventory_items:{title:'تسجيل مادة مخزون',fields:[['name','اسم المادة'],['unit','الوحدة'],['current','الرصيد الحالي','number'],['min','الحد الأدنى','number']]}
@@ -1432,8 +1432,12 @@ function renderOperationalTables(canManage){
 }
 function operationalFormFields(type,record={}){
  return operationalConfig[type].fields.map(([name,label,kind])=>({
-  name,label,type:kind==='date'?'date':kind==='number'?'number':kind==='textarea'?'textarea':'text',
-  options:Array.isArray(kind)?kind:(name==='employee'?['',...(data.employees||[]).map(e=>e.name)]:undefined),
+  name,label,type:kind==='date'?'date':kind==='month'?'month':kind==='number'?'number':kind==='textarea'?'textarea':'text',
+  options:Array.isArray(kind)?kind:
+    name==='employee'?['',...(data.employees||[]).map(e=>e.name)]:
+    ['driver','driver_name','السائق'].includes(name)?['',...(data.drivers||[]).map(e=>e.name)]:
+    ['vehicle','vehicle_no','asset','المركبة','رقم الآلية'].includes(name)?['',...(data.vehicles||[]).map(e=>e.name)]:
+    undefined,
   required:['date','item','name','quantity','employee','status','month'].includes(name),
   value:record[name]??(name==='date'?new Date().toISOString().slice(0,10):'')
  }));
@@ -1456,11 +1460,13 @@ function openOperationalForm(type,id){
     const emp=data.employees.find(e=>String(e.name)===String(payload.employee));
     const month=String(payload.month||'').trim();
     if(!emp)throw new Error('اختر موظفاً مسجلاً');
-    if(!/^\\d{4}-\\d{2}$/.test(month))throw new Error('أدخل الشهر بصيغة YYYY-MM');
+    if(!/^\d{4}-\d{2}$/.test(month))throw new Error('اختر الشهر المطلوب');
     const [yy,mm]=month.split('-').map(Number);
     const daysInMonth=new Date(yy,mm,0).getDate();
-    const presentDays=(data.attendance||[]).filter(a=>a.employee===payload.employee&&String(a.date||'').slice(0,7)===month&&a.status==='حاضر').length;
-    const absentDays=(data.attendance||[]).filter(a=>a.employee===payload.employee&&String(a.date||'').slice(0,7)===month&&a.status==='غائب').length;
+    const monthAttendance=(data.attendance||[]).filter(a=>a.employee===payload.employee&&String(a.date||'').slice(0,7)===month);
+    const presentDays=monthAttendance.filter(a=>a.status==='حاضر').length;
+    const absentDays=monthAttendance.filter(a=>a.status==='غائب').length;
+    if(!monthAttendance.length)throw new Error('لا توجد سجلات حضور أو غياب لهذا الموظف في الشهر المحدد');
     payload.present_days=presentDays; payload.absent_days=absentDays;
     payload.base_salary=Number((Number(emp.salary||0)/daysInMonth*presentDays).toFixed(2));
     payload.paid=Number(payload.paid||0);
