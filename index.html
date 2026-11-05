@@ -534,7 +534,7 @@ body.plant-role .side .nav{gap:2px!important}
 <div class="panel">
 <div class="head"><h3>شؤون الموظفين</h3><button class="btn primary" onclick="openEmployeeModal()">＋ إضافة موظف</button></div>
 <table>
-<thead><tr><th>الاسم</th><th>القسم</th><th>الوظيفة</th><th>الراتب الأساسي</th><th>السلف</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>الاسم</th><th>القسم</th><th>الوظيفة</th><th>اليومية الثابتة</th><th>السلف</th><th>الإجراءات</th></tr></thead>
 <tbody id="employeesBody"></tbody>
 </table>
 </div>
@@ -544,6 +544,7 @@ body.plant-role .side .nav{gap:2px!important}
 <section id="payroll" class="hidden"><div class="panel"><div class="head"><h3>الرواتب</h3><button class="btn primary" onclick="openOperationalForm('payroll')">＋ تسجيل استلام راتب</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>الشهر</th><th>الراتب المستحق حسب الحضور</th><th>المبلغ المستلم</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="payrollBody"></tbody></table></div></div></section>
 <section id="advances" class="hidden"><div class="panel"><div class="head"><h3>سلف الموظفين</h3><button class="btn primary" onclick="openOperationalForm('advances')">＋ تسجيل سلفة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>المبلغ</th><th>المستقطع</th><th>المتبقي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="advancesBody"></tbody></table></div></div></section>
 <section id="bonuses" class="hidden"><div class="panel"><div class="head"><h3>مكافآت الموظفين</h3><button class="btn primary" onclick="openOperationalForm('bonuses')">＋ صرف مكافأة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>سبب المكافأة</th><th>المبلغ</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="bonusesBody"></tbody></table></div></div></section>
+<section id="fines" class="hidden"><div class="panel"><div class="head"><h3>غرامات الموظفين</h3><button class="btn primary" onclick="openOperationalForm('fines')">＋ تسجيل غرامة</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>سبب الغرامة</th><th>المبلغ</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="finesBody"></tbody></table></div></div></section>
 <!-- 13. المتابعة والأرشفة -->
 <section id="audit" class="hidden">
 <div class="panel">
@@ -830,6 +831,7 @@ manager: [
 ['payroll','الرواتب'],
 ['advances','السلف'],
 ['bonuses','المكافآت'],
+['fines','الغرامات'],
 ['audit','المتابعة والأرشفة'],
 ['reports','التقارير'],
 ['fuel','الوقود والگاز'],
@@ -859,6 +861,7 @@ accountant: [
 ['payroll','الرواتب'],
 ['advances','السلف'],
 ['bonuses','المكافآت'],
+['fines','الغرامات'],
 ['inventory','المخزون'],
 ['drivers','السائقون'],
 ['vehicles','الآليات / الخلاطات'],
@@ -967,7 +970,7 @@ async function initSystem(){
       ]);
       if (operationalResult.error) throw operationalResult.error;
       if (auditResult.error) throw auditResult.error;
-      ['fuel','purchases','maintenance','spare_parts','attendance','payroll','advances','bonuses','inventory_items'].forEach(k => data[k] = []);
+      ['fuel','purchases','maintenance','spare_parts','attendance','payroll','advances','bonuses','fines','inventory_items'].forEach(k => data[k] = []);
       (operationalResult.data || []).forEach(row => {
         if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
       });
@@ -1406,12 +1409,12 @@ renderOperationalTables(isManager || isAccountant);
 ['invoices','invoicesBody',['no','customer','orderNo','total','paid','remaining']],
 ['receipts','receiptsBody',['no','customer','amount','method','date']],
 ['expenses','expensesBody',['title','amount','date','notes']],
-['employees','employeesBody',['name','dept','job','salary','advances']],
+['employees','employeesBody',['name','dept','job','daily_wage','advances']],
 ['audit','auditBody',['timestamp','user','action','details']]
 ].forEach(([k,id,fs])=>{
 if($(id)){
 $(id).innerHTML=tableRows(data[k],x=>
-`<tr>${fs.map(f=>`<td>${esc(k==='employees'&&f==='advances'?fmt((data.advances||[]).filter(a=>a.employee===x.name).reduce((n,a)=>n+Number(a.remaining??a.amount??0),0)):k==='employees'&&f==='salary'?fmt(x.salary):x[f]||'—')}</td>`).join('')}
+`<tr>${fs.map(f=>`<td>${esc(k==='employees'&&f==='advances'?fmt((data.advances||[]).filter(a=>a.employee===x.name).reduce((n,a)=>n+Number(a.remaining??a.amount??0),0)):k==='employees'&&f==='daily_wage'?fmt(x.daily_wage):x[f]||'—')}</td>`).join('')}
 <td>${k==='employees'?`<button class="btn primary" onclick="openOperationalForm('payroll')">صرف راتب</button> <button class="btn" onclick="openOperationalForm('advances')">سلفة</button>`:k==='invoices'?`<button class="btn gold" onclick="printInvoice('${esc(x.no)}')">طباعة A4</button>`:
 k==='receipts'?`<button class="btn gold" onclick="printReceipt('${esc(x.no)}')">طباعة السند</button>`:
 k==='inventory' && x.created_at?`<button class="btn" onclick="editOperationalRecord('inventory_items','${esc(x.id)}')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord('inventory_items','${esc(x.id)}')">حذف</button>`:((!isAccountant && !isPlant) || (isAccountant && ['drivers','vehicles'].includes(k)))?`<button class="btn danger" onclick="delSimple('${k}','${esc(x.id||x.no)}')">حذف</button>`:'مراقبة'}</td></tr>`
@@ -1429,6 +1432,7 @@ const operationalConfig = {
  payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر','month'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
  advances:{title:'تسجيل سلفة موظف',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['amount','مبلغ السلفة','number'],['deducted','المبلغ المستقطع','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
  bonuses:{title:'صرف مكافأة موظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['reason','سبب المكافأة'],['amount','مبلغ المكافأة','number'],['notes','ملاحظات','textarea']]},
+ fines:{title:'تسجيل غرامة موظف',fields:[['employee','اسم الموظف'],['date','تاريخ الغرامة','date'],['reason','سبب الغرامة'],['amount','مبلغ الغرامة','number'],['notes','ملاحظات','textarea']]},
  inventory_items:{title:'تسجيل مادة مخزون',fields:[['name','اسم المادة'],['unit','الوحدة'],['current','الرصيد الحالي','number'],['min','الحد الأدنى','number']]}
 };
 function renderOperationalTables(canManage){
@@ -1482,9 +1486,17 @@ function openOperationalForm(type,id){
     const absentDays=monthAttendance.filter(a=>a.status==='غائب').length;
     if(!monthAttendance.length)throw new Error('لا توجد سجلات حضور أو غياب لهذا الموظف في الشهر المحدد');
     payload.present_days=presentDays; payload.absent_days=absentDays;
-    payload.base_salary=Number((Number(emp.salary||0)/daysInMonth*presentDays).toFixed(2));
+    const dailyWage=Number(emp.daily_wage||0);
+    if(dailyWage<=0)throw new Error('أدخل اليومية الثابتة للموظف من بيانات الموظفين أولاً');
+    const monthBonuses=(data.bonuses||[]).filter(x=>x.employee===payload.employee&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
+    const monthFines=(data.fines||[]).filter(x=>x.employee===payload.employee&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
+    const monthAdvances=(data.advances||[]).filter(x=>x.employee===payload.employee&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.deducted||0),0);
+    payload.present_days=presentDays; payload.absent_days=absentDays;
+    payload.base_salary=Number((dailyWage*presentDays).toFixed(2));
+    payload.bonuses_total=monthBonuses; payload.fines_total=monthFines; payload.advances_deducted=monthAdvances;
+    payload.net_due=Number((payload.base_salary+monthBonuses-monthFines-monthAdvances).toFixed(2));
     payload.paid=Number(payload.paid||0);
-    payload.remaining=Number((payload.base_salary-payload.paid).toFixed(2));
+    payload.remaining=Number((payload.net_due-payload.paid).toFixed(2));
   }
   if((payload.total===undefined||payload.total==='')&&payload.quantity!==undefined&&payload.unit_price!==undefined)payload.total=Number(payload.quantity||0)*Number(payload.unit_price||0);
   try{
@@ -1520,9 +1532,13 @@ function openOperationalForm(type,id){
    const records=(data.attendance||[]).filter(a=>a.employee===emp.name&&String(a.date||'').slice(0,7)===month);
    const present=records.filter(a=>a.status==='حاضر').length;
    const absent=records.filter(a=>a.status==='غائب').length;
-   const salary=Number(emp.salary||0);
-   const amount=Number((salary/days*present).toFixed(2));
-   preview.innerHTML='أيام الشهر: '+days+'<br>أيام الحضور: '+present+'<br>أيام الغياب: '+absent+'<br>الراتب الشهري: '+salary.toLocaleString('en-US')+'<br>**الراتب المستحق: '+amount.toLocaleString('en-US')+' دينار**';
+   const daily=Number(emp.daily_wage||0);
+   const wage=Number((daily*present).toFixed(2));
+   const bonuses=(data.bonuses||[]).filter(x=>x.employee===emp.name&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
+   const fines=(data.fines||[]).filter(x=>x.employee===emp.name&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
+   const advances=(data.advances||[]).filter(x=>x.employee===emp.name&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.deducted||0),0);
+   const net=wage+bonuses-fines-advances;
+   preview.innerHTML='أيام الشهر: '+days+'<br>أيام الحضور: '+present+'<br>أيام الغياب: '+absent+'<br>اليومية الثابتة: '+daily.toLocaleString('en-US')+'<br>أجور الحضور: '+wage.toLocaleString('en-US')+'<br>المكافآت: '+bonuses.toLocaleString('en-US')+'<br>السلف المستقطعة: '+advances.toLocaleString('en-US')+'<br>الغرامات: '+fines.toLocaleString('en-US')+'<br><b>صافي المستحق: '+net.toLocaleString('en-US')+' دينار</b>';
   };
   employeeField?.addEventListener('change',updatePreview);
   monthField?.addEventListener('change',updatePreview);
@@ -1990,7 +2006,7 @@ openForm('إضافة موظف جديد',[
 {name:'name',label:'اسم الموظف',required:true},
 {name:'dept',label:'القسم'},
 {name:'job',label:'الوظيفة'},
-{name:'salary',label:'الراتب الأساسي',type:'number',required:true},
+{name:'daily_wage',label:'الأجرة اليومية الثابتة (دينار)',type:'number',required:true},
 {name:'advances',label:'السلف الحالية',type:'number',value:0}
 ],async v=>{
 v.id = Date.now();
