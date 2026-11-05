@@ -1671,70 +1671,27 @@ printDocA5('وصل أمر تجهيز',`
 
 function receiptLoad(no) {
     const l = data.loads.find(x => String(x.no) === String(no));
-    const o = l && data.orders.find(
-        x => String(x.no) === String(l.orderNo)
-    );
-
-    if (!l || !o) {
-        return toast('الحمولة أو أمر التجهيز غير موجود');
-    }
-
-    const orderLoads = data.loads.filter(x =>
-        String(x.orderNo) === String(l.orderNo) &&
-        Number(x.no) <= Number(l.no)
-    );
-
-    const accumulatedQty = orderLoads.reduce(
-        (sum, x) => sum + (Number(x.qty) || 0), 0
-    );
-
+    const o = l && data.orders.find(x => String(x.no) === String(l.orderNo));
+    if (!l || !o) return toast('الحمولة أو أمر التجهيز غير موجود');
+    const orderLoads = data.loads.filter(x => String(x.orderNo) === String(l.orderNo) && Number(x.no) <= Number(l.no));
+    const accumulatedQty = orderLoads.reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
     const fmtQty = n => Number(n.toFixed(2)).toString();
     const d = dateOnly(l.date || o.date);
-
-    printDocA5('وصل تجهيز الحمولة - أمر ' + o.no, `
-        <div class="r">
-            <div class="head">
-                <img src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.png"
-                     style="width:65px;height:65px;object-fit:contain">
-                <h2>شركة صدى الإعمار للكونكريت الجاهز</h2>
-                <div class="en">SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</div>
-            </div>
-
-            <div class="title">وصل تجهيز حمولة</div>
-
-            <div class="top" style="direction:rtl">
-                <div>تاريخ التجهيز<br>${esc(d)}${l.time ? `<br>وقت التجهيز<br>${esc(l.time)}` : ''}</div>
-                <div>رقم أمر التجهيز<br><span class="no">${esc(o.no)}</span></div>
-            </div>
-
-            <table class="data">
-                <tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr>
-                <tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr>
-                <tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr>
-                <tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr>
-                <tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr>
-                <tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr>
-                <tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr>
-                <tr><td>كمية هذه النقلة</td><td>${esc(l.qty)} م³</td></tr>
-            </table>
-
-            <div class="big">
-                <div>
-                    <b>إجمالي الكمية المجهزة</b>
-                    <strong style="color:#D62828">${fmtQty(accumulatedQty)} م³</strong>
-                </div>
-                <div>
-                    <b>رقم النقلة</b>
-                    <strong style="color:#1672C5">${esc(l.no)}</strong>
-                </div>
-            </div>
-
-            <div class="sign" style="direction:rtl">
-                <div>توقيع المعمل<br><br>__________________</div>
-                <div>توقيع الزبون<br><br>__________________</div>
-            </div>
-        </div>
-    `);
+    const loadNumber = Number(l.no);
+    const loadWords = {1:'النقلة الأولى',2:'النقلة الثانية',3:'النقلة الثالثة',4:'النقلة الرابعة',5:'النقلة الخامسة',6:'النقلة السادسة',7:'النقلة السابعة',8:'النقلة الثامنة',9:'النقلة التاسعة',10:'النقلة العاشرة',11:'النقلة الحادية عشرة',12:'النقلة الثانية عشرة',13:'النقلة الثالثة عشرة',14:'النقلة الرابعة عشرة',15:'النقلة الخامسة عشرة',16:'النقلة السادسة عشرة',17:'النقلة السابعة عشرة',18:'النقلة الثامنة عشرة',19:'النقلة التاسعة عشرة',20:'النقلة العشرون'};
+    const loadLabel = loadWords[loadNumber] || ('النقلة رقم ' + esc(l.no));
+    printDocA5('وصل تجهيز ' + loadLabel + ' - أمر ' + o.no, `
+      <div class="r">
+        <div class="head"><img src="https://raw.githubusercontent.com/raed5313/concrete-management-system/main/logo.png" style="width:90px;height:70px;object-fit:contain;display:block;margin:0 auto 5px"><h2 style="font-size:20px;color:#a47b20">شركة صدى الإعمار</h2><div style="font-weight:bold;font-size:15px">للخرسانة والكونكريت الجاهز</div><div class="en">SADA ALAAMAR COMPANY FOR READY MIX CONCRETE</div></div>
+        <div class="title" style="font-size:22px;padding:10px">وصل تجهيز خرسانة</div>
+        <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>رقم الوصل<br><span class="no">${esc(l.no)}</span></div></div>
+        <table class="data"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(l.vehicle || '—')}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td style="font-weight:bold;font-size:15px">${esc(l.qty)} م³</td></tr></table>
+        <div class="section" style="font-size:17px;padding:8px">تفاصيل التجهيز</div>
+        <div class="big" style="padding:8px;gap:8px"><div><b>الكمية المجهزة (م³)</b><strong style="font-size:34px">${fmtQty(Number(l.qty)||0)}</strong></div><div><b>رقم الحمولة</b><strong style="font-size:21px;color:#a47b20">${loadLabel}</strong></div></div>
+        <div style="text-align:center;font-size:11px;font-weight:bold;margin:6px 0">إجمالي الكمية المجهزة حتى هذه النقلة: ${fmtQty(accumulatedQty)} م³</div>
+        <div class="sign" style="direction:rtl"><div>توقيع الزبون<br><br>................................</div><div>توقيع المعمل<br><br>................................</div></div>
+        <div class="foot">شركة صدى الإعمار للخرسانة والكونكريت الجاهز</div>
+      </div>`);
 }
 
 function printDailyPlantReport(){
