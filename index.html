@@ -1991,9 +1991,9 @@ w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="
 @page{size:A5 portrait;margin:5mm;}
 *{box-sizing:border-box}
 body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
- .r{width:100%;border:3px double #b28a29;padding:4mm;min-height:0;max-height:none;overflow:visible;break-inside:avoid;} .atlas-doc-brand{display:block;text-align:center;margin:0 auto 3mm;padding:0;border:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important;break-inside:avoid}
+ .r{width:100%;border:3px double #b28a29;padding:4mm;min-height:200mm;display:flex;flex-direction:column;max-height:none;overflow:visible;break-inside:avoid;} .atlas-doc-brand{display:block;text-align:center;margin:0 auto 3mm;padding:0;border:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important;break-inside:avoid}
  .atlas-doc-brand svg{display:block;width:min(100%,142mm);height:27mm;margin:auto;filter:drop-shadow(0 2px 2px #0008)}
- .atlas-doc-tagline{font-size:7px;font-weight:900;letter-spacing:.6px;color:#f0d17a;text-shadow:0 1px 2px #000} .atlas-manager-sign{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-top:5mm;padding-top:2mm;border-top:1px solid #b28a29;font-size:10px;font-weight:800;break-inside:avoid}.atlas-manager-sign span{display:inline-block;min-width:48mm;text-align:center;color:#333;letter-spacing:1px}
+ .atlas-doc-tagline{font-size:7px;font-weight:900;letter-spacing:.6px;color:#f0d17a;text-shadow:0 1px 2px #000} .atlas-manager-sign{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-top:auto!important;padding-top:2mm;border-top:1px solid #b28a29;font-size:10px;font-weight:800;break-inside:avoid;flex-shrink:0}.atlas-manager-sign span{display:inline-block;min-width:48mm;text-align:center;color:#333;letter-spacing:1px}
  .r>.head{display:none!important}
 
  .head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:2mm;margin-bottom:4px;}
