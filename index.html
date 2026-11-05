@@ -671,6 +671,38 @@ const fmt=n=>{
  return value.toLocaleString('en-US',{maximumFractionDigits:3}).replace(/,/g,'،');
 };
 
+// تنسيق الأرقام الظاهرة بفواصل الآلاف العربية دون تغيير القيم المخزنة أو حقول الإدخال
+function formatVisibleThousands(root=document.body){
+  if(!root || !document.createTreeWalker) return;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  const nodes=[];
+  while(walker.nextNode()){
+    const node=walker.currentNode;
+    const parent=node.parentElement;
+    if(!parent || parent.closest('script,style,textarea,input,select,option,[contenteditable="true"]')) continue;
+    nodes.push(node);
+  }
+  nodes.forEach(node=>{
+    const original=node.nodeValue;
+    const formatted=original.replace(/(^|[^\\d،,./-])(\\d{4,})(?=$|[^\\d،,./-])/g,
+      (match,prefix,digits)=>prefix+Number(digits).toLocaleString('en-US').replace(/,/g,'،'));
+    if(formatted!==original) node.nodeValue=formatted;
+  });
+}
+const atlasNumberObserver=new MutationObserver(records=>{
+  records.forEach(record=>{
+    if(record.type==='childList') record.addedNodes.forEach(node=>{
+      if(node.nodeType===Node.TEXT_NODE) formatVisibleThousands(node.parentElement);
+      else if(node.nodeType===Node.ELEMENT_NODE) formatVisibleThousands(node);
+    });
+    else if(record.type==='characterData') formatVisibleThousands(record.target.parentElement);
+  });
+});
+if(document.body){
+  formatVisibleThousands();
+  atlasNumberObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
+}
+
 // روابط دخول مستقلة حسب الدور: ?role=plant أو ?role=accountant أو ?role=manager
 const roleEntry = new URLSearchParams(location.search).get('role');
 const roleEntryNames = { plant:'المعمل', accountant:'المحاسب', manager:'المدير' };
