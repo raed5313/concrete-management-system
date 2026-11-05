@@ -1036,7 +1036,7 @@ ${!canPrintOnly ? `<button class="btn" onclick="editOrder('${esc(o.no)}')" ${!ca
 </tr>
 <tr><td colspan="8"><div class="loadbox">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px"><b class="goldtext">الكمية الفعلية والحمولات</b><strong style="color:#42d8e8;font-size:20px">${fmt(totalLoadQty)} m</strong></div>
-${vehicleTotals.length?`<div style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0">${vehicleTotals.map(v=>`<div style="background:#17232d;border:1px solid #b58b36;border-radius:10px;padding:10px 14px;color:#f4d27a"><b>الخلاطة: ${esc(v.vehicle)}</b><br><strong style="font-size:20px">${fmt(v.qty)} m</strong><small style="display:block;color:#cbd5e1">${v.count} حمولات</small></div>`).join('')}</div>`:'' }
+
 ${ls.length?`<table><tbody>${ls.map(l=>`
 <tr>
 <td>حمولة ${esc(l.no)}</td>
