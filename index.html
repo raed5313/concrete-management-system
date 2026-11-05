@@ -1433,19 +1433,22 @@ function renderOperationalTables(canManage){
 function operationalFormFields(type,record={}){
  return operationalConfig[type].fields.map(([name,label,kind])=>({
   name,label,type:kind==='date'?'date':kind==='number'?'number':kind==='textarea'?'textarea':'text',
-  options:Array.isArray(kind)?kind:(name==='employee'?data.employees.map(e=>e.name):undefined),
+  options:Array.isArray(kind)?kind:(name==='employee'?['',...(data.employees||[]).map(e=>e.name)]:undefined),
   required:['date','item','name','quantity','employee','status','month'].includes(name),
   value:record[name]??(name==='date'?new Date().toISOString().slice(0,10):'')
  }));
 }
 function openOperationalForm(type,id){
+ if(!operationalConfig[type]){toast('نوع السجل غير معروف');return;}
  if(!['manager','accountant'].includes(currentRole)){toast('هذا القسم غير متاح لصلاحيتك');return;}
+ if(type==='attendance' && !(data.employees||[]).length){toast('أضف الموظف أولاً من قائمة الموظفين ثم سجّل حضوره');return;}
  const old=id?(data[type]||[]).find(x=>String(x.id)===String(id)):null;
  if(id&&!old)return;
  openForm((old?'تعديل ':'')+operationalConfig[type].title,operationalFormFields(type,old||{}),async values=>{
   const payload={...values};
   ['quantity','unit_price','total','cost','base_salary','paid','remaining','amount','deducted','current','min'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
   if(type==='attendance'){
+    if(!payload.employee || !payload.date || !['حاضر','غائب'].includes(payload.status))throw new Error('يرجى اختيار الموظف والتاريخ وحالة الدوام');
     const duplicate=(data.attendance||[]).find(a=>a.employee===payload.employee&&a.date===payload.date&&(!old||String(a.id)!==String(old.id)));
     if(duplicate)throw new Error('تم تسجيل دوام هذا الموظف لهذا اليوم مسبقاً');
   }
@@ -1503,7 +1506,7 @@ $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
 ${f.options?
-`<select name="${f.name}">${f.options.map(v=>`<option>${esc(v)}</option>`).join('')}</select>`:
+`<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${i===0&&v===''?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
 `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.step?`step="${f.step}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} value="${esc(f.value??'')}">`}
