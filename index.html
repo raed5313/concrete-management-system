@@ -1621,10 +1621,10 @@ let w=window.open('','_blank','width=700,height=900');
 if(!w){toast('اسمح بالنوافذ المنبثقة');return}
 w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>
 <style>
-@page{size:A5 portrait;margin:6mm;}
+@page{size:A4 portrait;margin:8mm;}
 *{box-sizing:border-box}
-body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:12px;}
-.r{border:2px double #b28a29;padding:10mm;max-height:185mm;overflow:hidden;}
+body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;background:#fff;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.r{border:3px double #b28a29;padding:8mm;min-height:275mm;overflow:visible;break-inside:avoid;}
 .head{text-align:center;border-bottom:2px solid #b28a29;padding-bottom:6mm;margin-bottom:8px;}
 .head h2{color:#a47b20;margin:0 0 4px 0;font-size:16px;}
 .en{font-size:9px;color:#555;}
