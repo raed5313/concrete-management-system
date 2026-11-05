@@ -899,8 +899,12 @@ async function initSystem(){
       const {data: companyRow, error: companyError} = await supabaseClient
         .from('company_app_data').select('payload').eq('id', true).maybeSingle();
       if (companyError) throw companyError;
-      const operationalResult = await supabaseClient.from('company_operational_records').select('*').order('created_at');
+      const [operationalResult,auditResult] = await Promise.all([
+        supabaseClient.from('company_operational_records').select('*').order('created_at'),
+        supabaseClient.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(500)
+      ]);
       if (operationalResult.error) throw operationalResult.error;
+      if (auditResult.error) throw auditResult.error;
       ['fuel','purchases','maintenance','spare_parts','payroll','advances','inventory_items'].forEach(k => data[k] = []);
       (operationalResult.data || []).forEach(row => {
         if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
@@ -914,6 +918,16 @@ async function initSystem(){
       } else {
         throw new Error('سجل البيانات المركزية غير مهيأ في قاعدة البيانات');
       }
+      const legacyAudit = Array.isArray(data.audit) ? data.audit : [];
+      const centralAudit = (auditResult.data || []).map(row=>({
+        id:row.id,
+        timestamp:row.created_at ? new Date(row.created_at).toLocaleString('ar-IQ') : '',
+        user:row.user_name || '',
+        action:row.action || '',
+        details:row.details || ''
+      }));
+      const auditIds = new Set(centralAudit.map(row=>String(row.id)));
+      data.audit = [...centralAudit,...legacyAudit.filter(row=>!row.id || !auditIds.has(String(row.id)))].slice(0,500);
       data.inventory = [...(data.inventory||[]), ...(data.inventory_items||[])];
       render();
 
@@ -1768,8 +1782,22 @@ const {data:saved,error}=await supabaseClient.from(c[1]).insert(payload).select(
 if(error)throw error;
 v.id=saved.id;
 data[c[1]].push(v);
-logAction(currentUserName,'إضافة سجل',c[0]+': '+v.name);
-const auditSaved=await save();closeModal();toast(auditSaved?'تم الحفظ ومشاركة البيانات مع بقية الحسابات':'تم حفظ السجل، لكن تعذر حفظ سجل المتابعة');
+const auditAction='إضافة سجل';
+const auditDetails=c[0]+': '+v.name;
+logAction(currentUserName,auditAction,auditDetails);
+closeModal();
+try{
+ const {error:auditError}=await supabaseClient.from('audit_logs').insert({
+  user_name:currentUserName,
+  action:auditAction,
+  details:auditDetails
+ });
+ if(auditError) throw auditError;
+ toast('تم حفظ '+c[0]+' وتسجيل العملية في المتابعة المركزية');
+}catch(auditError){
+ console.error('Audit log insert failed:',auditError);
+ toast('تم حفظ '+c[0]+' بنجاح، لكن تعذر تسجيل العملية في المتابعة: '+(auditError.message||''));
+}
 }catch(err){console.error(err);toast('تعذر حفظ السجل في قاعدة البيانات: '+(err.message||''));}
 });
 }
