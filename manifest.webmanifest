@@ -4,7 +4,7 @@
   "description": "نظام إدارة الخرسانة الجاهزة",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./?role=manager",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
