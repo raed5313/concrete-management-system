@@ -552,6 +552,7 @@ body.plant-role .side .nav{gap:2px!important}
 <section id="fuel" class="hidden"><div class="panel"><div class="head"><h3>الوقود والگاز</h3><button class="btn primary" onclick="openOperationalForm('fuel')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المركبة / الجهة</th><th>نوع الوقود</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="fuelBody"></tbody></table></div></div></section>
 <section id="purchases" class="hidden"><div class="panel"><div class="head"><h3>المشتريات</h3><button class="btn primary" onclick="openOperationalForm('purchases')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المادة / القطعة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>المجهّز</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="purchasesBody"></tbody></table></div></div></section>
 <section id="suppliers" class="hidden"><div class="panel"><div class="head"><h3>إدارة الموردين</h3><button class="btn primary" onclick="openOperationalForm('suppliers')">＋ إضافة مورد</button></div><div class="tablewrap"><table><thead><tr><th>اسم المورد</th><th>رقم الهاتف</th><th>العنوان</th><th>الرصيد / الحساب</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="suppliersBody"></tbody></table></div></div></section>
+<section id="supplier_payments" class="hidden"><div class="panel"><div class="head"><h3>دفعات الموردين</h3><button class="btn primary" onclick="openOperationalForm('supplier_payments')">＋ تسجيل دفعة</button></div><p class="muted">تُربط كل دفعة بمورد مسجل وتظهر في كشف حسابه.</p><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المورد</th><th>المبلغ</th><th>طريقة الدفع</th><th>رقم المرجع</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="supplier_paymentsBody"></tbody></table></div></div></section>
 <section id="maintenance" class="hidden"><div class="panel"><div class="head"><h3>صيانة وإصلاح المركبات والمعمل</h3><button class="btn primary" onclick="openOperationalForm('maintenance')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الجهة / الآلية</th><th>نوع العطل</th><th>الإصلاح</th><th>القطع المستخدمة</th><th>الكلفة</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="maintenanceBody"></tbody></table></div></div></section>
 <section id="spare_parts" class="hidden"><div class="panel"><div class="head"><h3>قطع الغيار</h3><button class="btn primary" onclick="openOperationalForm('spare_parts')">＋ إضافة سجل</button></div><div class="tablewrap"><table><thead><tr><th>اسم القطعة</th><th>رقم القطعة</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>المجهّز</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="spare_partsBody"></tbody></table></div></div></section>
 
@@ -1064,7 +1065,7 @@ data.mixes = mixesResult.data || [];
       ]);
       if (operationalResult.error) throw operationalResult.error;
       if (auditResult.error) throw auditResult.error;
-      ['fuel','purchases','suppliers','maintenance','spare_parts','attendance','payroll','advances','bonuses','fines','inventory_items'].forEach(k => data[k] = []);
+      ['fuel','purchases','suppliers','supplier_payments','maintenance','spare_parts','attendance','payroll','advances','bonuses','fines','inventory_items'].forEach(k => data[k] = []);
       (operationalResult.data || []).forEach(row => {
         if (data[row.record_type]) data[row.record_type].push({id:row.id,...(row.payload||{}),created_at:row.created_at,updated_at:row.updated_at});
       });
@@ -1574,6 +1575,7 @@ const operationalConfig = {
  maintenance:{title:'تسجيل صيانة وإصلاح',fields:[['date','التاريخ','date'],['asset','المركبة / معدّة المعمل'],['fault','نوع العطل'],['repair','تفاصيل الإصلاح','textarea'],['parts','القطع المستخدمة','textarea'],['cost','الكلفة','number'],['notes','ملاحظات','textarea']]},
  spare_parts:{title:'تسجيل قطعة غيار',fields:[['date','التاريخ','date'],['vehicle','الآلية المرتبطة'],['name','اسم القطعة'],['part_no','رقم القطعة'],['unit','الوحدة'],['quantity','الكمية','number'],['unit_price','سعر الوحدة','number'],['supplier','المجهّز'],['notes','ملاحظات','textarea']]},
  suppliers:{title:'إضافة مورد جديد',fields:[['name','اسم المورد'],['phone','رقم الهاتف'],['address','العنوان'],['account','الرصيد / الحساب','number'],['notes','ملاحظات','textarea']]},
+ supplier_payments:{title:'تسجيل دفعة مورد',fields:[['supplier','اسم المورد'],['date','تاريخ الدفع','date'],['amount','المبلغ المدفوع','number'],['method','طريقة الدفع',['نقداً','تحويل مصرفي','صك']],['reference','رقم المرجع / الصك'],['notes','ملاحظات','textarea']]},
  attendance:{title:'تسجيل حضور / غياب',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['status','حالة الدوام',['حاضر','غائب']],['notes','ملاحظات','textarea']]},
  payroll:{title:'احتساب راتب الموظف',fields:[['employee','اسم الموظف'],['date','تاريخ الصرف','date'],['month','الشهر','month'],['paid','المبلغ المستلم','number'],['notes','ملاحظات','textarea']]},
  advances:{title:'تسجيل سلفة موظف',fields:[['employee','اسم الموظف'],['date','التاريخ','date'],['amount','مبلغ السلفة','number'],['deducted','المبلغ المستقطع','number'],['remaining','المتبقي','number'],['notes','ملاحظات','textarea']]},
@@ -1588,7 +1590,7 @@ function renderOperationalTables(canManage){
   body.innerHTML=tableRows(data[type]||[],r=>{
    const cells=fields.map(([key])=>'<td>'+esc(r[key]??'—')+'</td>').join('');
    const actions=canManage
-    ? '<button class="btn" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
+    ? (type==='suppliers' ? '<button class="btn gold" onclick="printSupplierStatement(\\''+esc(r.name)+'\\')">كشف حساب</button> ' : '') + '<button class="btn" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
     : '<button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>';
    return '<tr>'+cells+'<td><div class="actions">'+actions+'</div></td></tr>';
   },fields.length+1);
@@ -1622,6 +1624,12 @@ function openOperationalForm(type,id){
     payload.amount=Number(payload.amount||0); payload.deducted=Number(payload.deducted||0);
     if(payload.amount<0||payload.deducted<0||payload.deducted>payload.amount)throw new Error('قيمة الاستقطاع يجب ألا تتجاوز مبلغ السلفة');
     payload.remaining=Number((payload.amount-payload.deducted).toFixed(2));
+  }
+  if(type==='supplier_payments'){
+    const supplierName=String(payload.supplier||'').trim();
+    if(!supplierName || !(data.suppliers||[]).some(s=>String(s.name).trim()===supplierName))throw new Error('اختر مورداً مسجلاً من قائمة الموردين');
+    payload.supplier=supplierName;
+    if(!Number.isFinite(Number(payload.amount))||Number(payload.amount)<=0)throw new Error('أدخل مبلغ دفعة صحيحاً أكبر من صفر');
   }
   if(type==='attendance'){
     if(!payload.employee || !payload.date || !['حاضر','غائب'].includes(payload.status))throw new Error('يرجى اختيار الموظف والتاريخ وحالة الدوام');
