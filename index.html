@@ -2524,82 +2524,61 @@ function receiptLoad(no) {
 }
 
 function printDailyPlantReport(){
-let pDate = $('printDateFilter') ? $('printDateFilter').value : new Date().toISOString().slice(0,10);
-let dayLoads = data.loads.filter(l => l.date === pDate);
+ const pDate=$('printDateFilter')?$('printDateFilter').value:new Date().toISOString().slice(0,10);
+ const dayLoads=(data.loads||[]).filter(l=>String(l.date||'').slice(0,10)===pDate);
+ const rows=dayLoads.map(l=>{
+  const order=(data.orders||[]).find(o=>String(o.no)===String(l.orderNo))||{};
+  return '<tr><td>'+esc(l.no||'—')+'</td><td>'+esc(l.orderNo||'—')+'</td><td>'+esc(order.customer||'—')+'</td><td>'+esc(l.driver||'—')+'</td><td>'+esc(l.vehicle||'—')+'</td><td>'+fmt(l.qty)+' م³</td><td>'+esc(l.time||'—')+'</td></tr>';
+ }).join('');
+ const w=window.open('','_blank','width=900,height=900');
+ if(!w){toast('اسمح بالنوافذ المنبثقة للطباعة');return;}
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الحمولات اليومية</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:12px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #777;padding:7px;text-align:center;font-size:11px}th{background:#eee}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير الحمولات اليومية لتاريخ: '+esc(pDate)+'</h3><table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية</th><th>الوقت</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7">لا توجد حمولات مسجلة لهذا التاريخ</td></tr>')+'</tbody></table><p>إجمالي الكمية: '+fmt(dayLoads.reduce((n,l)=>n+(Number(l.qty)||0),0))+' م³</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.close();
+}
 
-let w=window.open('','_blank','width=800,height=900');
-if(!w){toast('اسمح بالنوافذ المنبثقة');return}
-w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title></title>
-<style>body{font-family:Tahoma;padding:15px;color:#111}h2,h3{text-align:center;margin:5px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #777;padding:7px;text-align:right;font-size:12px}th{background:#eee}.atlas-doc-brand{max-width:760px;margin:0 auto 16px;text-align:center;padding:0;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}.atlas-doc-brand svg{display:block;width:100%;max-height:150px;margin:auto;filter:drop-shadow(0 2px 2px #0008)}.atlas-doc-tagline{color:#f0d17a;font-size:11px;font-weight:900;letter-spacing:1px} .atlas-signatures{display:flex;align-items:flex-start;justify-content:space-between;gap:18mm;width:100%;margin-top:22mm!important;padding-top:3mm;border-top:0!important;font-size:10px;font-weight:800;break-inside:avoid;flex-shrink:0}.atlas-signature{display:flex;flex-direction:column;align-items:center;gap:8mm;min-width:48mm;text-align:center}.atlas-signature span{display:inline-block;min-width:48mm;text-align:center;color:#333;letter-spacing:1px}</style></head><body>
-${atlasDocumentBrand()}
-<h3>تقرير الحمولات اليومية لتاريخ: ${esc(pDate)}</h3>
-<table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية م³</th><th>الوقت</th></tr></thead>
-<tbody>
-${dayLoads.length ? dayLoads.map(l=>{
-let o = data.orders.find(ord=>String(ord.no)===String(l.orderNo))||{};
-return `<tr><td>${esc(l.no)}</td><td>${esc(l.orderNo)}</td><td>${esc(o.customer||'—')}</td><td>${esc(l.driver||'—')}</td><td>${esc(l.vehicle||'—')}</td><td>${esc(l.qty)}</td><td>${esc(l.time||'—')}</td></tr>`;
-}).join('') : '<tr><td colspan="7" style="text-align:center">لا توجد حمولات مسجلة لهذا التاريfunction printSupplierStatement(supplierName){
- const supplier=(data.suppliers||[]).find(s=>String(s.name).trim()===String(supplierName).trim());
+function printSupplierStatement(supplierName){
+ const supplier=(data.suppliers||[]).find(s=>String(s.name||'').trim()===String(supplierName||'').trim());
  if(!supplier){toast('لم يتم العثور على المورد');return;}
  const purchases=(data.purchases||[]).filter(x=>String(x.supplier||'').trim()===String(supplierName).trim());
  const parts=(data.spare_parts||[]).filter(x=>String(x.supplier||'').trim()===String(supplierName).trim());
  const payments=(data.supplier_payments||[]).filter(x=>String(x.supplier||'').trim()===String(supplierName).trim());
- const purchaseRows=[...purchases.map(x=>({date:x.date,type:'مشتريات',detail:x.item||'—',qty:x.quantity||0,total:Number(x.total)||Number(x.quantity||0)*Number(x.unit_price||0)})),...parts.map(x=>({date:x.date,type:'قطع غيار',detail:x.name||'—',qty:x.quantity||0,total:Number(x.quantity||0)*Number(x.unit_price||0)}))].sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
- const purchasesTotal=purchaseRows.reduce((n,x)=>n+x.total,0);
- const paymentsTotal=payments.reduce((n,x)=>n+Number(x.amount||0),0);
- const balance=purchasesTotal-paymentsTotal;
- const purchaseHtml=purchaseRows.map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.detail)+'</td><td>'+fmt(x.qty)+'</td><td>'+fmt(x.total)+'</td></tr>').join('');
- const paymentHtml=payments.map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+fmt(x.amount)+'</td><td>'+esc(x.method||'—')+'</td><td>'+esc(x.reference||'—')+'</td><td>'+esc(x.notes||'—')+'</td></tr>').join('');
- const w=window.open('','_blank','width=1000,height=900');
+ const rows=[...purchases.map(x=>({date:x.date,type:'مشتريات',detail:x.item||'—',qty:x.quantity||0,total:Number(x.total)||Number(x.quantity||0)*Number(x.unit_price||0)})),...parts.map(x=>({date:x.date,type:'قطع غيار',detail:x.name||'—',qty:x.quantity||0,total:Number(x.quantity||0)*Number(x.unit_price||0)}))].sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+ const purchaseTotal=rows.reduce((n,x)=>n+x.total,0);
+ const paymentTotal=payments.reduce((n,x)=>n+Number(x.amount||0),0);
+ const balance=purchaseTotal-paymentTotal;
+ const purchaseRows=rows.map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.detail)+'</td><td>'+fmt(x.qty)+'</td><td>'+fmt(x.total)+'</td></tr>').join('');
+ const paymentRows=payments.map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+fmt(x.amount)+'</td><td>'+esc(x.method||'—')+'</td><td>'+esc(x.reference||'—')+'</td><td>'+esc(x.notes||'—')+'</td></tr>').join('');
+ const w=window.open('','_blank','width=900,height=900');
  if(!w){toast('اسمح بالنوافذ المنبثقة لطباعة كشف المورد');return;}
- w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب المورد</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}</style></head><body>${atlasDocumentBrand()}<h3>كشف حساب المورد: ${esc(supplier.name)}</h3><p>الهاتف: ${esc(supplier.phone||'—')} — العنوان: ${esc(supplier.address||'—')}</p><div class="summary"><div>إجمالي المشتريات والقطع<br>${fmt(purchasesTotal)} د.ع</div><div>إجمالي الدفعات<br>${fmt(paymentsTotal)} د.ع</div><div>الرصيد الحسابي<br>${fmt(balance)} د.ع</div></div><h4>المشتريات وقطع الغيار</h4><table><thead><tr><th>التاريخ</th><th>النوع</th><th>التفاصيل</th><th>الكمية</th><th>القيمة</th></tr></thead><tbody>${purchaseHtml||'<tr><td colspan="5">لا توجد مشتريات مسجلة</td></tr>'}</tbody></table><h4>الدفعات للمورد</h4><table><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الطريقة</th><th>المرجع</th><th>ملاحظات</th></tr></thead><tbody>${paymentHtml||'<tr><td colspan="5">لا توجد دفعات مسجلة</td></tr>'}</tbody></table><p style="font-size:10px;text-align:center">كشف حسب السجلات المتاحة في النظام — ${new Date().toLocaleDateString('ar-IQ')} — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>`);
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب المورد</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}</style></head><body>'+atlasDocumentBrand()+'<h3>كشف حساب المورد: '+esc(supplier.name)+'</h3><p>الهاتف: '+esc(supplier.phone||'—')+' — العنوان: '+esc(supplier.address||'—')+'</p><div class="summary"><div>إجمالي المشتريات وقطع الغيار<br>'+fmt(purchaseTotal)+' د.ع</div><div>إجمالي الدفعات<br>'+fmt(paymentTotal)+' د.ع</div><div>الرصيد الحسابي<br>'+fmt(balance)+' د.ع</div></div><h4>المشتريات وقطع الغيار</h4><table><thead><tr><th>التاريخ</th><th>النوع</th><th>التفاصيل</th><th>الكمية</th><th>القيمة</th></tr></thead><tbody>'+(purchaseRows||'<tr><td colspan="5">لا توجد مشتريات مسجلة</td></tr>')+'</tbody></table><h4>الدفعات للمورد</h4><table><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الطريقة</th><th>المرجع</th><th>ملاحظات</th></tr></thead><tbody>'+(paymentRows||'<tr><td colspan="5">لا توجد دفعات مسجلة</td></tr>')+'</tbody></table><p style="font-size:10px;text-align:center">الرصيد محسوب من المشتريات والدفعات المسجلة فقط — '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
  w.document.close();
 }
 
 function printCustomerStatement(custName){
- const orders=data.orders.filter(o=>o.customer===custName);
- const receipts=data.receipts.filter(r=>r.customer===custName);
+ const orders=(data.orders||[]).filter(o=>o.customer===custName);
+ const receipts=(data.receipts||[]).filter(r=>r.customer===custName);
  const rows=orders.map(o=>{
-  const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
-  const delivered=o.status==='مكتمل ومجهز' && Number.isFinite(Number(o.actualQty)) ? Number(o.actualQty) : loads.reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+  const loads=(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no));
+  const delivered=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((n,l)=>n+(Number(l.qty)||0),0);
   const total=delivered*(Number(o.price)||0);
-  const paid=receipts.filter(r=>String(r.orderNo)===String(o.no)).reduce((sum,r)=>sum+(Number(r.amount)||0),0);
-  const balance=total-paid;
-  return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.site||'—')+'</td><td>'+fmt(delivered)+' م³</td><td>'+fmt(o.price||0)+'</td><td>'+fmt(total)+'</td><td>'+fmt(paid)+'</td><td>'+fmt(balance)+'</td></tr>';
+  const paid=receipts.filter(r=>String(r.orderNo)===String(o.no)).reduce((n,r)=>n+(Number(r.amount)||0),0);
+  return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.site||'—')+'</td><td>'+fmt(delivered)+' م³</td><td>'+fmt(o.price||0)+'</td><td>'+fmt(total)+'</td><td>'+fmt(paid)+'</td><td>'+fmt(total-paid)+'</td></tr>';
  }).join('');
- const totalDelivered=orders.reduce((sum,o)=>{
-  const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
-  return sum+(o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((q,l)=>q+(Number(l.qty)||0),0));
+ const deliveredTotal=orders.reduce((n,o)=>{
+  const loads=(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no));
+  return n+(o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((q,l)=>q+(Number(l.qty)||0),0));
  },0);
- const totalValue=orders.reduce((sum,o)=>{
-  const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
-  const delivered=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((q,l)=>q+(Number(l.qty)||0),0);
-  return sum+delivered*(Number(o.price)||0);
+ const valueTotal=orders.reduce((n,o)=>{
+  const loads=(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no));
+  const qty=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((q,l)=>q+(Number(l.qty)||0),0);
+  return n+qty*(Number(o.price)||0);
  },0);
- const totalPaid=receipts.reduce((sum,r)=>sum+(Number(r.amount)||0),0);
- const balance=totalValue-totalPaid;
+ const paidTotal=receipts.reduce((n,r)=>n+Number(r.amount||0),0);
  const receiptRows=receipts.map(r=>'<tr><td>'+esc(r.no)+'</td><td>'+esc(r.date||'—')+'</td><td>'+esc(r.orderNo||'—')+'</td><td>'+fmt(r.amount)+'</td><td>'+esc(r.method||'—')+'</td></tr>').join('');
- const w=window.open('','_blank','width=1000,height=900');
+ const w=window.open('','_blank','width=900,height=900');
  if(!w){toast('اسمح بالنوافذ المنبثقة لطباعة كشف الحساب');return;}
- w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب العميل</title>
- <style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}.negative{color:#b42318;font-weight:bold}.positive{color:#087443;font-weight:bold}</style></head><body>
- ${atlasDocumentBrand()}
- <h3>كشف حساب العميل: ${esc(custName)}</h3>
- <div class="summary"><div>قيمة المجهز فعلياً<br>${fmt(totalValue)} د.ع</div><div>إجمالي المقبوض<br>${fmt(totalPaid)} د.ع</div><div>الرصيد<br><span class="${balance<0?'positive':'negative'}">${fmt(balance)} د.ع</span></div></div>
- <h4>أوامر التجهيز — الحساب على الكمية المجهزة فعلياً</h4>
- <table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الموقع</th><th>المجهز</th><th>سعر المتر</th><th>قيمة المجهز</th><th>المقبوض للأمر</th><th>الرصيد</th></tr></thead><tbody>${rows||'<tr><td colspan="8">لا توجد أوامر لهذا العميل</td></tr>'}</tbody></table>
- <h4>سندات القبض</h4>
- <table><thead><tr><th>رقم السند</th><th>التاريخ</th><th>رقم الأمر</th><th>المبلغ</th><th>طريقة الدفع</th></tr></thead><tbody>${receiptRows||'<tr><td colspan="5">لا توجد سندات قبض</td></tr>'}</tbody></table>
- <p><b>إجمالي الكمية المجهزة:</b> ${fmt(totalDelivered)} م³</p>
- <p><b>عدد أوامر التجهيز:</b> ${orders.length}</p>
- <p style="font-size:10px;text-align:center">تاريخ إصدار الكشف: ${new Date().toLocaleDateString('ar-IQ')} — أطلس للكونكريت ATLAS</p>
- <script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>`);
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب العميل</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}</style></head><body>'+atlasDocumentBrand()+'<h3>كشف حساب العميل: '+esc(custName)+'</h3><div class="summary"><div>قيمة المجهز فعلياً<br>'+fmt(valueTotal)+' د.ع</div><div>إجمالي المقبوض<br>'+fmt(paidTotal)+' د.ع</div><div>الرصيد<br>'+fmt(valueTotal-paidTotal)+' د.ع</div></div><h4>أوامر التجهيز — الحساب على الكمية المجهزة فعلياً</h4><table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الموقع</th><th>المجهز</th><th>سعر المتر</th><th>قيمة المجهز</th><th>المقبوض للأمر</th><th>الرصيد</th></tr></thead><tbody>'+(rows||'<tr><td colspan="8">لا توجد أوامر لهذا العميل</td></tr>')+'</tbody></table><h4>سندات القبض</h4><table><thead><tr><th>رقم السند</th><th>التاريخ</th><th>رقم الأمر</th><th>المبلغ</th><th>طريقة الدفع</th></tr></thead><tbody>'+(receiptRows||'<tr><td colspan="5">لا توجد سندات قبض</td></tr>')+'</tbody></table><p><b>إجمالي الكمية المجهزة:</b> '+fmt(deliveredTotal)+' م³</p><p><b>عدد أوامر التجهيز:</b> '+orders.length+'</p><p style="font-size:10px;text-align:center">تاريخ إصدار الكشف: '+new Date().toLocaleDateString('ar-IQ')+' — أطلس للكونكريت ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
  w.document.close();
-}tr>`).join('')}</tbody></table>
-${atlasManagerSignature()}
-<script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);};<\/script>
-</body></html>`);
-w.document.close();
 }
 
 function printInvoice(no){
