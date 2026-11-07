@@ -2645,18 +2645,58 @@ function printFilteredOrdersReport(){
 }
 
 function printReportGeneral(){
-printDocA4('التقرير العام للنظام',`
-<div class="r">
-<div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">GENERAL SYSTEM REPORT</div></div>
-<div class="title">التقرير العام للعمليات</div>
-<table class="data">
-<tr><td>إجمالي أوامر التجهيز</td><td>${data.orders.length}</td></tr>
-<tr><td>إجمالي الحمولات</td><td>${data.loads.length}</td></tr>
-<tr><td>إجمالي الكميات المجهزة</td><td>${fmt(data.loads.reduce((s,x)=>s+(+x.qty||0),0))} م³</td></tr>
-<tr><td>عدد العملاء المسجلين</td><td>${data.customers.length}</td></tr>
-</table>
-<div class="foot">تقرير صادر عن نظام أطلس للكونكريت بتاريخ ${new Date().toLocaleDateString('ar-IQ')}</div>
-</div>`);
+ const deliveredByOrder=new Map();
+ (data.loads||[]).forEach(load=>{
+  const key=String(load.orderNo??'');
+  deliveredByOrder.set(key,(deliveredByOrder.get(key)||0)+(Number(load.qty)||0));
+ });
+ const deliveredQty=(data.loads||[]).reduce((sum,load)=>sum+(Number(load.qty)||0),0);
+ const deliveredSales=(data.orders||[]).reduce((sum,order)=>{
+  const qty=deliveredByOrder.get(String(order.no??''))||0;
+  return sum+qty*(Number(order.price)||0);
+ },0);
+ const receipts=(data.receipts||[]).reduce((sum,item)=>sum+(Number(item.amount)||0),0);
+ const expenses=(data.expenses||[]).reduce((sum,item)=>sum+(Number(item.amount)||0),0);
+ const operationalCost=type=>(data[type]||[]).reduce((sum,item)=>{
+  if(type==='fuel'||type==='purchases')return sum+(Number(item.total)||Number(item.quantity||0)*Number(item.unit_price||0));
+  if(type==='spare_parts')return sum+Number(item.quantity||0)*Number(item.unit_price||0);
+  return sum+Number(item.cost||0);
+ },0);
+ const fuelCost=operationalCost('fuel');
+ const maintenanceCost=operationalCost('maintenance');
+ const purchaseCost=operationalCost('purchases');
+ const sparePartsCost=operationalCost('spare_parts');
+ const fleetCost=fuelCost+maintenanceCost+purchaseCost+sparePartsCost;
+ const difference=deliveredSales-receipts;
+ const money=value=>fmt(Number(value||0).toFixed(2))+' د.ع';
+ printDocA4('التقرير المالي والتشغيلي العام',`
+ <div class="r">
+ <div class="head"><h2>أطلس للكونكريت</h2><div class="en">ATLAS CONCRETE</div></div>
+ <div class="title">التقرير المالي والتشغيلي العام</div>
+ <h3>أولاً: الإنتاج والتجهيز</h3>
+ <table class="data">
+ <tr><td>عدد أوامر التجهيز</td><td>${(data.orders||[]).length}</td></tr>
+ <tr><td>عدد الحمولات المسجلة</td><td>${(data.loads||[]).length}</td></tr>
+ <tr><td>إجمالي الكمية المجهزة فعلياً</td><td><strong>${fmt(deliveredQty)} م³</strong></td></tr>
+ <tr><td>عدد العملاء المسجلين</td><td>${(data.customers||[]).length}</td></tr>
+ </table>
+ <h3>ثانياً: ملخص الإيرادات والمقبوضات</h3>
+ <table class="data">
+ <tr><td>قيمة الخرسانة المجهزة فعلياً حسب سعر كل أمر</td><td><strong>${money(deliveredSales)}</strong></td></tr>
+ <tr><td>إجمالي سندات القبض المسجلة</td><td>${money(receipts)}</td></tr>
+ <tr><td>الفرق بين قيمة المجهز والمقبوض (مؤشر متابعة)</td><td><strong>${money(difference)}</strong></td></tr>
+ </table>
+ <h3>ثالثاً: المصروفات</h3>
+ <table class="data">
+ <tr><td>المصروفات العامة المسجلة</td><td>${money(expenses)}</td></tr>
+ <tr><td>وقود / گاز الآليات</td><td>${money(fuelCost)}</td></tr>
+ <tr><td>الصيانة والإصلاح</td><td>${money(maintenanceCost)}</td></tr>
+ <tr><td>مشتريات الورشة والآليات</td><td>${money(purchaseCost)}</td></tr>
+ <tr><td>قطع الغيار</td><td>${money(sparePartsCost)}</td></tr>
+ <tr><td><strong>إجمالي سجلات الورشة</strong></td><td><strong>${money(fleetCost)}</strong></td></tr>
+ </table>
+ <div class="foot">تقرير إجمالي للفترة المتاحة في النظام — تاريخ الإصدار: ${new Date().toLocaleDateString('ar-IQ')}<br>الفرق بين قيمة المجهز والمقبوض مؤشر حسابي إجمالي وليس كشف ذمم تفصيلياً للعملاء.</div>
+ </div>`);
 }
 
 function clearData(){
