@@ -1751,7 +1751,7 @@ $('form').innerHTML=fields.map(f=>`
 <label>${f.label}</label>
 ${f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
-f.datalist?`<input name="${f.name}" type="text" list="${esc(f.name)}List" ${f.required?'required':''} value="${esc(f.value??'')}" autocomplete="off"><datalist id="${esc(f.name)}List">${f.datalist.map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:
+f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.map(v=>`<option value="${esc(v)}">${v==='__custom__'?'كتابة اسم سائق آخر':v===''?'— اختر السائق —':esc(v)}</option>`).join('')}</select><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق غير المسجل" style="display:none;margin-top:8px" autocomplete="off">`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
 `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.step?`step="${f.step}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} value="${esc(f.value??'')}">`}
@@ -1765,6 +1765,8 @@ try{
  if(result&&typeof result.then==='function')result.catch(err=>{console.error(err);toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'))});
 }catch(err){console.error(err);toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'))}
 };
+const driverChoice=$('driverChoice'),customDriverName=$('customDriverName');
+if(driverChoice&&customDriverName){driverChoice.addEventListener('change',()=>{const custom=driverChoice.value==='__custom__';customDriverName.style.display=custom?'block':'none';customDriverName.required=custom;if(!custom)customDriverName.value='';});}
 $('modal').classList.remove('hidden');
 }
 
@@ -1921,10 +1923,12 @@ async function openLoad(no) {
     }
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
-        {name:'driver', label:'اسم السائق (اختر من القائمة أو اكتب اسماً جديداً)', required:false, type:'text', datalist:(data.drivers||[]).map(x=>x.name)},
+        {name:'driver', label:'اختيار السائق من القائمة', required:false, type:'driverCombo', options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true}
     ], v => {
+        if (v.driver === '__custom__') v.driver = (v.custom_driver || '').trim();
+        if (!v.driver) v.driver = '';
         if (o.status === 'مكتمل ومجهز') {
             toast('هذا الأمر مقفول ولا يمكن إضافة حمولات جديدة');
             return;
