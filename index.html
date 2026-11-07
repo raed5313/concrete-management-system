@@ -306,6 +306,65 @@ body.plant-role .side .nav{gap:2px!important}
  .sada-alert-actions button{width:auto!important;min-width:0!important;flex:1!important;font-size:12px!important;padding:8px 5px!important}
 }
 
+
+/* ATLAS visual refinement: restrained depth, mobile-first surfaces */
+#loginScreen{
+  background:
+    radial-gradient(ellipse at 50% 12%,rgba(228,184,79,.14),transparent 38%),
+    radial-gradient(ellipse at 85% 90%,rgba(66,216,232,.09),transparent 34%),
+    #070b10;
+  overflow:auto;
+}
+.login-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(150deg,rgba(25,35,44,.98),rgba(10,16,22,.99) 68%);
+  border:1px solid rgba(228,184,79,.48);
+  border-radius:22px;padding:clamp(22px,5vw,34px);
+  box-shadow:0 28px 70px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.07),0 0 0 1px rgba(228,184,79,.08);
+  transform:perspective(900px) rotateX(1deg);
+}
+.login-card:before{
+  content:"";position:absolute;z-index:-1;inset:-1px;
+  background:linear-gradient(125deg,rgba(228,184,79,.16),transparent 35%,rgba(66,216,232,.08) 75%,transparent);
+  pointer-events:none;
+}
+.login-card h2{letter-spacing:.2px;text-shadow:0 2px 18px rgba(228,184,79,.2)}
+.login-card input{
+  min-height:48px;border-radius:11px;
+  background:rgba(3,8,13,.78);
+  transition:border-color .2s,box-shadow .2s,transform .2s;
+}
+.login-card input:focus{
+  outline:none;border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(228,184,79,.13),0 8px 22px rgba(0,0,0,.2);
+}
+.login-card button{
+  min-height:48px;border-radius:11px;
+  background:linear-gradient(135deg,#b78b2e,#e4b84f 55%,#9e7423);
+  color:#17130a;border:1px solid rgba(255,231,164,.5);
+  box-shadow:0 8px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s,filter .18s,box-shadow .18s;
+}
+.login-card button:active{transform:translateY(1px) scale(.99);filter:brightness(.96)}
+.brand,.panel,.stat{
+  box-shadow:0 8px 24px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.035);
+}
+.brand{border-color:rgba(228,184,79,.28);background:linear-gradient(145deg,#17212a,#0d151c)}
+.nav button,.btn{transition:transform .16s,filter .16s,box-shadow .16s}
+.nav button:active,.btn:active{transform:translateY(1px)}
+.nav button.active{box-shadow:inset -3px 0 0 var(--gold),0 5px 14px rgba(0,0,0,.18)}
+@media(max-width:800px){
+  .login-card{width:min(430px,100%);transform:none}
+  .side{padding:8px 8px 5px}
+  .brand{border-radius:12px}
+  .brand img{width:54px;height:54px}
+  .nav{gap:6px;padding-bottom:5px}
+  .nav button{padding:10px 12px;border-radius:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
 </style>
 </head>
 <body>
