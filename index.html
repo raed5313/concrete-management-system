@@ -1749,7 +1749,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
-${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.map(v=>`<option value="${esc(v)}">${v==='__custom__'?'كتابة اسم سائق آخر':v===''?'— اختر السائق —':esc(v)}</option>`).join('')}</select><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق غير المسجل" style="display:none;margin-top:8px" autocomplete="off">`:${f.options?
+${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.map(v=>`<option value="${esc(v)}">${v==='__custom__'?'كتابة اسم سائق آخر':v===''?'— اختر السائق —':esc(v)}</option>`).join('')}</select><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق غير المسجل" style="display:none;margin-top:8px" autocomplete="off">`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
