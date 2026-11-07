@@ -1085,7 +1085,10 @@ data.mixes = mixesResult.data || [];
       }));
       const auditIds = new Set(centralAudit.map(row=>String(row.id)));
       data.audit = [...centralAudit,...legacyAudit.filter(row=>!row.id || !auditIds.has(String(row.id)))].slice(0,500);
-      data.inventory = [...(data.inventory||[]), ...(data.inventory_items||[])];
+      // ادمج مواد المخزون التشغيلية دون تكرار السجلات عند كل دورة مزامنة.
+      const operationalInventoryIds = new Set((data.inventory_items||[]).map(x=>String(x.id)));
+      const legacyInventory = (data.inventory||[]).filter(x=>!x.id || !operationalInventoryIds.has(String(x.id)));
+      data.inventory = [...legacyInventory, ...(data.inventory_items||[])];
       render();
 
     } catch(err) {
@@ -1617,8 +1620,16 @@ function openOperationalForm(type,id){
   }
   if(type==='attendance'){
     if(!payload.employee || !payload.date || !['حاضر','غائب'].includes(payload.status))throw new Error('يرجى اختيار الموظف والتاريخ وحالة الدوام');
+    if(!(data.employees||[]).some(e=>String(e.name)===String(payload.employee)))throw new Error('اختر موظفاً مسجلاً من قائمة الموظفين');
     const duplicate=(data.attendance||[]).find(a=>a.employee===payload.employee&&a.date===payload.date&&(!old||String(a.id)!==String(old.id)));
     if(duplicate)throw new Error('تم تسجيل دوام هذا الموظف لهذا اليوم مسبقاً');
+  }
+  if(['bonuses','fines','advances','payroll'].includes(type)){
+    if(!payload.employee || !(data.employees||[]).some(e=>String(e.name)===String(payload.employee)))throw new Error('اختر موظفاً مسجلاً من قائمة الموظفين');
+  }
+  if(['fuel','maintenance','purchases','spare_parts'].includes(type)){
+    const vehicleName=String(payload.vehicle||payload.asset||'').trim();
+    if(!vehicleName)throw new Error('اختر الآلية المرتبطة بالسجل');
   }
   if(type==='payroll'){
     const emp=data.employees.find(e=>String(e.name)===String(payload.employee));
@@ -1642,6 +1653,8 @@ function openOperationalForm(type,id){
     payload.bonuses_total=monthBonuses; payload.fines_total=monthFines; payload.advances_deducted=monthAdvances;
     payload.net_due=Number((payload.base_salary+monthBonuses-monthFines-monthAdvances).toFixed(2));
     payload.paid=Number(payload.paid||0);
+    if(!Number.isFinite(payload.paid)||payload.paid<0)throw new Error('أدخل مبلغاً مستلماً صحيحاً');
+    if(payload.paid>payload.net_due)throw new Error('المبلغ المستلم لا يمكن أن يتجاوز صافي الراتب المستحق');
     payload.remaining=Number((payload.net_due-payload.paid).toFixed(2));
   }
   if(['fuel','maintenance','purchases','spare_parts'].includes(type)){
