@@ -1749,7 +1749,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
-${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.map(v=>`<option value="${esc(v)}">${v==='__custom__'?'كتابة اسم سائق آخر':v===''?'— اختر السائق —':esc(v)}</option>`).join('')}</select><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق غير المسجل" style="display:none;margin-top:8px" autocomplete="off">`:f.options?
+${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.filter(v=>v!=='__custom__').map(v=>`<option value="${esc(v)}">${v===''?'— اختر السائق المسجل —':esc(v)}</option>`).join('')}</select><label for="customDriverName" style="display:block;margin-top:10px">أو تسجيل اسم سائق غير مسجل</label><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق خارج النظام" style="display:block;margin-top:6px" autocomplete="off">`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
@@ -1926,8 +1926,8 @@ async function openLoad(no) {
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true}
     ], v => {
-        if (v.driver === '__custom__') v.driver = (v.custom_driver || '').trim();
-        if (!v.driver) v.driver = '';
+        // إذا كُتب اسم خارجي نعتمده، وإلا نعتمد الاسم المختار من القائمة.
+        v.driver = (v.custom_driver || '').trim() || (v.driver === '__custom__' ? '' : (v.driver || '').trim());
         if (o.status === 'مكتمل ومجهز') {
             toast('هذا الأمر مقفول ولا يمكن إضافة حمولات جديدة');
             return;
