@@ -1894,7 +1894,6 @@ async function openLoad(no) {
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
         {name:'driver', label:'اسم السائق من قائمة السائقين (اختياري)', required:false,options:['',...(data.drivers||[]).map(x=>x.name)]},
-        {name:'driverNew', label:'أو اكتب اسم سائق آخر (اختياري)', type:'text'},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true}
     ], v => {
@@ -1913,12 +1912,15 @@ async function openLoad(no) {
                 const {data: orderRow, error: orderError} =
                     await supabaseClient
                     .from('concrete_orders')
-                    .select('id,order_no')
+                    .select('id,order_no,status')
                     .eq('order_no', String(o.no))
                     .single();
 
                 if (orderError || !orderRow) {
                     throw orderError || new Error('أمر التجهيز غير موجود');
+                }
+                if (orderRow.status === 'مكتمل ومجهز') {
+                    throw new Error('هذا الأمر مقفول في قاعدة البيانات ولا يمكن إضافة حمولة جديدة');
                 }
 
                 // جلب حمولات هذا الأمر فقط
@@ -1946,7 +1948,7 @@ async function openLoad(no) {
                         load_no: loadNo,
                         orderId: orderRow.id,
                         orderNo: String(o.no),
-                        driver: (v.driverNew || '').trim() || v.driver || null,
+                        driver: v.driver || null,
                         vehicle: v.vehicle || null,
                         qty: Number(v.qty),
                         pump: o.pump || null,
@@ -1959,8 +1961,7 @@ async function openLoad(no) {
 
                 if (saveError) throw saveError;
 
-                v.driver = (v.driverNew || '').trim() || v.driver || '';
-                delete v.driverNew;
+                v.driver = v.driver || '';
                 v.orderNo = o.no;
                 v.no = loadNo;
                 v.date = new Date().toISOString().slice(0, 10);
