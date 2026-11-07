@@ -1590,7 +1590,7 @@ function renderOperationalTables(canManage){
   body.innerHTML=tableRows(data[type]||[],r=>{
    const cells=fields.map(([key])=>'<td>'+esc(r[key]??'—')+'</td>').join('');
    const actions=canManage
-    ? (type==='suppliers' ? '<button class="btn gold" onclick="printSupplierStatement(\\''+esc(r.name)+'\\')">كشف حساب</button> ' : '') + '<button class="btn" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
+    ? (type==='suppliers' ? '<button class="btn gold" onclick="printSupplierStatement(\''+esc(r.name)+'\')">كشف حساب</button> ' : '') + '<button class="btn" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
     : '<button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>';
    return '<tr>'+cells+'<td><div class="actions">'+actions+'</div></td></tr>';
   },fields.length+1);
