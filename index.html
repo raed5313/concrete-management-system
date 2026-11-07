@@ -666,6 +666,7 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
 <button class="btn primary" onclick="printReportGeneral()">طباعة تقرير عام</button>
+<button class="btn gold" onclick="printProfitLossReport()">تقرير الأرباح والخسائر للفترة</button>
 </div>
 </div>
 </div>
@@ -2662,6 +2663,50 @@ function printFilteredOrdersReport(){
     return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' م³</td><td>'+fmt(total)+' م³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' م³</td></tr>').join('');
   }).join('');
   printDocA4('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
+}
+
+function printProfitLossReport(){
+ const from=$('reportFrom')?.value||'';
+ const to=$('reportTo')?.value||'';
+ if(from&&to&&from>to){toast('تاريخ البداية يجب أن يسبق تاريخ النهاية');return;}
+ const inPeriod=value=>{
+  const date=String(value||'').slice(0,10);
+  return (!from||date>=from)&&(!to||date<=to);
+ };
+ const amount=(value)=>Number.isFinite(Number(value))?Number(value):0;
+ const loadRows=(data.loads||[]).filter(l=>inPeriod(l.date));
+ const sales=loadRows.reduce((sum,l)=>{
+  const order=(data.orders||[]).find(o=>String(o.no)===String(l.orderNo));
+  return sum+(Number(l.qty)||0)*(Number(order?.price)||0);
+ },0);
+ const totalQty=loadRows.reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+ const expenseRows=(data.expenses||[]).filter(x=>inPeriod(x.date));
+ const generalExpenses=expenseRows.reduce((sum,x)=>sum+amount(x.amount),0);
+ const fuelRows=(data.fuel||[]).filter(x=>inPeriod(x.date));
+ const fuel=fuelRows.reduce((sum,x)=>sum+(amount(x.total)||amount(x.quantity)*amount(x.unit_price)),0);
+ const maintenanceRows=(data.maintenance||[]).filter(x=>inPeriod(x.date));
+ const maintenance=maintenanceRows.reduce((sum,x)=>sum+amount(x.cost),0);
+ const purchaseRows=(data.purchases||[]).filter(x=>inPeriod(x.date));
+ const purchases=purchaseRows.reduce((sum,x)=>sum+(amount(x.total)||amount(x.quantity)*amount(x.unit_price)),0);
+ const partsRows=(data.spare_parts||[]).filter(x=>inPeriod(x.date));
+ const spareParts=partsRows.reduce((sum,x)=>sum+amount(x.quantity)*amount(x.unit_price),0);
+ const payrollRows=(data.payroll||[]).filter(x=>{
+  const key=String(x.month||x.date||'').slice(0,7);
+  return (!from||key>=from.slice(0,7))&&(!to||key<=to.slice(0,7));
+ });
+ const payroll=payrollRows.reduce((sum,x)=>sum+amount(x.net_due),0);
+ const bonuses=(data.bonuses||[]).filter(x=>inPeriod(x.date)).reduce((sum,x)=>sum+amount(x.amount),0);
+ const fines=(data.fines||[]).filter(x=>inPeriod(x.date)).reduce((sum,x)=>sum+amount(x.amount),0);
+ const costs={generalExpenses,fuel,maintenance,purchases,spareParts,payroll};
+ const totalCosts=Object.values(costs).reduce((sum,value)=>sum+value,0);
+ const profit=sales-totalCosts;
+ const receipts=(data.receipts||[]).filter(x=>inPeriod(x.date)).reduce((sum,x)=>sum+amount(x.amount),0);
+ const money=value=>fmt(value.toFixed(2))+' د.ع';
+ const period=(from||'بداية السجلات')+' إلى '+(to||'آخر السجلات');
+ const w=window.open('','_blank','width=950,height=900');
+ if(!w){toast('اسمح بالنوافذ المنبثقة لطباعة التقرير');return;}
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الأرباح والخسائر</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{border:1px solid #777;padding:9px;font-size:11px;text-align:right}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #999;padding:12px;text-align:center;font-weight:bold}.profit{font-size:18px;font-weight:bold}.note{font-size:10px;line-height:1.8;color:#444}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير الأرباح والخسائر — ATLAS</h3><p style="text-align:center">الفترة: '+esc(period)+'</p><div class="summary"><div>قيمة الخرسانة المجهزة<br>'+money(sales)+'</div><div>إجمالي التكاليف والمصروفات<br>'+money(totalCosts)+'</div><div>النتيجة التقديرية<br><span class="profit">'+money(profit)+'</span></div></div><h4>الإيرادات والإنتاج</h4><table><tr><th>البيان</th><th>القيمة</th></tr><tr><td>عدد الحمولات ضمن الفترة</td><td>'+fmt(loadRows.length)+'</td></tr><tr><td>الكمية المجهزة فعلياً</td><td>'+fmt(totalQty)+' م³</td></tr><tr><td>قيمة التجهيز حسب أسعار أوامر العملاء</td><td>'+money(sales)+'</td></tr><tr><td>المقبوضات المسجلة خلال الفترة (للمتابعة النقدية)</td><td>'+money(receipts)+'</td></tr></table><h4>تفصيل التكاليف والمصروفات</h4><table><tr><th>نوع التكلفة</th><th>المبلغ</th></tr><tr><td>المصروفات العامة</td><td>'+money(generalExpenses)+'</td></tr><tr><td>الوقود والگاز</td><td>'+money(fuel)+'</td></tr><tr><td>الصيانة والإصلاح</td><td>'+money(maintenance)+'</td></tr><tr><td>المشتريات</td><td>'+money(purchases)+'</td></tr><tr><td>قطع الغيار</td><td>'+money(spareParts)+'</td></tr><tr><td>صافي الرواتب المحتسبة</td><td>'+money(payroll)+'</td></tr><tr><th>إجمالي التكاليف</th><th>'+money(totalCosts)+'</th></tr></table><p class="note">ملاحظة محاسبية: هذا تقرير إداري تقديري مبني على السجلات المتاحة وتواريخها، وليس قائمة مالية مدققة. لا تُضاف دفعات الموردين مرة أخرى إلى المصروفات لتجنب ازدواج احتساب المشتريات. المكافآت والغرامات مدرجة ضمن صافي الراتب إذا كانت محتسبة في سجل الرواتب؛ لذلك لا تضاف منفصلة إلى إجمالي التكاليف. تُعرض المقبوضات كمؤشر نقدي ولا تُطرح من الإيرادات لحساب الربح.</p><p style="text-align:center;font-size:10px">تاريخ الإصدار: '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.close();
 }
 
 function printReportGeneral(){
