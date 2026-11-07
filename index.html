@@ -558,7 +558,7 @@ body.plant-role .side .nav{gap:2px!important}
 
 <section id="workshop" class="hidden">
 <div class="panel">
-<div class="head"><h3>الورشة — ملف الآلية ومصاريفها</h3></div>
+<div class="head"><h3>الورشة — ملف الآلية ومصاريفها</h3><button class="btn gold" onclick="printVehicleCostReport()">طباعة تقرير تكلفة الآليات</button></div>
 <div class="formgrid" style="padding:12px">
 <div class="field"><label>اختر الآلية</label><select id="workshopVehicle" onchange="renderWorkshop()"><option value="">كل الآليات</option></select></div>
 </div>
@@ -2663,6 +2663,29 @@ function printFilteredOrdersReport(){
     return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' م³</td><td>'+fmt(total)+' م³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' م³</td></tr>').join('');
   }).join('');
   printDocA4('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
+}
+
+function printVehicleCostReport(){
+ const from=$('reportFrom')?.value||'',to=$('reportTo')?.value||'';
+ if(from&&to&&from>to){toast('تاريخ البداية يجب أن يسبق النهاية');return;}
+ const selected=$('workshopVehicle')?.value||'';
+ const inPeriod=date=>{const d=String(date||'').slice(0,10);return (!from||d>=from)&&(!to||d<=to);};
+ const norm=v=>String(v||'').trim().toLowerCase().replace(/[\sـ-]/g,'');
+ const vehicles=(data.vehicles||[]).filter(v=>!selected||String(v.name)===selected),entries=[];
+ const resolve=x=>{const name=x.vehicle||x.asset||'';const v=(data.vehicles||[]).find(v=>(x.vehicle_id&&String(v.id)===String(x.vehicle_id))||norm(v.name)===norm(name));return v?String(v.name):String(name||'');};
+ const add=(x,type,detail,qty,cost)=>{if(!inPeriod(x.date))return;const vehicle=resolve(x);if(vehicle&&vehicles.some(v=>String(v.name)===vehicle))entries.push({vehicle,type,detail:detail||'—',date:x.date||'—',qty:qty??'',cost:Number(cost)||0});};
+ (data.fuel||[]).forEach(x=>add(x,'وقود / گاز',x.fuel_type,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0)));
+ (data.maintenance||[]).forEach(x=>add(x,'صيانة وإصلاح',(x.fault||'')+' '+(x.repair||''),'',x.cost));
+ (data.purchases||[]).forEach(x=>add(x,'مشتريات',x.item,x.quantity,x.total||Number(x.quantity||0)*Number(x.unit_price||0)));
+ (data.spare_parts||[]).forEach(x=>add(x,'قطع غيار',(x.name||'')+' '+(x.part_no||''),x.quantity,Number(x.quantity||0)*Number(x.unit_price||0)));
+ (data.expenses||[]).filter(x=>x.vehicle||x.vehicle_id).forEach(x=>add(x,'مصروف آلية',x.title||x.notes,'',x.amount));
+ const summary=vehicles.map(v=>{const list=entries.filter(x=>x.vehicle===String(v.name)),sums={};list.forEach(x=>sums[x.type]=(sums[x.type]||0)+x.cost);return {name:v.name,records:list.length,total:list.reduce((n,x)=>n+x.cost,0),sums};});
+ const all=entries.reduce((n,x)=>n+x.cost,0);
+ const rows=summary.map(v=>'<tr><td>'+esc(v.name)+'</td><td>'+fmt(v.records)+'</td><td>'+fmt(v.sums['وقود / گاز']||0)+'</td><td>'+fmt(v.sums['صيانة وإصلاح']||0)+'</td><td>'+fmt(v.sums['مشتريات']||0)+'</td><td>'+fmt(v.sums['قطع غيار']||0)+'</td><td>'+fmt(v.sums['مصروف آلية']||0)+'</td><td><b>'+fmt(v.total)+'</b></td></tr>').join('');
+ const detailRows=entries.sort((a,b)=>String(a.date).localeCompare(String(b.date))).map(x=>'<tr><td>'+esc(x.date)+'</td><td>'+esc(x.vehicle)+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.detail)+'</td><td>'+esc(x.qty)+'</td><td>'+fmt(x.cost)+'</td></tr>').join('');
+ const w=window.open('','_blank','width=1000,height=900');if(!w){toast('اسمح بالنوافذ المنبثقة للطباعة');return;}
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تكلفة الآليات — ATLAS</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:6px;font-size:10px;text-align:center}th{background:#eee}.summary{border:1px solid #888;padding:12px;margin:12px 0;font-weight:bold;text-align:center}.note{font-size:10px;line-height:1.8}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير تكلفة الآليات — ATLAS</h3><p>الفترة: '+esc(from||'بداية السجلات')+' إلى '+esc(to||'آخر السجلات')+'</p><div class="summary">إجمالي تكلفة الآليات: '+fmt(all)+' د.ع — عدد الآليات: '+fmt(summary.length)+'</div><h4>ملخص تكلفة كل آلية</h4><table><thead><tr><th>الآلية</th><th>عدد السجلات</th><th>وقود / گاز</th><th>صيانة</th><th>مشتريات</th><th>قطع غيار</th><th>مصروفات أخرى</th><th>الإجمالي</th></tr></thead><tbody>'+(rows||'<tr><td colspan="8">لا توجد سجلات مرتبطة بالآليات في الفترة المحددة</td></tr>')+'</tbody></table><h4>تفاصيل السجلات</h4><table><thead><tr><th>التاريخ</th><th>الآلية</th><th>نوع السجل</th><th>التفاصيل</th><th>الكمية</th><th>المبلغ</th></tr></thead><tbody>'+(detailRows||'<tr><td colspan="6">لا توجد تفاصيل</td></tr>')+'</tbody></table><p class="note">يعتمد التقرير على السجلات المرتبطة برقم الآلية أو اسمها المطابق. لا يشمل المصروفات العامة غير المرتبطة بآلية. راجع اكتمال ربط السجلات قبل اعتماد النتائج محاسبياً.</p><p style="text-align:center;font-size:10px">تاريخ الإصدار: '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.close();
 }
 
 function printProfitLossReport(){
