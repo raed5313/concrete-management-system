@@ -921,6 +921,7 @@ manager: [
 ['fuel','الوقود والگاز'],
 ['purchases','المشتريات'],
 ['suppliers','الموردون'],
+['supplier_payments','دفعات الموردين'],
 ['maintenance','الصيانة والإصلاح'],
 ['spare_parts','قطع الغيار'],
 ['workshop','الورشة'],
@@ -957,6 +958,7 @@ accountant: [
 ['fuel','الوقود والگاز'],
 ['purchases','المشتريات'],
 ['suppliers','الموردون'],
+['supplier_payments','دفعات الموردين'],
 ['maintenance','الصيانة والإصلاح'],
 ['spare_parts','قطع الغيار'],
 ['workshop','الورشة']
@@ -2528,7 +2530,25 @@ ${atlasDocumentBrand()}
 ${dayLoads.length ? dayLoads.map(l=>{
 let o = data.orders.find(ord=>String(ord.no)===String(l.orderNo))||{};
 return `<tr><td>${esc(l.no)}</td><td>${esc(l.orderNo)}</td><td>${esc(o.customer||'—')}</td><td>${esc(l.driver||'—')}</td><td>${esc(l.vehicle||'—')}</td><td>${esc(l.qty)}</td><td>${esc(l.time||'—')}</td></tr>`;
-}).join('') : '<tr><td colspan="7" style="text-align:center">لا توجد حمولات مسجلة لهذا التاريfunction printCustomerStatement(custName){
+}).join('') : '<tr><td colspan="7" style="text-align:center">لا توجد حمولات مسجلة لهذا التاريfunction printSupplierStatement(supplierName){
+ const supplier=(data.suppliers||[]).find(s=>String(s.name).trim()===String(supplierName).trim());
+ if(!supplier){toast('لم يتم العثور على المورد');return;}
+ const purchases=(data.purchases||[]).filter(x=>String(x.supplier||'').trim()===String(supplierName).trim());
+ const parts=(data.spare_parts||[]).filter(x=>String(x.supplier||'').trim()===String(supplierName).trim());
+ const payments=(data.supplier_payments||[]).filter(x=>String(x.supplier||'').trim()===String(supplierName).trim());
+ const purchaseRows=[...purchases.map(x=>({date:x.date,type:'مشتريات',detail:x.item||'—',qty:x.quantity||0,total:Number(x.total)||Number(x.quantity||0)*Number(x.unit_price||0)})),...parts.map(x=>({date:x.date,type:'قطع غيار',detail:x.name||'—',qty:x.quantity||0,total:Number(x.quantity||0)*Number(x.unit_price||0)}))].sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+ const purchasesTotal=purchaseRows.reduce((n,x)=>n+x.total,0);
+ const paymentsTotal=payments.reduce((n,x)=>n+Number(x.amount||0),0);
+ const balance=purchasesTotal-paymentsTotal;
+ const purchaseHtml=purchaseRows.map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.detail)+'</td><td>'+fmt(x.qty)+'</td><td>'+fmt(x.total)+'</td></tr>').join('');
+ const paymentHtml=payments.map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+fmt(x.amount)+'</td><td>'+esc(x.method||'—')+'</td><td>'+esc(x.reference||'—')+'</td><td>'+esc(x.notes||'—')+'</td></tr>').join('');
+ const w=window.open('','_blank','width=1000,height=900');
+ if(!w){toast('اسمح بالنوافذ المنبثقة لطباعة كشف المورد');return;}
+ w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب المورد</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}</style></head><body>${atlasDocumentBrand()}<h3>كشف حساب المورد: ${esc(supplier.name)}</h3><p>الهاتف: ${esc(supplier.phone||'—')} — العنوان: ${esc(supplier.address||'—')}</p><div class="summary"><div>إجمالي المشتريات والقطع<br>${fmt(purchasesTotal)} د.ع</div><div>إجمالي الدفعات<br>${fmt(paymentsTotal)} د.ع</div><div>الرصيد الحسابي<br>${fmt(balance)} د.ع</div></div><h4>المشتريات وقطع الغيار</h4><table><thead><tr><th>التاريخ</th><th>النوع</th><th>التفاصيل</th><th>الكمية</th><th>القيمة</th></tr></thead><tbody>${purchaseHtml||'<tr><td colspan="5">لا توجد مشتريات مسجلة</td></tr>'}</tbody></table><h4>الدفعات للمورد</h4><table><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الطريقة</th><th>المرجع</th><th>ملاحظات</th></tr></thead><tbody>${paymentHtml||'<tr><td colspan="5">لا توجد دفعات مسجلة</td></tr>'}</tbody></table><p style="font-size:10px;text-align:center">كشف حسب السجلات المتاحة في النظام — ${new Date().toLocaleDateString('ar-IQ')} — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>`);
+ w.document.close();
+}
+
+function printCustomerStatement(custName){
  const orders=data.orders.filter(o=>o.customer===custName);
  const receipts=data.receipts.filter(r=>r.customer===custName);
  const rows=orders.map(o=>{
