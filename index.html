@@ -366,11 +366,6 @@ body.plant-role .side .nav{gap:2px!important}
 }
 
 
-/* الشعار الرسمي المعتمد لأطلس للكونكريت */
-.atlas-brand-mark{width:100%;max-width:205px;height:auto;margin:0 auto 4px;display:flex;align-items:center;justify-content:center}
-.atlas-official-logo{width:100%;height:auto;max-height:112px;object-fit:contain;display:block}
-.atlas-login-logo{display:block;width:min(290px,100%);height:auto;max-height:190px;object-fit:contain;margin:0 auto 14px;filter:drop-shadow(0 5px 12px rgba(0,0,0,.28))}
-@media(max-width:800px){.atlas-brand-mark{max-width:150px}.atlas-official-logo{max-height:75px}.atlas-login-logo{width:min(250px,100%);max-height:150px}}
 </style>
 </head>
 <body>
@@ -378,7 +373,6 @@ body.plant-role .side .nav{gap:2px!important}
 <!-- شاشة تسجيل الدخول -->
 <div id="loginScreen">
 <div class="login-card">
-<img src="./assets/atlas-logo.svg" alt="شعار أطلس للكونكريت ATLAS" class="atlas-login-logo">
 <h2>تسجيل الدخول الموحد</h2>
 <p class="muted" style="text-align:center;margin-bottom:12px">نظام أطلس للكونكريت الجاهز</p>
 <p id="roleEntryHint" class="muted" style="text-align:center;margin:0 0 18px;color:var(--gold);font-weight:bold">تسجيل الدخول الموحد لجميع الحسابات</p>
@@ -405,7 +399,29 @@ body.plant-role .side .nav{gap:2px!important}
 <aside class="side">
 <div class="brand">
 <div class="atlas-brand-mark" role="img" aria-label="شعار أطلس للكونكريت ATLAS">
-<img src="./assets/atlas-logo.svg" alt="شعار أطلس للكونكريت ATLAS" class="atlas-official-logo"></div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" style="width:100%;height:100%;display:block">
+<defs>
+ <linearGradient id="atlasMetal" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".22" stop-color="#f5d36f"/><stop offset=".48" stop-color="#b77d20"/><stop offset=".7" stop-color="#f9df8a"/><stop offset="1" stop-color="#805313"/></linearGradient>
+ <linearGradient id="atlasFace" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff8d6"/><stop offset=".42" stop-color="#d9a83f"/><stop offset="1" stop-color="#8a5b13"/></linearGradient>
+ <linearGradient id="atlasBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bcecf3"/><stop offset="1" stop-color="#267a8b"/></linearGradient>
+ <filter id="atlasShadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dx="5" dy="8" result="off"/><feComponentTransfer><feFuncA type="linear" slope=".65"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<!-- مجسم قمة أطلس بحواف معدنية وعمق ثلاثي الأبعاد -->
+<g transform="translate(24 20)" filter="url(#atlasShadow)">
+ <path d="M112 20 L220 254 L178 254 L112 111 L47 254 L7 254 Z" fill="#644719" opacity=".95" transform="translate(9 9)"/>
+ <path d="M112 12 L220 245 L178 245 L112 102 L47 245 L7 245 Z" fill="url(#atlasFace)" stroke="#f7dc8b" stroke-width="5" stroke-linejoin="round"/>
+ <path d="M112 12 L112 102 L178 245 L220 245 Z" fill="#8d611c" opacity=".48"/>
+ <path d="M62 181 H162 L178 211 H48 Z" fill="url(#atlasMetal)" stroke="#fff0b0" stroke-width="3"/>
+ <path d="M22 261 H204" stroke="#d4a744" stroke-width="10" stroke-linecap="round"/>
+ <path d="M22 261 H204" stroke="#fff0b0" stroke-width="2" stroke-linecap="round"/>
+</g>
+<g transform="translate(270 38)" filter="url(#atlasShadow)">
+ 
+ <path d="M0 103 H500" stroke="url(#atlasMetal)" stroke-width="5" stroke-linecap="round"/>
+ <text x="250" y="190" text-anchor="middle" font-family="Arial,sans-serif" font-size="91" font-weight="900" letter-spacing="10" fill="url(#atlasMetal)" stroke="#674719" stroke-width="2" paint-order="stroke">ATLAS</text>
+ <text x="250" y="235" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="bold" letter-spacing="5" fill="url(#atlasBlue)">READY MIX CONCRETE</text>
+</g>
+</svg></div>
 <small class="atlas-brand-caption">ATLAS COMPANY</small>
 </div>
 
