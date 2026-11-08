@@ -2899,3 +2899,17 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 #orders #ordersBody .load-details summary{background:#ffd2a3!important;color:#38200e!important;border-color:#df9956!important}
 
 </style>
+
+<style>
+
+/* ألوان حالات أوامر التجهيز حسب الطلب */
+#orders #ordersBody tr.order-card.order-open,
+#orders #ordersBody tr.order-card.order-open td{background:#ffffff!important;color:#202020!important;border-color:#d8d8d8!important}
+#orders #ordersBody tr.order-card.order-locked,
+#orders #ordersBody tr.order-card.order-locked td{background:#fff2b8!important;color:#594600!important;border-color:#e6cf72!important}
+#orders #ordersBody tr.order-card.order-invoiced,
+#orders #ordersBody tr.order-card.order-invoiced td{background:#d9f2df!important;color:#174b2b!important;border-color:#a9d8b4!important}
+#orders #ordersBody tr.order-card.order-locked td:before{color:#856b18!important}
+#orders #ordersBody tr.order-card.order-invoiced td:before{color:#287447!important}
+
+</style>
