@@ -378,32 +378,98 @@ body.plant-role .side .nav{gap:2px!important}
 .orders-filter-search{flex:1.5;min-width:190px}
 @media(max-width:650px){.orders-filterbar{gap:7px;padding:9px}.orders-filter-field{min-width:calc(50% - 8px)}.orders-filter-search{min-width:100%}.orders-filterbar>.btn{flex:1}}
 
+
+/* صفحة دخول ATLAS مستوحاة من التصميم المرجعي */
+#loginScreen.atlas-login{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(390px,.85fr);padding:0;overflow:auto;background:#101b22;z-index:9999}
+.atlas-login-visual{position:relative;min-height:100vh;overflow:hidden;background:linear-gradient(145deg,#435b68,#15232c 78%);display:flex;align-items:center;justify-content:center}
+.atlas-plant-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+.atlas-visual-glow{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,13,18,.1),rgba(5,13,18,.48));z-index:1}
+.atlas-visual-caption{position:absolute;z-index:2;bottom:8%;left:7%;right:7%;display:flex;flex-direction:column;gap:9px;color:#fff;text-shadow:0 2px 10px #000}
+.atlas-visual-caption span{color:#55d5d1;font-size:13px;letter-spacing:4px;font-weight:bold}
+.atlas-visual-caption strong{font-size:clamp(22px,3vw,38px)}
+.atlas-visual-caption small{font-size:14px;color:#d2dcdf}
+.atlas-login-panel{display:grid;place-items:center;padding:28px;background:#17232a;border-left:1px solid rgba(66,216,232,.3)}
+.atlas-login-card{width:min(480px,100%);padding:clamp(22px,3vw,38px);border:1px solid rgba(66,216,232,.48);border-top:3px solid #42d8e8;border-radius:13px;background:linear-gradient(145deg,#202d34,#172229);box-shadow:0 22px 60px rgba(0,0,0,.4);transform:none}
+.atlas-login-card:before{display:none}
+.atlas-login-brand{display:flex;align-items:center;justify-content:center;gap:15px;text-align:right}
+.atlas-login-brand svg{width:76px;height:72px;filter:drop-shadow(0 4px 5px #0008)}
+.atlas-login-name{font-size:36px;font-weight:900;letter-spacing:2px;color:#f4f5f2}
+.atlas-login-ar{font-size:17px;font-weight:bold;color:#42d8e8}
+.atlas-login-rule{height:1px;background:linear-gradient(90deg,transparent,#42d8e8,#b98d37,transparent);margin:18px 0}
+.atlas-login-subtitle{color:#42d8e8;font-weight:bold;text-align:right;font-size:13px}
+.atlas-login-subtitle span{font-size:20px;margin-left:7px}
+.atlas-login-card h2{text-align:right;color:#f5f7f6;font-size:27px;margin:28px 0 8px;text-shadow:none}
+.atlas-login-hint{text-align:right!important;color:#aebdc1!important;margin:0 0 22px!important;font-size:12px}
+.atlas-login-card .field{margin-bottom:17px}
+.atlas-login-card label{color:#d3dcde;font-size:13px}
+.atlas-login-card input{background:#142027!important;border:1px solid #52636a!important;color:#fff!important;border-radius:7px;min-height:52px}
+.atlas-login-card input:focus{border-color:#42d8e8!important;box-shadow:0 0 0 3px #42d8e822!important}
+.atlas-login-card button{background:#42cfc4;color:#092b2b;border:0;border-radius:7px;min-height:54px;font-size:15px;box-shadow:none}
+.atlas-login-card button span{margin-right:10px;font-size:20px}
+.atlas-login-footer{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #405057;margin-top:24px;padding-top:16px;color:#9baeb2;font-size:11px}
+@media(max-width:850px){#loginScreen.atlas-login{grid-template-columns:1fr}.atlas-login-visual{min-height:30vh;max-height:34vh}.atlas-plant-art{opacity:.65}.atlas-visual-caption{bottom:8%;left:6%;right:6%}.atlas-visual-caption strong{font-size:21px}.atlas-login-panel{padding:18px 14px;min-height:66vh}.atlas-login-card{width:min(500px,100%)}}
+@media(max-width:420px){.atlas-login-visual{min-height:25vh}.atlas-visual-caption small{font-size:11px}.atlas-login-brand svg{width:60px}.atlas-login-name{font-size:30px}.atlas-login-ar{font-size:14px}.atlas-login-footer{font-size:10px}}
+
 </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
-<div id="loginScreen">
-<div class="login-card">
-<h2>تسجيل الدخول الموحد</h2>
-<p class="muted" style="text-align:center;margin-bottom:12px">نظام أطلس للكونكريت الجاهز</p>
-<p id="roleEntryHint" class="muted" style="text-align:center;margin:0 0 18px;color:var(--gold);font-weight:bold">تسجيل الدخول الموحد لجميع الحسابات</p>
-<form id="loginForm" onsubmit="handleLogin(event)">
-<div class="field">
-<label>اسم المستخدم</label>
-<input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم">
-</div>
-<div class="field">
-<label>كلمة المرور</label>
-<input type="password" id="loginPass" required placeholder="أدخل كلمة المرور">
-</div>
-<button type="submit">دخول إلى النظام</button>
-<div id="loginError" class="login-error"></div>
-</form>
-<div style="margin-top:15px;font-size:11px;color:var(--muted);text-align:center">
-يُرجى استخدام بيانات الحساب المعتمدة من مسؤول النظام.
-</div>
-</div>
+<!-- شاشة تسجيل الدخول — هوية أطلس -->
+<div id="loginScreen" class="atlas-login">
+  <div class="atlas-login-visual" aria-hidden="true">
+    <div class="atlas-visual-glow"></div>
+    <svg class="atlas-plant-art" viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="plantSky" x2="0" y2="1"><stop stop-color="#536b78"/><stop offset="1" stop-color="#17232b"/></linearGradient>
+        <linearGradient id="plantTruck" x2="0" y2="1"><stop stop-color="#e5e8e5"/><stop offset="1" stop-color="#89979a"/></linearGradient>
+        <linearGradient id="plantDrum" x2="1" y2="1"><stop stop-color="#e9f1ee"/><stop offset="1" stop-color="#6c858b"/></linearGradient>
+      </defs>
+      <path fill="url(#plantSky)" d="M0 0h760v560H0z"/>
+      <circle cx="590" cy="95" r="90" fill="#d9b75c" opacity=".12"/>
+      <path d="M0 360L110 270l90 45 100-110 105 125 100-80 120 90 135-110v230H0z" fill="#263943"/>
+      <g fill="#aeb9b6" opacity=".9">
+        <path d="M62 95h88v220H62zM54 82h104v18H54zM72 58h68v25H72z"/>
+        <path d="M180 130h75v185h-75zM173 118h89v15h-89zM192 96h50v22h-50z"/>
+        <path d="M285 165h54v150h-54zM278 154h68v13h-68z"/>
+      </g>
+      <g stroke="#71848a" stroke-width="8" fill="none"><path d="M150 185h130v-55h90M255 225h120v-55h75M335 270h120v-65h90"/></g>
+      <path d="M0 410h760v150H0z" fill="#111b20"/>
+      <path d="M0 440l760-45M0 505l760-50" stroke="#718087" stroke-width="3" opacity=".3"/>
+      <g transform="translate(115 280)">
+        <path d="M35 110h390v88H35z" fill="#26343a"/>
+        <path d="M48 82h130v116H48z" fill="url(#plantTruck)" stroke="#d9e1df" stroke-width="5"/>
+        <path d="M62 94h90v55H62z" fill="#385766"/>
+        <path d="M178 100l35-25h190l22 25-30 95H190z" fill="url(#plantDrum)" stroke="#dce4e1" stroke-width="5"/>
+        <path d="M195 92l190 83M218 76l174 77" stroke="#45b7bd" stroke-width="12" opacity=".85"/>
+        <path d="M188 115l205 70" stroke="#526d72" stroke-width="5"/>
+        <path d="M425 124h75l35 74H420z" fill="#b7c2bf"/>
+        <path d="M438 136h47l18 38h-72z" fill="#35515d"/>
+        <g fill="#101619" stroke="#718087" stroke-width="8"><circle cx="105" cy="205" r="34"/><circle cx="270" cy="205" r="34"/><circle cx="445" cy="205" r="34"/></g>
+        <g fill="#d3d8d5"><circle cx="105" cy="205" r="12"/><circle cx="270" cy="205" r="12"/><circle cx="445" cy="205" r="12"/></g>
+        <text x="300" y="142" fill="#1d555c" font-size="20" font-weight="bold" text-anchor="middle">ATLAS</text>
+      </g>
+    </svg>
+    <div class="atlas-visual-caption"><span>ATLAS CONCRETE</span><strong>قوة الإنجاز تبدأ من هنا</strong><small>نظام إدارة متكامل للكونكريت الجاهز</small></div>
+  </div>
+  <div class="atlas-login-panel">
+    <div class="login-card atlas-login-card">
+      <div class="atlas-login-brand">
+        <svg viewBox="0 0 100 90" role="img" aria-label="شعار أطلس"><defs><linearGradient id="loginGold" x2="1" y2="1"><stop stop-color="#fff0ad"/><stop offset=".5" stop-color="#d4a43d"/><stop offset="1" stop-color="#805713"/></linearGradient></defs><path d="M8 78L43 8l36 70H60L43 43 26 78z" fill="url(#loginGold)" stroke="#f8df94" stroke-width="2"/><path d="M48 63h33l10 15H55z" fill="#42d8e8"/><path d="M14 84h78" stroke="#d4a43d" stroke-width="4" stroke-linecap="round"/></svg>
+        <div><div class="atlas-login-name">ATLAS</div><div class="atlas-login-ar">أطلس للكونكريت الجاهز</div></div>
+      </div>
+      <div class="atlas-login-rule"></div>
+      <div class="atlas-login-subtitle"><span>◈</span> نظام إدارة الكونكريت الجاهز</div>
+      <h2>تسجيل الدخول</h2>
+      <p id="roleEntryHint" class="muted atlas-login-hint">تسجيل الدخول الموحد لجميع الحسابات</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="field"><label>اسم المستخدم</label><input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم" autocomplete="username"></div>
+        <div class="field"><label>كلمة المرور</label><input type="password" id="loginPass" required placeholder="أدخل كلمة المرور" autocomplete="current-password"></div>
+        <button type="submit">تسجيل الدخول <span>←</span></button>
+        <div id="loginError" class="login-error"></div>
+      </form>
+      <div class="atlas-login-footer"><span>أطلس للكونكريت — ATLAS</span><span>نظام الإدارة الرئيسي</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- التطبيق الرئيسي -->
