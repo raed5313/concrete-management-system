@@ -1783,7 +1783,7 @@ ${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.require
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
-`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.step?`step="${f.step}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} value="${esc(f.value??'')}">`}
+`<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.step?`step="${f.step}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} placeholder="${esc(f.placeholder||'')}" value="${esc(f.value??'')}">`}
 </div>`).join('')+
 '<div class="full"><button class="btn primary" type="submit">حفظ البيانات</button></div>';
 
@@ -1809,7 +1809,7 @@ function openOrder(){
 
   openForm('أمر تجهيز جديد',[
     {name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
-    {name:'phone',label:'رقم الموبايل',type:'tel',placeholder:'07XXXXXXXXX'},
+    {name:'phone',label:'رقم موبايل العميل',type:'tel',placeholder:'أدخل رقم الموبايل هنا — 07XXXXXXXXX',full:true},
     {name:'site',label:'موقع الصب',required:true},
     {name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
     {name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
@@ -2119,7 +2119,7 @@ let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o)return;
 openForm('تعديل أمر التجهيز '+no,
 ['customer','phone','site','pour','grade','pump','admixture_type','qty','price','date'].map(k=>({
-name:k,label:k==='phone'?'رقم الموبايل':k,value:o[k]||'',type:k==='phone'?'tel':'text',placeholder:k==='phone'?'07XXXXXXXXX':'',required:k==='customer'||k==='site'
+name:k,label:k==='phone'?'رقم موبايل العميل':k,value:o[k]||'',type:k==='phone'?'tel':'text',placeholder:k==='phone'?'أدخل رقم الموبايل هنا — 07XXXXXXXXX':'',full:k==='phone',required:k==='customer'||k==='site'
 })),
 v=>{
 (async()=>{
