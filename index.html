@@ -2447,19 +2447,6 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 </head><body>${content}
 <script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);};<\/script>
 
-<style>
-/* تصحيح تسميات حقول بطاقة أمر التجهيز بعد إضافة رقم الهاتف كحقل مستقل */
-#orders #ordersBody tr.order-card td:nth-child(1):before{content:"رقم الأمر"!important}
-#orders #ordersBody tr.order-card td:nth-child(2):before{content:"التاريخ"!important}
-#orders #ordersBody tr.order-card td:nth-child(3):before{content:"الحالة"!important}
-#orders #ordersBody tr.order-card td:nth-child(4):before{content:"اسم العميل"!important}
-#orders #ordersBody tr.order-card td:nth-child(5):before{content:"رقم الموبايل"!important}
-#orders #ordersBody tr.order-card td:nth-child(6):before{content:"موقع الصب"!important}
-#orders #ordersBody tr.order-card td:nth-child(7):before{content:"نوع الصب"!important}
-#orders #ordersBody tr.order-card td:nth-child(8):before{content:"المقاومة"!important}
-#orders #ordersBody tr.order-card td:nth-child(9):before{content:"الكمية"!important}
-#orders #ordersBody tr.order-card td:nth-child(10):before{content:"الإجراءات"!important}
-</style>
 </body></html>`);
 w.document.close();
 }
