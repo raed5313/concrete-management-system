@@ -497,7 +497,7 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 <div class="tablewrap">
 <table>
-<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>الموقع</th><th>الصب</th><th>م³ (تقديري / فعلي)</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>رقم الهاتف</th><th>الموقع</th><th>الصب</th><th>م³ (تقديري / فعلي)</th><th>الإجراءات</th></tr></thead>
 <tbody id="ordersBody"></tbody>
 </table>
 </div>
@@ -1501,7 +1501,7 @@ let canPrintOnly = isAccountant;
 return `
 <tr class="${stateClass} order-card">
 <td>${esc(o.no)}</td><td>${esc(dateOnly(o.date))}</td><td>${statusBadge}</td>
-<td>${esc(o.customer)}</td><td>${esc(o.site)}</td>
+<td>${esc(o.customer)}</td><td dir="ltr" style="white-space:nowrap">${esc(o.phone||"—")}</td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td><strong style="color:#8b1d2c;font-size:14px">${esc(o.grade||'—')}</strong></td><td>${fmt(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
 <td><div class="actions">
 
@@ -1512,7 +1512,7 @@ ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعدي
 ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
-<tr class="order-load-row"><td colspan="8" class="order-load-cell">
+<tr class="order-load-row"><td colspan="9" class="order-load-cell">
 <div class="loadbox order-loadbox" style="margin-top:6px">
 <div class="order-load-head"><b class="goldtext">الحمولات المسجلة داخل الأمر</b><strong class="order-accumulated">${fmt(totalLoadQty)} م³</strong></div>
 ${ls.length?`<table><tbody>${ls.map(l=>`
@@ -2501,6 +2501,7 @@ printDocA5('وصل أمر تجهيز',`
 <div class="top"><div>التاريخ<br>${esc(dateOnly(o.date))}</div><div>رقم الأمر<br><span class="no">${esc(o.no)}</span></div></div>
 <table class="data">
 <tr><td>اسم العميل</td><td>${esc(o.customer)}</td></tr>
+<tr><td>رقم الهاتف</td><td dir="ltr">${esc(o.phone||"—")}</td></tr>
 <tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
 <tr><td>نوع الصب / المقاومة</td><td>${esc(o.pour)} — ${esc(o.grade)}</td></tr>
 <tr><td>الكمية التقديرية / الفعلية</td><td>${fmt(o.qty)} م³ ${o.actualQty?` (الفعلية: ${o.actualQty} م³)`:''}</td></tr>
