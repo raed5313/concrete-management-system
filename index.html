@@ -2449,14 +2449,14 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 <script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);};<\/script>
 
 <style>
-/* تسمية رقم الهاتف مستقلاً في بطاقة أمر التجهيز للمعمل فقط */
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(4):before{content:"اسم العميل"!important}
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(5):before{content:"رقم الموبايل"!important}
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(6):before{content:"موقع الصب"!important}
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(7):before{content:"نوع الصب"!important}
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(8):before{content:"المقاومة"!important}
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(9):before{content:"الكمية"!important}
-body.atlas-role-plant #orders #ordersBody tr.order-card td:nth-child(10):before{content:"الإجراءات"!important}
+/* تسمية حقول أمر التجهيز بشكل موحد في جميع حسابات النظام */
+#orders #ordersBody tr.order-card td:nth-child(4):before{content:"اسم العميل"!important}
+#orders #ordersBody tr.order-card td:nth-child(5):before{content:"رقم الموبايل"!important}
+#orders #ordersBody tr.order-card td:nth-child(6):before{content:"موقع الصب"!important}
+#orders #ordersBody tr.order-card td:nth-child(7):before{content:"نوع الصب"!important}
+#orders #ordersBody tr.order-card td:nth-child(8):before{content:"المقاومة"!important}
+#orders #ordersBody tr.order-card td:nth-child(9):before{content:"الكمية"!important}
+#orders #ordersBody tr.order-card td:nth-child(10):before{content:"الإجراءات"!important}
 </style>
 </body></html>`);
 w.document.close();
