@@ -366,6 +366,13 @@ body.plant-role .side .nav{gap:2px!important}
 }
 
 
+/* شريط البحث والتصفية في أوامر التجهيز */
+.orders-filterbar{display:flex;align-items:end;gap:10px;flex-wrap:wrap;padding:12px;margin:10px 0 14px;background:var(--p);border:1px solid var(--line);border-radius:10px}
+.orders-filter-field{display:flex;flex-direction:column;gap:5px;min-width:130px;flex:1}
+.orders-filter-field label{font-size:12px;color:var(--muted);font-weight:700}
+.orders-filter-field input,.orders-filter-field select{width:100%;min-height:39px;background:#101c26;color:#fff;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font:inherit}
+.orders-filter-search{flex:1.5;min-width:190px}
+@media(max-width:650px){.orders-filterbar{gap:7px;padding:9px}.orders-filter-field{min-width:calc(50% - 8px)}.orders-filter-search{min-width:100%}.orders-filterbar>.btn{flex:1}}
 </style>
 </head>
 <body>
@@ -478,6 +485,15 @@ body.plant-role .side .nav{gap:2px!important}
 <div class="head">
 <h3>أوامر التجهيز والحمولات المرتبطة</h3>
 <button class="btn primary" id="orderSecAddBtn" onclick="openOrder()">＋ إضافة أمر</button>
+</div>
+<div class="orders-filterbar" dir="rtl">
+<div class="orders-filter-field"><label for="ordersFromDate">من تاريخ</label><input type="date" id="ordersFromDate"></div>
+<div class="orders-filter-field"><label for="ordersToDate">إلى تاريخ</label><input type="date" id="ordersToDate"></div>
+<div class="orders-filter-field"><label for="ordersStatusFilter">الحالة</label><select id="ordersStatusFilter"><option value="">الكل</option><option>قيد التجهيز</option><option>قيد العمل</option><option>مكتمل ومجهز</option><option>تم التسجيل</option></select></div>
+<div class="orders-filter-field orders-filter-search"><label for="ordersGeneralSearch">البحث العام</label><input type="search" id="ordersGeneralSearch" placeholder="رقم الأمر أو اسم العميل أو الموقع أو الصب"></div>
+<button type="button" class="btn primary" onclick="render()">⌕ بحث</button>
+<button type="button" class="btn" onclick="window.print()">▣ طباعة</button>
+<button type="button" class="btn" onclick="clearOrdersFilters()">مسح</button>
 </div>
 <div class="tablewrap">
 <table>
@@ -1385,6 +1401,10 @@ function renderWorkshop(){
  totals.innerHTML='<div class="detail">عدد السجلات<strong>'+records.length+'</strong></div><div class="detail">إجمالي الوقود والصيانة والقطع<strong>'+fmt(total)+' د.ع</strong></div>';
  body.innerHTML=records.sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>'<tr><td>'+esc(x.date||'—')+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.vehicle)+'</td><td>'+esc(x.detail)+'</td><td>'+esc(x.qty)+'</td><td>'+fmt(x.cost)+'</td></tr>').join('')||'<tr><td colspan="6">لا توجد سجلات مرتبطة بالآليات المختارة بعد.</td></tr>';
 }
+function clearOrdersFilters(){
+['ordersFromDate','ordersToDate','ordersStatusFilter','ordersGeneralSearch'].forEach(id=>{const el=$(id);if(el)el.value='';});
+render();
+}
 function render(){
 if($('workshop')) renderWorkshop();
 let isManager = currentRole === 'manager';
@@ -1447,7 +1467,16 @@ if($('mixesBody')){
 }
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
-data.orders.slice().reverse(),
+data.orders.filter(o=>{
+const from=$('ordersFromDate')?.value||'';
+const to=$('ordersToDate')?.value||'';
+const status=$('ordersStatusFilter')?.value||'';
+const q=($('ordersGeneralSearch')?.value||'').trim().toLowerCase();
+const rawDate=String(o.date||'').slice(0,10);
+const orderDate=/^\\d{4}-\\d{2}-\\d{2}$/.test(rawDate)?rawDate:'';
+const hay=[o.no,o.customer,o.site,o.pour,o.grade,o.status,o.phone].join(' ').toLowerCase();
+return (!from||(orderDate&&orderDate>=from))&&(!to||(orderDate&&orderDate<=to))&&(!status||String(o.status||'')===status)&&(!q||hay.includes(q));
+}).slice().reverse(),
 o=>{
 let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
