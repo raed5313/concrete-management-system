@@ -163,10 +163,13 @@ th{color:var(--gold)}
 #orders #ordersBody tr.order-card td:nth-child(2):before{content:"التاريخ"}
 #orders #ordersBody tr.order-card td:nth-child(3):before{content:"الحالة"}
 #orders #ordersBody tr.order-card td:nth-child(4):before{content:"اسم الزبون"}
-#orders #ordersBody tr.order-card td:nth-child(5):before{content:"موقع الصب"}
-#orders #ordersBody tr.order-card td:nth-child(6):before{content:"نوع الصب"}
-#orders #ordersBody tr.order-card td:nth-child(7):before{content:"الكمية"}
-#orders #ordersBody tr.order-card td:nth-child(8):before{content:"الإجراءات"}
+#orders #ordersBody tr.order-card td:nth-child(5):before{content:"رقم الموبايل"}
+#orders #ordersBody tr.order-card td:nth-child(6):before{content:"موقع الصب"}
+#orders #ordersBody tr.order-card td:nth-child(7):before{content:"نوع الصب"}
+#orders #ordersBody tr.order-card td:nth-child(8):before{content:"المقاومة"}
+#orders #ordersBody tr.order-card td:nth-child(9):before{content:"الكمية"}
+#orders #ordersBody tr.order-card td:nth-child(10):before{content:"الإجراءات"}
+#orders #ordersBody tr.order-card td.order-phone-cell .order-phone-label{display:none}
 #orders #ordersBody tr.order-card td:last-child{border-bottom:0}
 #orders #ordersBody tr.order-card td .actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-start}
 #orders #ordersBody tr:has(>td.order-load-cell){display:block;width:100%;margin-top:-8px}
@@ -1513,7 +1516,7 @@ ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعدي
 ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
-<tr class="order-load-row"><td colspan="9" class="order-load-cell">
+<tr class="order-load-row"><td colspan="10" class="order-load-cell">
 <div class="loadbox order-loadbox" style="margin-top:6px">
 <div class="order-load-head"><b class="goldtext">الحمولات المسجلة داخل الأمر</b><strong class="order-accumulated">${fmt(totalLoadQty)} م³</strong></div>
 ${ls.length?`<table><tbody>${ls.map(l=>`
