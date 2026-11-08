@@ -168,7 +168,8 @@ th{color:var(--gold)}
 #orders #ordersBody tr.order-card td:nth-child(7):before{content:"نوع الصب"}
 #orders #ordersBody tr.order-card td:nth-child(8):before{content:"المقاومة"}
 #orders #ordersBody tr.order-card td:nth-child(9):before{content:"الكمية"}
-#orders #ordersBody tr.order-card td:nth-child(10):before{content:"الإجراءات"}
+#orders #ordersBody tr.order-card td:nth-child(10):before{content:"سعر المتر"}
+#orders #ordersBody tr.order-card td:nth-child(11):before{content:"الإجراءات"}
 #orders #ordersBody tr.order-card td.order-phone-cell .order-phone-label{display:none}
 #orders #ordersBody tr.order-card td:last-child{border-bottom:0}
 #orders #ordersBody tr.order-card td .actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-start}
@@ -1507,6 +1508,7 @@ return `
 <td>${esc(o.no)}</td><td>${esc(dateOnly(o.date))}</td><td>${statusBadge}</td>
 <td>${esc(o.customer)}</td><td class="order-phone-cell"><span class="order-phone-label">رقم الموبايل</span><span class="order-phone-value" dir="ltr">${esc(o.phone||"—")}</span></td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td><strong style="color:#8b1d2c;font-size:14px">${esc(o.grade||'—')}</strong></td><td>${fmt(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
+<td class="order-price-cell"><strong style="color:#b8860b">\${fmt(o.price||0)} د.ع</strong></td>
 <td><div class="actions">
 
 ${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
@@ -1516,7 +1518,7 @@ ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعدي
 ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></td>
 </tr>
-<tr class="order-load-row"><td colspan="10" class="order-load-cell">
+<tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox" style="margin-top:6px">
 <div class="order-load-head"><b class="goldtext">الحمولات المسجلة داخل الأمر</b><strong class="order-accumulated">${fmt(totalLoadQty)} م³</strong></div>
 ${ls.length?`<table><tbody>${ls.map(l=>`
