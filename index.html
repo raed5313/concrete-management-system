@@ -1508,7 +1508,7 @@ return `
 <td>${esc(o.no)}</td><td>${esc(dateOnly(o.date))}</td><td>${statusBadge}</td>
 <td>${esc(o.customer)}</td><td class="order-phone-cell"><span class="order-phone-label">رقم الموبايل</span><span class="order-phone-value" dir="ltr">${esc(o.phone||"—")}</span></td><td>${esc(o.site)}</td>
 <td>${esc(o.pour)}</td><td><strong style="color:#8b1d2c;font-size:14px">${esc(o.grade||'—')}</strong></td><td>${fmt(o.qty)} م³ ${o.actualQty?` / <b style="color:#42d8e8">${o.actualQty} م³ فعلي</b>`:''}</td>
-<td class="order-price-cell"><strong style="color:#b8860b">\${fmt(o.price||0)} د.ع</strong></td>
+<td class="order-price-cell"><strong style="color:#b8860b">${fmt(o.price||0)} د.ع</strong></td>
 <td><div class="actions">
 
 ${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
