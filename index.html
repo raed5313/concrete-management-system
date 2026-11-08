@@ -2596,16 +2596,16 @@ function receiptLoad(no) {
     const l = data.loads.find(x => String(x.no) === String(no));
     const o = l && data.orders.find(x => String(x.no) === String(l.orderNo));
     if (!l || !o) return toast('الحمولة أو أمر التجهيز غير موجود');
-    const orderLoads = data.loads.filter(x => String(x.orderNo) === String(l.orderNo) && Number(x.no) <= Number(l.no));
+    const allOrderLoads = data.loads.filter(x => String(x.orderNo) === String(l.orderNo));
+    const loadSequence = allOrderLoads.findIndex(x => String(x.no) === String(l.no)) + 1;
+    const orderLoads = allOrderLoads.slice(0, Math.max(loadSequence, 0));
     const accumulatedQty = orderLoads.reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
     const fmtQty = n => Number(n.toFixed(2)).toString();
     const d = dateOnly(l.date || o.date);
     // في وصل التجهيز يظهر رمز الآلية المختصر فقط: حرف M متبوعاً بالرقم
     const vehiclePrefix = String(l.vehicle || '').trim().match(/^M\d+/i);
     const vehicleReceiptCode = vehiclePrefix ? vehiclePrefix[0].toUpperCase() : (l.vehicle ? 'M' : '—');
-    const loadNumber = Number(l.no);
-    const loadWords = {1:'النقلة الأولى',2:'النقلة الثانية',3:'النقلة الثالثة',4:'النقلة الرابعة',5:'النقلة الخامسة',6:'النقلة السادسة',7:'النقلة السابعة',8:'النقلة الثامنة',9:'النقلة التاسعة',10:'النقلة العاشرة',11:'النقلة الحادية عشرة',12:'النقلة الثانية عشرة',13:'النقلة الثالثة عشرة',14:'النقلة الرابعة عشرة',15:'النقلة الخامسة عشرة',16:'النقلة السادسة عشرة',17:'النقلة السابعة عشرة',18:'النقلة الثامنة عشرة',19:'النقلة التاسعة عشرة',20:'النقلة العشرون'};
-    const loadLabel = loadWords[loadNumber] || ('النقلة رقم ' + esc(l.no));
+    const loadLabel = 'النقلة رقم ' + loadSequence;
     printDocA5('وصل تجهيز ' + loadLabel + ' - أمر ' + o.no, `
       <div class="r atlas-load-receipt">
         <div class="head"><div style="width:145px;height:46px;margin:0 auto 2px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" role="img" aria-label="أطلس للكونكريت ATLAS" style="width:100%;height:100%;display:block">
@@ -2633,7 +2633,7 @@ function receiptLoad(no) {
  .atlas-load-receipt .foot{margin-top:3px!important;padding-top:2px!important}
 }</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td>${fmt(l.qty)} م³</td></tr></table>
         <div class="section" style="font-size:13px;padding:4px">تفاصيل التجهيز</div>
-        <div class="big" style="padding:4px;gap:5px"><div style="margin-right:auto"><b>رقم الحمولة</b><strong style="font-size:17px;padding:3px;color:#a47b20">${loadLabel}</strong></div></div>
+        <div class="big" style="padding:4px;gap:5px"><div style="margin-right:auto"><b>تسلسل الحمولة</b><strong style="font-size:17px;padding:3px;color:#a47b20">${loadLabel}</strong></div></div>
         <div class="big" style="padding:4px;gap:5px;direction:rtl"><div style="width:48%;margin-right:0;text-align:center"><b style="font-size:12px;font-weight:800">إجمالي الكمية المتراكمة (م³)</b><strong style="display:block;font-size:25px;font-weight:900;padding:3px;color:#991b1b">${fmtQty(accumulatedQty)}</strong></div></div>
         <div class="sign" style="direction:rtl;margin-top:3px"><div style="padding:6px 4px 12px">توقيع الزبون<br><br>....................</div><div style="padding:6px 4px 12px">توقيع المعمل<br><br>....................</div></div>
         <div class="foot">شركة أطلس للكونكريت</div>
