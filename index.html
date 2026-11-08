@@ -2528,26 +2528,7 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 #orders #ordersBody tr.order-card td.order-phone-cell .order-phone-value{white-space:nowrap;text-align:left;direction:ltr}
 </style>
 
-<!-- صوت الصلاة على النبي عند فتح نظام أطلس -->
-<audio id="atlasOpeningSalatAudio" preload="auto">
-  <source src="./salat-alnabi.mp3" type="audio/mpeg">
-</audio>
-<script>
-(function(){
-  const audio = document.getElementById('atlasOpeningSalatAudio');
-  if (!audio) return;
-  let started = false;
-  const startAudio = () => {
-    if (started) return;
-    started = true;
-    audio.play().catch(() => { started = false; });
-  };
-  window.addEventListener('load', startAudio, { once: true });
-  ['pointerdown','touchstart','keydown'].forEach(eventName => {
-    window.addEventListener(eventName, startAudio, { once: true, passive: true });
-  });
-})();
-</script>
+
 
 </body></html>`);
 w.document.close();
@@ -2959,6 +2940,26 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
 </script>
 <script>
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(err => console.warn("PWA registration failed", err))); }
+</script>
+
+<!-- صوت الصلاة على النبي عند فتح نظام أطلس -->
+<audio id="atlasOpeningSalatAudio" preload="auto">
+  <source src="./salat-alnabi.mp3" type="audio/mpeg">
+</audio>
+<script>
+(function () {
+  const audio = document.getElementById('atlasOpeningSalatAudio');
+  if (!audio) return;
+  const playOnFirstInteraction = function () {
+    audio.play().catch(function () {});
+    window.removeEventListener('pointerdown', playOnFirstInteraction);
+    window.removeEventListener('touchstart', playOnFirstInteraction);
+    window.removeEventListener('keydown', playOnFirstInteraction);
+  };
+  window.addEventListener('pointerdown', playOnFirstInteraction, { once: true });
+  window.addEventListener('touchstart', playOnFirstInteraction, { once: true, passive: true });
+  window.addEventListener('keydown', playOnFirstInteraction, { once: true });
+})();
 </script>
 </body>
 </html>
