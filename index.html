@@ -2602,9 +2602,11 @@ function receiptLoad(no) {
     const accumulatedQty = orderLoads.reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
     const fmtQty = n => Number(n.toFixed(2)).toString();
     const d = dateOnly(l.date || o.date);
-    // في وصل التجهيز يظهر رمز الآلية المختصر فقط: حرف M متبوعاً بالرقم
-    const vehiclePrefix = String(l.vehicle || '').trim().match(/^M\d+/i);
-    const vehicleReceiptCode = vehiclePrefix ? vehiclePrefix[0].toUpperCase() : (l.vehicle ? 'M' : '—');
+    // في وصل التجهيز المطبوع فقط: إظهار حرف M ورقم الآلية دون بقية الاسم أو الوصف
+    const vehicleText = String(l.vehicle || '').trim();
+    const vehicleMatch = vehicleText.match(/M\s*[-#:]?\s*(\d+)/i);
+    const vehicleDigits = vehicleMatch ? vehicleMatch[1] : ( /^\d+$/.test(vehicleText) ? vehicleText : '' );
+    const vehicleReceiptCode = vehicleDigits ? 'M' + vehicleDigits : '—';
     const loadLabel = 'النقلة رقم ' + loadSequence;
     printDocA5('وصل تجهيز ' + loadLabel + ' - أمر ' + o.no, `
       <div class="r atlas-load-receipt">
