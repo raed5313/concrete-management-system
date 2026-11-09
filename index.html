@@ -1851,6 +1851,17 @@ async function deleteOperationalRecord(type,id){
 }
 function printOperationalRecord(type,id){
  const r=(data[type]||[]).find(x=>String(x.id)===String(id));if(!r)return;
+ if(type==='payroll'){
+  const month=String(r.month||'');
+  const adv=(data.advances||[]).filter(x=>x.employee===r.employee&&String(x.date||'').slice(0,7)===month);
+  const fines=(data.fines||[]).filter(x=>x.employee===r.employee&&String(x.date||'').slice(0,7)===month);
+  const money=v=>Number(v||0).toLocaleString('en-US');
+  const advRows=adv.length?adv.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(x.date||'—')+'</td><td>'+esc(x.notes||'—')+'</td><td>'+money(x.amount)+'</td><td>'+money(x.deducted)+'</td><td>'+money(x.remaining??(Number(x.amount||0)-Number(x.deducted||0)))+'</td></tr>').join(''):'<tr><td colspan="6">لا توجد سلف مسجلة لهذا الشهر</td></tr>';
+  const fineRows=fines.length?fines.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(x.date||'—')+'</td><td>'+esc(x.reason||'—')+'</td><td>'+esc(x.notes||'—')+'</td><td>'+money(x.amount)+'</td></tr>').join(''):'<tr><td colspan="5">لا توجد غرامات مسجلة لهذا الشهر</td></tr>';
+  const details=[['الموظف',r.employee],['الشهر',month],['الراتب الأساسي',money(r.base_salary)],['المكافآت',money(r.bonuses_total)],['إجمالي السلف المستقطعة',money(r.advances_deducted)],['إجمالي الغرامات',money(r.fines_total)],['صافي المستحق',money(r.net_due)],['المبلغ المستلم',money(r.paid)],['المتبقي',money(r.remaining)]].map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1]??'—')+'</td></tr>').join('');
+  const html='<div class="r"><div class="head"><h2>شركة أطلس للكونكريت</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">كشف راتب الموظف</div><table class="data">'+details+'</table><h3>تفاصيل جميع السلف خلال الشهر</h3><table class="data"><thead><tr><th>ت</th><th>التاريخ</th><th>ملاحظات</th><th>مبلغ السلفة</th><th>المستقطع</th><th>المتبقي</th></tr></thead><tbody>'+advRows+'</tbody></table><h3>تفاصيل جميع الغرامات خلال الشهر</h3><table class="data"><thead><tr><th>ت</th><th>التاريخ</th><th>سبب الغرامة</th><th>ملاحظات</th><th>المبلغ</th></tr></thead><tbody>'+fineRows+'</tbody></table><div style="display:flex;justify-content:space-between;gap:35px;margin-top:65px;text-align:center"><div style="width:45%">توقيع الموظف<br><br>..............................</div><div style="width:45%">توقيع المحاسب<br><br>..............................</div></div></div>';
+  printDocA4('كشف راتب الموظف',html);return;
+ }
  const labels=operationalConfig[type].fields.map(([key,label])=>'<tr><td>'+esc(label)+'</td><td>'+esc(r[key]??'—')+'</td></tr>').join('');
  printDocA4(operationalConfig[type].title,'<div class="r"><div class="head"><h2>شركة أطلس للكونكريت</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">'+esc(operationalConfig[type].title)+'</div><table class="data">'+labels+'</table></div>');
 }
@@ -3227,6 +3238,13 @@ body{background:#ffffff!important}
 #mainApp .main > section .order-loadbox{
   /* لا نفرض لوناً على البطاقات؛ تبقى ألوانها المحددة لكل نافذة */
 }
+
+/* مربعات التقارير الرمادية */
+.report-filters{background:#d9dde2!important}
+.report-filters label{color:#26313b!important}
+.report-filters input{background:#f4f5f6!important;color:#202832!important;border-color:#aeb6bf!important}
+.report-kpi{background:linear-gradient(145deg,#d5d9de,#bfc5cc)!important;color:#202832!important;box-shadow:0 3px 10px #0001!important}
+.report-kpi span{color:#424c56!important}
 </style>
 </body>
 </html>
