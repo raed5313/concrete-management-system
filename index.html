@@ -1599,11 +1599,12 @@ return `
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
- <span class="atlas-load-vehicle">${esc(l.vehicle||'—')}</span>
+ <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
+ <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">▣</button>
- ${currentRole === 'manager' ? `<button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
+ ${currentRole === 'manager' ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
 </div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div>
 
@@ -2232,6 +2233,25 @@ logAction(currentUserName,'حذف أمر تجهيز','رقم الأمر: '+no);
 await save();toast('تم حذف الأمر وحمولاته من قاعدة البيانات');
 }catch(err){console.error(err);toast('تعذر حذف الأمر: '+(err.message||''));}
 }
+async function editLoad(id){
+ if(currentRole!=='manager'){toast('تعديل الحمولة متاح للمدير فقط');return;}
+ const l=data.loads.find(x=>String(x.id)===String(id));if(!l)return;
+ openForm('تعديل الحمولة رقم '+l.no,[
+  {name:'driver',label:'اسم السائق',value:l.driver||'',required:false,type:'driverCombo',options:['',...(data.drivers||[]).map(x=>x.name)]},
+  {name:'vehicle',label:'الآلية',value:l.vehicle||'',required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
+  {name:'qty',label:'الكمية م³',value:l.qty,type:'number',required:true}
+ ],async v=>{
+  try{
+   const qty=Number(v.qty);if(!Number.isFinite(qty)||qty<=0)throw new Error('أدخل كمية صحيحة');
+   const {error}=await supabaseClient.from('loads').update({driver:v.driver||null,vehicle:v.vehicle||null,qty}).eq('id',l.id);
+   if(error)throw error;
+   Object.assign(l,{driver:v.driver||'',vehicle:v.vehicle||'',qty});
+   logAction(currentUserName,'تعديل حمولة','رقم الحمولة: '+l.no+' — الأمر: '+l.orderNo);
+   await save();closeModal();render();toast('تم تعديل الحمولة وحفظها مركزياً');
+  }catch(err){console.error(err);toast('تعذر تعديل الحمولة: '+(err.message||''));}
+ });
+}
+
 async function delLoad(id){
 if(currentRole!=='manager'){toast('حذف الحمولة متاح للمدير فقط');return;}
 if(!confirm('حذف الحمولة؟'))return;
@@ -3076,4 +3096,9 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 #orders #ordersBody .atlas-load-print,#orders #ordersBody .atlas-load-delete{flex:0 0 28px!important;width:28px!important;height:28px!important;padding:0!important;border:0!important;background:transparent!important;color:#42d8e8!important;font-size:21px!important;font-weight:900!important;cursor:pointer!important}
 #orders #ordersBody .atlas-load-delete{color:#ff6675!important}
 #orders #ordersBody .atlas-load-list .muted{color:#d5dbe0!important;text-align:center!important}
+</style>
+
+<style>
+#orders #ordersBody .atlas-load-driver{flex:0 1 145px!important;min-width:70px!important;color:#f3f4f6!important;font-size:13px!important;font-weight:800!important;text-align:right!important;overflow-wrap:anywhere!important}
+#orders #ordersBody .atlas-load-edit{flex:0 0 28px!important;width:28px!important;height:28px!important;padding:0!important;border:0!important;background:transparent!important;color:#f5c65a!important;font-size:20px!important;font-weight:900!important;cursor:pointer!important}
 </style>
