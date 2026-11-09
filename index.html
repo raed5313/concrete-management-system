@@ -3188,5 +3188,18 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
   font-weight:900!important;
 }
 </style>
+
+<style>
+/* خلفية بيضاء لمساحة النظام مع الإبقاء على ألوان البطاقات والقوائم والأزرار */
+body{background:#ffffff!important}
+.app{background:#ffffff!important}
+.main{background:#ffffff!important;color:#202329!important}
+.main .panel,.main .stat,.main .brand{color:var(--white)!important}
+/* تصغير خط بطاقة أمر التجهيز قليلاً */
+#orders #ordersBody .atlas-order-field strong{font-size:14px!important;line-height:1.35!important}
+#orders #ordersBody .atlas-order-customer strong{font-size:18px!important;line-height:1.4!important}
+#orders #ordersBody .atlas-order-field small{font-size:11px!important}
+#orders #ordersBody .atlas-order-customer span{font-size:13px!important}
+</style>
 </body>
 </html>
