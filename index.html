@@ -1860,7 +1860,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
-${f.type==='driverCombo'?`<input name="${f.name}" type="text" list="atlasDriverOptions" autocomplete="off" placeholder="اختر سائقاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}"><datalist id="atlasDriverOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
+${f.type==='driverCombo'?`<input name="${f.name}" type="text" list="atlasDriverOptions" autocomplete="off" placeholder="اختر سائقاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}"><datalist id="atlasDriverOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
@@ -1889,7 +1889,7 @@ function openOrder(){
   }
 
   openForm('أمر تجهيز جديد',[
-    {name:'customer',label:'اسم العميل',required:true,options:['',...data.customers.map(x=>x.name)]},
+    {name:'customer',label:'اسم العميل',type:'customerCombo',required:true,options:['',...data.customers.map(x=>x.name)]},
     {name:'phone',label:'رقم موبايل العميل',type:'tel',placeholder:'أدخل رقم الموبايل هنا — 07XXXXXXXXX',full:true},
     {name:'site',label:'موقع الصب',required:true},
     {name:'pour',label:'نوع الصب',options:['سقف+درج','أساس','أعمدة','أرضية','جدار','أخرى']},
