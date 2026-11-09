@@ -3003,8 +3003,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
   font-weight:900!important;
 }
 </style>
-</body>
-</html>
+
 
 <style>
 /* عرض الحمولات مباشرة أسفل كل أمر دون طيّ أو مسافة فاصلة كبيرة */
@@ -3178,3 +3177,16 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
   font-size:14px!important;
 }
 </style>
+
+<style>
+/* تثبيت اللون الأحمر للحقول المطلوبة في بطاقة أمر التجهيز - آخر أولوية CSS */
+#orders #ordersBody tr.order-card .atlas-order-customer strong,
+#orders #ordersBody tr.order-card .atlas-order-grade strong,
+#orders #ordersBody tr.order-card .atlas-order-qty .atlas-order-actual{
+  color:#e00000!important;
+  -webkit-text-fill-color:#e00000!important;
+  font-weight:900!important;
+}
+</style>
+</body>
+</html>
