@@ -1599,11 +1599,11 @@ return `
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
- <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
+ <button type="button" class="atlas-load-driver-toggle" onclick="this.classList.toggle('shown');this.textContent=this.classList.contains('shown')?this.dataset.driver:'إظهار السائق'" data-driver="${esc(l.driver||'—')}" title="اضغط لإظهار اسم السائق">إظهار السائق</button>
  <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
- <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">▣</button>
+ <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">🖨️</button>
  ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
 </div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div>
@@ -2243,9 +2243,10 @@ async function editLoad(id){
  ],async v=>{
   try{
    const qty=Number(v.qty);if(!Number.isFinite(qty)||qty<=0)throw new Error('أدخل كمية صحيحة');
-   const {error}=await supabaseClient.from('loads').update({driver:v.driver||null,vehicle:v.vehicle||null,qty}).eq('id',l.id);
+   const driver=(v.custom_driver||'').trim()||(v.driver||'').trim();
+   const {error}=await supabaseClient.from('loads').update({driver:driver||null,vehicle:v.vehicle||null,qty}).eq('id',l.id);
    if(error)throw error;
-   Object.assign(l,{driver:v.driver||'',vehicle:v.vehicle||'',qty});
+   Object.assign(l,{driver,vehicle:v.vehicle||'',qty});
    logAction(currentUserName,'تعديل حمولة','رقم الحمولة: '+l.no+' — الأمر: '+l.orderNo);
    await save();closeModal();render();toast('تم تعديل الحمولة وحفظها مركزياً');
   }catch(err){console.error(err);toast('تعذر تعديل الحمولة: '+(err.message||''));}
@@ -3135,4 +3136,10 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
  #orders #ordersBody .atlas-order-customer{min-height:68px!important}
  #orders #ordersBody .atlas-order-field strong{font-size:12px!important}
 }
+</style>
+
+<style>
+#orders #ordersBody .atlas-load-driver-toggle{flex:0 1 90px!important;min-width:66px!important;max-width:115px!important;padding:4px 7px!important;border:1px solid #68727c!important;border-radius:6px!important;background:#343a42!important;color:#d9e5ec!important;font-size:10px!important;font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;cursor:pointer!important}
+#orders #ordersBody .atlas-load-driver-toggle.shown{background:#e8edf0!important;color:#28333b!important;border-color:#b8c4cb!important}
+#orders #ordersBody .atlas-load-print{font-size:18px!important}
 </style>
