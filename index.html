@@ -1768,8 +1768,8 @@ function openOperationalForm(type,id){
     const absentDays=monthAttendance.filter(a=>a.status==='غائب').length;
     if(!monthAttendance.length&&!Number(emp.monthly_salary||0))throw new Error('لا توجد سجلات حضور أو غياب لهذا الموظف في الشهر المحدد');
     payload.present_days=presentDays; payload.absent_days=absentDays;
-    const dailyWage=Number(emp.daily_wage||0);
-    if(dailyWage<=0)throw new Error('أدخل اليومية الثابتة للموظف من بيانات الموظفين أولاً');
+    const dailyWage=Number(emp.daily_wage||0), monthlySalary=Number(emp.monthly_salary||0);
+    if(dailyWage<=0&&monthlySalary<=0)throw new Error('أدخل الراتب الشهري أو اليومية الثابتة للموظف أولاً');
     const monthBonuses=(data.bonuses||[]).filter(x=>x.employee===payload.employee&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
     const monthFines=(data.fines||[]).filter(x=>x.employee===payload.employee&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
     const monthAdvances=(data.advances||[]).filter(x=>x.employee===payload.employee&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.deducted||0),0);
@@ -1830,7 +1830,7 @@ function openOperationalForm(type,id){
    const fines=(data.fines||[]).filter(x=>x.employee===emp.name&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.amount||0),0);
    const advances=(data.advances||[]).filter(x=>x.employee===emp.name&&String(x.date||'').slice(0,7)===month).reduce((n,x)=>n+Number(x.deducted||0),0);
    const net=wage+bonuses-fines-advances;
-   preview.innerHTML='أيام الشهر: '+days+'<br>أيام الحضور: '+present+'<br>أيام الغياب: '+absent+'<br>اليومية الثابتة: '+daily.toLocaleString('en-US')+'<br>أجور الحضور: '+wage.toLocaleString('en-US')+'<br>المكافآت: '+bonuses.toLocaleString('en-US')+'<br>السلف المستقطعة: '+advances.toLocaleString('en-US')+'<br>الغرامات: '+fines.toLocaleString('en-US')+'<br><b>صافي المستحق: '+net.toLocaleString('en-US')+' دينار</b>';
+   preview.innerHTML='أيام الشهر: '+days+'<br>أيام الحضور: '+present+'<br>أيام الغياب: '+absent+'<br>'+(monthlySalary>0?'الراتب الشهري الثابت: '+monthlySalary.toLocaleString('en-US'):'الأجرة اليومية: '+daily.toLocaleString('en-US'))+'<br>الراتب الأساسي: '+wage.toLocaleString('en-US')+'<br>المكافآت: '+bonuses.toLocaleString('en-US')+'<br>السلف المستقطعة: '+advances.toLocaleString('en-US')+'<br>الغرامات: '+fines.toLocaleString('en-US')+'<br><b>صافي المستحق: '+net.toLocaleString('en-US')+' دينار</b>';
   };
   employeeField?.addEventListener('change',updatePreview);
   monthField?.addEventListener('change',updatePreview);
@@ -2399,6 +2399,8 @@ openForm('إضافة موظف جديد',[
 {name:'monthly_salary',label:'الراتب الشهري الثابت (دينار)',type:'number',value:0},
 {name:'advances',label:'السلف الحالية',type:'number',value:0}
 ],async v=>{
+const wage=Number(v.daily_wage||0), monthly=Number(v.monthly_salary||0); if(wage<0||monthly<0||(!wage&&!monthly)){toast('أدخل راتباً شهرياً أو أجرة يومية صحيحة');return;}
+v.daily_wage=wage;v.monthly_salary=monthly;
 v.id = Date.now();
 data.employees.push(v);
 logAction(currentUserName, 'إضافة موظف', v.name);
