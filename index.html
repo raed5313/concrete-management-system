@@ -3206,5 +3206,21 @@ body{background:#ffffff!important}
 #orders #ordersBody .atlas-order-field small{font-size:11px!important}
 #orders #ordersBody .atlas-order-customer span{font-size:13px!important}
 </style>
+<style>
+/* جعل مساحة نوافذ وأقسام النظام بيضاء مع إبقاء البطاقات الداخلية بألوانها الأصلية */
+#mainApp,
+#mainApp .main,
+#mainApp .main > section,
+#mainApp #inventoryAlerts{
+  background:#ffffff!important;
+}
+#mainApp .main > section .panel,
+#mainApp .main > section .stat,
+#mainApp .main > section .brand,
+#mainApp .main > section .order-card,
+#mainApp .main > section .order-loadbox{
+  /* لا نفرض لوناً على البطاقات؛ تبقى ألوانها المحددة لكل نافذة */
+}
+</style>
 </body>
 </html>
