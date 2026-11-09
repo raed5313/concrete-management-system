@@ -1859,7 +1859,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
-${f.type==='driverInput'?`<input name="${f.name}" type="text" list="atlasDriverOptions" autocomplete="off" placeholder="اختر سائقاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}"><datalist id="atlasDriverOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.filter(v=>v!=='__custom__').map(v=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر السائق المسجل —':esc(v)}</option>`).join('')}</select><label for="customDriverName" style="display:block;margin-top:10px">أو تسجيل اسم سائق غير مسجل</label><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق خارج النظام" style="display:block;margin-top:6px" autocomplete="off">`:f.options?
+${f.type==='driverCombo'?`<input name="${f.name}" type="text" list="atlasDriverOptions" autocomplete="off" placeholder="اختر سائقاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}"><datalist id="atlasDriverOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
@@ -2237,7 +2237,7 @@ async function editLoad(id){
  if(!['manager','plant','operator'].includes(currentRole)){toast('تعديل الحمولة متاح للمدير ومشغل المعمل فقط');return;}
  const l=data.loads.find(x=>String(x.id)===String(id));if(!l)return;
  openForm('تعديل الحمولة رقم '+l.no,[
-  {name:'driver',label:'اسم السائق',value:l.driver||'',required:false,type:'driverInput',options:(data.drivers||[]).map(x=>x.name)},
+  {name:'driver',label:'اسم السائق',value:l.driver||'',required:false,type:'driverCombo',options:(data.drivers||[]).map(x=>x.name)},
   {name:'vehicle',label:'الآلية',value:l.vehicle||'',required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
   {name:'qty',label:'الكمية م³',value:l.qty,type:'number',required:true}
  ],async v=>{
