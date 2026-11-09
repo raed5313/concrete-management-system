@@ -861,7 +861,7 @@ function formatVisibleThousands(root=document.body){
   nodes.forEach(node=>{
     const original=node.nodeValue;
     const formatted=original.replace(/(^|[^\d،,./-])(\d{4,})(?=$|[^\d،,./-])/g,
-      (match,prefix,digits)=>prefix+Number(digits).toLocaleString('en-US').replace(/,/g,'،'));
+      (match,prefix,digits)=>prefix+(digits.length>1 && digits.startsWith('0') ? digits : Number(digits).toLocaleString('en-US').replace(/,/g,'،')));
     if(formatted!==original) node.nodeValue=formatted;
   });
 }
