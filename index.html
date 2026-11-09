@@ -1859,7 +1859,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
-${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.filter(v=>v!=='__custom__').map(v=>`<option value="${esc(v)}">${v===''?'— اختر السائق المسجل —':esc(v)}</option>`).join('')}</select><label for="customDriverName" style="display:block;margin-top:10px">أو تسجيل اسم سائق غير مسجل</label><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق خارج النظام" style="display:block;margin-top:6px" autocomplete="off">`:f.options?
+${f.type==='driverCombo'?`<select name="${f.name}" id="driverChoice" ${f.required?'required':''}>${f.options.filter(v=>v!=='__custom__').map(v=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر السائق المسجل —':esc(v)}</option>`).join('')}</select><label for="customDriverName" style="display:block;margin-top:10px">أو تسجيل اسم سائق غير مسجل</label><input name="custom_driver" id="customDriverName" type="text" placeholder="اكتب اسم السائق خارج النظام" style="display:block;margin-top:6px" autocomplete="off">`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
 f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
@@ -2244,9 +2244,14 @@ async function editLoad(id){
   try{
    const qty=Number(v.qty);if(!Number.isFinite(qty)||qty<=0)throw new Error('أدخل كمية صحيحة');
    const driver=(v.custom_driver||'').trim()||(v.driver||'').trim();
-   const {error}=await supabaseClient.from('loads').update({driver:driver||null,vehicle:v.vehicle||null,qty}).eq('id',l.id);
+   const {data:updatedLoad,error}=await supabaseClient.from('loads')
+     .update({driver:driver||null,vehicle:v.vehicle||null,qty})
+     .eq('id',l.id)
+     .select('id,driver,vehicle,qty')
+     .maybeSingle();
    if(error)throw error;
-   Object.assign(l,{driver,vehicle:v.vehicle||'',qty});
+   if(!updatedLoad)throw new Error('لم تؤكد قاعدة البيانات تحديث الحمولة؛ تحقق من صلاحية التعديل واتصال الحساب');
+   Object.assign(l,{driver:updatedLoad.driver||'',vehicle:updatedLoad.vehicle||'',qty:Number(updatedLoad.qty)||qty});
    logAction(currentUserName,'تعديل حمولة','رقم الحمولة: '+l.no+' — الأمر: '+l.orderNo);
    await save();closeModal();render();toast('تم تعديل الحمولة وحفظها مركزياً');
   }catch(err){console.error(err);toast('تعذر تعديل الحمولة: '+(err.message||''));}
