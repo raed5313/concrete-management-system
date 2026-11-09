@@ -2655,7 +2655,7 @@ function receiptLoad(no) {
     const accumulatedQty = orderLoads.reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
     const fmtQty = n => Number(n.toFixed(2)).toString();
     const d = dateOnly(l.date || o.date);
-    const receiptNumber = String(o.no); // رقم الوصل دائماً هو رقم أمر التجهيز المرتبط
+    const receiptNumber = String(l.orderNo || o.no).trim().padStart(7, '0'); // رقم الوصل يطابق رقم الأمر المرتبط بسبعة أرقام
     // في وصل التجهيز المطبوع فقط: إظهار حرف M ورقم الآلية دون بقية الاسم أو الوصف
     const vehicleText = String(l.vehicle || '').trim();
     const vehicleMatch = vehicleText.match(/M\s*[-#:]?\s*(\d+)/i);
