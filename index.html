@@ -3005,3 +3005,95 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 
 </style>
 
+
+
+<style>
+/* ترتيب بطاقة أمر التجهيز بالكامل وفق النموذج المرجعي */
+#orders #ordersBody tr.order-card{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ gap:0!important;
+ width:100%!important;
+ overflow:hidden!important;
+ border:1px solid #c9cdd1!important;
+ border-radius:8px!important;
+ background:#f8f7f8!important;
+ color:#34343a!important;
+ margin:0!important;
+ box-shadow:none!important;
+}
+#orders #ordersBody tr.order-card td{
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:center!important;
+ align-items:flex-end!important;
+ text-align:right!important;
+ min-width:0!important;
+ min-height:66px!important;
+ padding:10px 14px!important;
+ gap:5px!important;
+ border:0!important;
+ border-bottom:1px solid #d7d7db!important;
+ border-left:1px solid #d7d7db!important;
+ background:#f8f7f8!important;
+ color:#34343a!important;
+ font-size:14px!important;
+ line-height:1.5!important;
+}
+#orders #ordersBody tr.order-card td:before{
+ display:block!important;
+ flex:none!important;
+ width:100%!important;
+ color:#8a6672!important;
+ font-size:12px!important;
+ font-weight:800!important;
+ text-align:right!important;
+ margin:0!important;
+}
+#orders #ordersBody tr.order-card td:nth-child(1):before{content:"رقم الأمر"!important}
+#orders #ordersBody tr.order-card td:nth-child(2):before{content:"التاريخ"!important}
+#orders #ordersBody tr.order-card td:nth-child(3){grid-column:1/-1;min-height:34px!important;align-items:center!important}
+#orders #ordersBody tr.order-card td:nth-child(3):before{content:"حالة الأمر"!important}
+#orders #ordersBody tr.order-card td:nth-child(4){grid-column:1/-1;min-height:82px!important}
+#orders #ordersBody tr.order-card td:nth-child(4):before{content:"اسم الزبون"!important}
+#orders #ordersBody tr.order-card td:nth-child(5){grid-column:1/-1;min-height:48px!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important}
+#orders #ordersBody tr.order-card td:nth-child(5):before{content:"رقم الهاتف"!important;width:auto!important}
+#orders #ordersBody tr.order-card td:nth-child(6){grid-column:1/-1;min-height:68px!important}
+#orders #ordersBody tr.order-card td:nth-child(6):before{content:"العنوان / موقع الصب"!important}
+#orders #ordersBody tr.order-card td:nth-child(7){grid-column:2;grid-row:7}
+#orders #ordersBody tr.order-card td:nth-child(7):before{content:"نوع الصب"!important}
+#orders #ordersBody tr.order-card td:nth-child(8){grid-column:2;grid-row:8}
+#orders #ordersBody tr.order-card td:nth-child(8):before{content:"المقاومة / المواصفة"!important}
+#orders #ordersBody tr.order-card td:nth-child(9){grid-column:1;grid-row:7 / span 2;justify-content:center!important}
+#orders #ordersBody tr.order-card td:nth-child(9):before{content:"الكمية التقديرية"!important}
+#orders #ordersBody tr.order-card td:nth-child(10){grid-column:1/-1;min-height:70px!important}
+#orders #ordersBody tr.order-card td:nth-child(10):before{content:"السعر الكلي / سعر المتر"!important}
+#orders #ordersBody tr.order-card td:nth-child(11){grid-column:1/-1;align-items:center!important;min-height:54px!important;border-bottom:0!important}
+#orders #ordersBody tr.order-card td:nth-child(11):before{content:"الإجراءات"!important;text-align:center!important}
+#orders #ordersBody tr.order-card td.order-phone-cell .order-phone-label{display:none!important}
+#orders #ordersBody tr.order-card .order-phone-value{direction:ltr!important}
+#orders #ordersBody tr.order-card .actions{justify-content:center!important;width:100%!important;gap:8px!important;flex-wrap:wrap!important}
+#orders #ordersBody tr.order-load-row{
+ display:block!important;width:100%!important;margin:0 0 18px!important;
+ padding:0!important;border:1px solid #e0a36c!important;border-top:0!important;
+ border-bottom:1px solid #e0a36c!important;border-radius:0 0 9px 9px!important;
+ background:#fff0df!important;
+}
+#orders #ordersBody tr.order-load-row td.order-load-cell{
+ display:block!important;width:100%!important;padding:8px!important;
+ background:transparent!important;border:0!important;
+}
+#orders #ordersBody .order-loadbox{
+ background:#ffe2c4!important;color:#38200e!important;
+ border:1px solid #e6ad7b!important;border-radius:8px!important;
+ padding:10px!important;
+}
+#orders #ordersBody .order-load-head{display:flex!important;justify-content:space-between!important;align-items:center!important}
+#orders #ordersBody .order-loadbox table{width:100%!important;min-width:0!important}
+#orders #ordersBody .order-loadbox table td{display:table-cell!important;min-height:0!important;padding:7px!important;color:#38200e!important;border-bottom:1px solid #e8bd96!important}
+#orders #ordersBody .order-loadbox .order-accumulated{background:#fff1f2!important;color:#991b1b!important;font-size:17px!important;font-weight:900!important}
+@media(max-width:600px){
+ #orders #ordersBody tr.order-card td{padding:8px 9px!important;font-size:12px!important;min-height:58px!important}
+ #orders #ordersBody tr.order-card td:before{font-size:11px!important}
+}
+</style>
