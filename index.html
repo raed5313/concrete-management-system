@@ -2099,6 +2099,7 @@ async function openLoad(no) {
                     .from('loads')
                     .insert({
                         load_no: loadNo,
+                        receipt_no: Number(o.no),
                         orderId: orderRow.id,
                         orderNo: String(o.no),
                         driver: v.driver || null,
