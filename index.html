@@ -1930,7 +1930,7 @@ function openOrder(){
           ? parseInt(existing[0].order_no,10) || 0
           : 0;
 
-        const orderNo = String(lastNo + 1);
+        const orderNo = String(lastNo + 1).padStart(6,'0');
 
         const {data: saved, error} = await supabaseClient
           .from('concrete_orders')
