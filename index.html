@@ -3116,3 +3116,23 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 #orders #ordersBody .atlas-load-qty{min-width:48px!important;font-size:14px!important}
 #orders #ordersBody .atlas-load-print,#orders #ordersBody .atlas-load-edit,#orders #ordersBody .atlas-load-delete{flex-basis:24px!important;width:24px!important;height:24px!important;font-size:17px!important}
 </style>
+
+
+<style>
+/* تصغير بطاقة أمر التجهيز قليلاً دون التأثير على بطاقة الحمولات */
+#orders #ordersBody .atlas-order-layout{gap:0!important}
+#orders #ordersBody .atlas-order-field{min-height:58px!important;padding:7px 10px!important;gap:3px!important}
+#orders #ordersBody .atlas-order-customer{min-height:76px!important}
+#orders #ordersBody .atlas-order-field small,
+#orders #ordersBody .atlas-order-actions>small{font-size:11px!important}
+#orders #ordersBody .atlas-order-field strong{font-size:13px!important;line-height:1.35!important}
+#orders #ordersBody .atlas-order-customer span{font-size:11px!important}
+#orders #ordersBody .atlas-order-actions{gap:5px!important;padding:7px 10px!important}
+#orders #ordersBody .atlas-order-actions .actions{gap:5px!important}
+#orders #ordersBody .atlas-order-actions .btn{padding:5px 8px!important;min-height:28px!important;font-size:12px!important}
+@media(max-width:520px){
+ #orders #ordersBody .atlas-order-field{min-height:52px!important;padding:6px 8px!important}
+ #orders #ordersBody .atlas-order-customer{min-height:68px!important}
+ #orders #ordersBody .atlas-order-field strong{font-size:12px!important}
+}
+</style>
