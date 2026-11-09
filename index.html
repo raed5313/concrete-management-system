@@ -1580,7 +1580,7 @@ return `
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
   <div class="atlas-order-field atlas-order-pour"><small>نوع الصب</small><strong>${esc(o.pour)}</strong></div>
   <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
-  <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong>${fmt(o.qty)} م³</strong>${o.actualQty?`<span>${fmt(o.actualQty)} م³ فعلي</span>`:''}</div>
+  <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong>${fmt(o.qty)} م³</strong>${o.actualQty?`<span class="atlas-order-actual">${fmt(o.actualQty)} م³ فعلي</span>`:''}</div>
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
   <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong></div>
   <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
@@ -2993,6 +2993,16 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
   window.addEventListener('keydown', playOnFirstInteraction, { once: true });
 })();
 </script>
+
+<style>
+/* إبراز اسم الزبون والمواصفة والكمية الفعلية باللون الأحمر */
+#orders #ordersBody .atlas-order-customer strong,
+#orders #ordersBody .atlas-order-grade strong,
+#orders #ordersBody .atlas-order-qty .atlas-order-actual{
+  color:#c62828!important;
+  font-weight:900!important;
+}
+</style>
 </body>
 </html>
 
