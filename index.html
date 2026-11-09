@@ -1133,6 +1133,7 @@ if(mixesResult.error) throw mixesResult.error;
         id:x.id,
         no:x.load_no,
         receiptNo:x.receipt_no,
+        orderId:x.orderId,
         orderNo:x.orderNo,
         driver:x.driver,
         vehicle:x.vehicle,
@@ -2647,15 +2648,23 @@ printDocA5('وصل أمر تجهيز',`
 
 function receiptLoad(no) {
     const l = data.loads.find(x => String(x.no) === String(no));
-    const o = l && data.orders.find(x => String(x.no) === String(l.orderNo));
+    const o = l && (
+        (l.orderId && data.orders.find(x => String(x.id) === String(l.orderId))) ||
+        data.orders.find(x => String(x.no) === String(l.orderNo))
+    );
     if (!l || !o) return toast('الحمولة أو أمر التجهيز غير موجود');
-    const allOrderLoads = data.loads.filter(x => String(x.orderNo) === String(l.orderNo));
+    // الاعتماد على العلاقة الفعلية orderId حتى لا يتأثر الوصل بقيمة orderNo القديمة أو الخاطئة
+    const allOrderLoads = data.loads.filter(x =>
+        l.orderId && x.orderId
+            ? String(x.orderId) === String(l.orderId)
+            : String(x.orderNo) === String(o.no)
+    );
     const loadSequence = allOrderLoads.findIndex(x => String(x.no) === String(l.no)) + 1;
     const orderLoads = allOrderLoads.slice(0, Math.max(loadSequence, 0));
     const accumulatedQty = orderLoads.reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
     const fmtQty = n => Number(n.toFixed(2)).toString();
     const d = dateOnly(l.date || o.date);
-    const receiptNumber = String(l.orderNo || o.no).trim().padStart(7, '0'); // رقم الوصل يطابق رقم الأمر المرتبط بسبعة أرقام
+    const receiptNumber = String(o.no).trim().padStart(7, '0'); // رقم كل وصل هو رقم أمر التجهيز المرتبط به، لكل الحمولات
     // في وصل التجهيز المطبوع فقط: إظهار حرف M ورقم الآلية دون بقية الاسم أو الوصف
     const vehicleText = String(l.vehicle || '').trim();
     const vehicleMatch = vehicleText.match(/M\s*[-#:]?\s*(\d+)/i);
