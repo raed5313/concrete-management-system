@@ -1594,19 +1594,17 @@ return `
 </td>
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
-<div class="loadbox order-loadbox" style="margin-top:6px">
-<div class="order-load-head"><b class="goldtext">الحمولات المسجلة داخل الأمر</b><strong class="order-accumulated">${fmt(totalLoadQty)} م³</strong></div>
-${ls.length?`<table><tbody>${ls.map(l=>`
-<tr>
-<td>حمولة ${esc(l.no)}</td>
-<td>السائق: ${esc(l.driver||'—')}</td>
-<td>الآلية: ${esc(l.vehicle||'—')}</td>
-<td>${esc(l.qty)} m</td>
-<td>
-<button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">🖨️</button>
-${currentRole === 'manager' ? `<button class="btn danger" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">❌</button>` : ''}
-</td>
-</tr>`).join('')}</tbody></table>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
+<div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
+<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} م³</strong></div>
+${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
+<div class="atlas-load-row">
+ <span class="atlas-load-seq">${index+1}</span>
+ <span class="atlas-load-vehicle">${esc(l.vehicle||'—')}</span>
+ <span class="atlas-load-spacer"></span>
+ <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
+ <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">▣</button>
+ ${currentRole === 'manager' ? `<button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
+</div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div>
 
 </td></tr>`;
@@ -3061,4 +3059,21 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 #orders #ordersBody .order-loadbox table{width:100%!important;min-width:0!important}
 #orders #ordersBody .order-loadbox table td{display:table-cell!important;padding:7px!important;color:#38200e!important}
 @media(max-width:520px){#orders #ordersBody .atlas-order-field{padding:8px 9px!important;min-height:60px!important}#orders #ordersBody .atlas-order-field strong{font-size:13px!important}#orders #ordersBody .atlas-order-field small,#orders #ordersBody .atlas-order-actions>small{font-size:11px!important}}
+</style>
+
+
+<style>
+/* قائمة الحمولات داخل بطاقة الأمر - ترتيب مطابق للصورة المرجعية */
+#orders #ordersBody .atlas-load-list{background:#202329!important;color:#f4f5f6!important;border:1px solid #59616a!important;border-radius:8px!important;padding:5px!important}
+#orders #ordersBody .atlas-load-total{display:flex!important;justify-content:center!important;align-items:center!important;padding:2px 0 7px!important}
+#orders #ordersBody .atlas-load-total strong{font-size:20px!important;font-weight:900!important;color:#42d8e8!important}
+#orders #ordersBody .atlas-load-rows{display:flex!important;flex-direction:column!important;width:100%!important}
+#orders #ordersBody .atlas-load-row{display:flex!important;flex-direction:row!important;direction:rtl!important;align-items:center!important;gap:9px!important;min-height:42px!important;width:100%!important;padding:4px 8px!important;border-top:1px solid #78818a!important;background:#202329!important}
+#orders #ordersBody .atlas-load-seq{flex:0 0 22px!important;text-align:right!important;color:#42d8e8!important;font-weight:900!important;font-size:14px!important}
+#orders #ordersBody .atlas-load-vehicle{flex:0 0 auto!important;min-width:42px!important;text-align:center!important;padding:4px 8px!important;border-radius:9px!important;background:#e5e7eb!important;color:#3d4650!important;font-size:12px!important;font-weight:900!important}
+#orders #ordersBody .atlas-load-spacer{flex:1 1 auto!important}
+#orders #ordersBody .atlas-load-qty{flex:0 0 auto!important;min-width:58px!important;text-align:left!important;color:#ffca28!important;font-size:16px!important;font-weight:900!important}
+#orders #ordersBody .atlas-load-print,#orders #ordersBody .atlas-load-delete{flex:0 0 28px!important;width:28px!important;height:28px!important;padding:0!important;border:0!important;background:transparent!important;color:#42d8e8!important;font-size:21px!important;font-weight:900!important;cursor:pointer!important}
+#orders #ordersBody .atlas-load-delete{color:#ff6675!important}
+#orders #ordersBody .atlas-load-list .muted{color:#d5dbe0!important;text-align:center!important}
 </style>
