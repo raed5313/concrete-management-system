@@ -1605,7 +1605,7 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
- <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">🖨️</button>
+ <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
  ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
 </div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 </div>
@@ -1628,7 +1628,7 @@ return `<tr>
 <td>${esc(l.vehicle||'—')}</td>
 <td>${fmt(l.qty)} م³</td>
 <td>${esc(l.time||'—')}</td>
-<td><button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.no)}')">🖨️</button></td>
+<td><button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button></td>
 </tr>`;
 }, 8
 );
@@ -2646,8 +2646,9 @@ printDocA5('وصل أمر تجهيز',`
 </div>`);
 }
 
-function receiptLoad(no) {
-    const l = data.loads.find(x => String(x.no) === String(no));
+function receiptLoad(loadId) {
+    // تحديد الحمولة بمعرفها الفريد لأن رقم النقلة يتكرر بين أوامر مختلفة.
+    const l = data.loads.find(x => String(x.id) === String(loadId));
     const o = l && (
         (l.orderId && data.orders.find(x => String(x.id) === String(l.orderId))) ||
         data.orders.find(x => String(x.no) === String(l.orderNo))
