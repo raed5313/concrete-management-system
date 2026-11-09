@@ -2650,7 +2650,7 @@ function receiptLoad(no) {
 <g transform="translate(35 20)"><path d="M105 12 L205 245 L165 245 L105 98 L45 245 L5 245 Z" fill="#20252B" stroke="url(#atlasGold)" stroke-width="8" stroke-linejoin="round"/><path d="M62 183 H148" stroke="url(#atlasGold)" stroke-width="12"/><path d="M20 255 H190" stroke="#20252B" stroke-width="5"/></g>
 <g transform="translate(250 55)"><path d="M0 88 H520" stroke="url(#atlasGold)" stroke-width="4"/><text x="260" y="165" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="bold" letter-spacing="9" fill="#20252B">ATLAS</text><text x="260" y="205" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" letter-spacing="4" fill="#A17B2C">READY MIX CONCRETE</text></g>
 </svg></div><h2 style="font-size:16px;color:#a47b20">شركة أطلس للكونكريت</h2><div style="font-weight:bold;font-size:12px">للخرسانة والكونكريت الجاهز</div><div class="en">ATLAS COMPANY FOR READY MIX CONCRETE</div></div>
-        <div class="title" style="font-size:16px;padding:5px">وصل تجهيز خرسانة</div>
+        <div class="title" style="font-size:16px;padding:5px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">وصل تجهيز خرسانة</div>
         <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>رقم الوصل<br><span class="no">${esc(o.no)}</span></div></div>
         <style>.atlas-load-info td{font-size:13px!important;font-weight:700!important;padding:3px 5px!important;color:#20252b!important;line-height:1.15!important}.atlas-load-info td:last-child{font-size:13px!important;font-weight:800!important}.atlas-load-info tr:nth-child(4) td:last-child{color:#7f1d1d!important}.atlas-load-info tr:nth-child(7) td:last-child{color:#1565c0!important}.atlas-load-info tr:last-child td:last-child{font-size:15px!important;font-weight:900!important}
 @media print{
@@ -2672,11 +2672,11 @@ function receiptLoad(no) {
         
         <div style="border:1px solid #b28a29;border-radius:4px;padding:5px 7px;margin:2px 0 4px;background:#fffdf6;color:#222;font-size:11px;line-height:1.5;min-height:24px"><b style="color:#805313">الملاحظات:</b> <span>${esc(l.note || o.note || '—')}</span></div>
          <div class="big" style="padding:4px;gap:8px;direction:rtl;align-items:stretch">
-           <div style="flex:1;border:0;text-align:center"><b>رقم الحمولة</b><strong style="font-size:16px;padding:3px;color:#a47b20">${loadLabel}</strong></div>
+           <div style="flex:1;border:0;text-align:center"><b>رقم الحمولة</b><strong style="font-size:14px;padding:3px;color:#a47b20">${loadLabel}</strong></div>
            <div style="flex:1;border:0;border-right:1px solid #b28a29;text-align:center"><b style="font-size:11px;font-weight:800">الكمية المتراكمة (م³)</b><strong style="display:block;font-size:23px;font-weight:900;padding:3px;color:#991b1b">${fmtQty(accumulatedQty)}</strong></div>
          </div>
          
-         <div class="section" style="font-size:13px;padding:4px">تفاصيل التجهيز</div>
+         <div class="section" style="font-size:13px;padding:4px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">تفاصيل التجهيز</div>
          <div class="sign" style="direction:ltr;margin-top:3px"><div style="direction:rtl;text-align:center;padding:6px 4px 12px">توقيع الزبون<br><br>....................</div><div style="direction:rtl;text-align:center;padding:6px 4px 12px">توقيع المعمل<br><br>....................</div></div>
          <div class="foot" style="border:1px solid #b28a29;border-radius:5px;padding:9px 10px;margin-top:6px;color:#303030;font-size:12px;font-weight:700;line-height:1.9;text-align:center;background:#fffdf6">نشكركم على اختياركم لنا. نؤكد التزامنا بتقديم أعلى معايير الجودة والمواصفات المتفق عليها. لأي ملاحظات أو استفسارات، يرجى عدم التردد في التواصل معنا.</div>
       </div>`);
