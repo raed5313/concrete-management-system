@@ -3001,16 +3001,39 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 
 <style>
 
-/* ألوان حالات أوامر التجهيز حسب الطلب */
+/* ألوان أوامر التجهيز حسب الحالة المطلوبة */
 #orders #ordersBody tr.order-card.order-open,
-#orders #ordersBody tr.order-card.order-open td{background:#ffffff!important;color:#202020!important;border-color:#d8d8d8!important}
-#orders #ordersBody tr.order-card.order-locked,
-#orders #ordersBody tr.order-card.order-locked td{background:#fff2b8!important;color:#594600!important;border-color:#e6cf72!important}
-#orders #ordersBody tr.order-card.order-invoiced,
-#orders #ordersBody tr.order-card.order-invoiced td{background:#d9f2df!important;color:#174b2b!important;border-color:#a9d8b4!important}
-#orders #ordersBody tr.order-card.order-locked td:before{color:#856b18!important}
-#orders #ordersBody tr.order-card.order-invoiced td:before{color:#287447!important}
+#orders #ordersBody tr.order-card.order-open>td.atlas-order-cell,
+#orders #ordersBody tr.order-card.order-open .atlas-order-layout,
+#orders #ordersBody tr.order-card.order-open .atlas-order-field,
+#orders #ordersBody tr.order-card.order-open .atlas-order-actions{
+ background:#f8dce5!important;color:#61283b!important;border-color:#e7b8c7!important
+}
+#orders #ordersBody tr.order-card.order-open .atlas-order-field strong{color:#61283b!important}
+#orders #ordersBody tr.order-card.order-open .atlas-order-field small,
+#orders #ordersBody tr.order-card.order-open .atlas-order-actions>small{color:#98566d!important}
 
+#orders #ordersBody tr.order-card.order-locked,
+#orders #ordersBody tr.order-card.order-locked>td.atlas-order-cell,
+#orders #ordersBody tr.order-card.order-locked .atlas-order-layout,
+#orders #ordersBody tr.order-card.order-locked .atlas-order-field,
+#orders #ordersBody tr.order-card.order-locked .atlas-order-actions{
+ background:#fff2b8!important;color:#594600!important;border-color:#e6cf72!important
+}
+#orders #ordersBody tr.order-card.order-locked .atlas-order-field strong{color:#594600!important}
+#orders #ordersBody tr.order-card.order-locked .atlas-order-field small,
+#orders #ordersBody tr.order-card.order-locked .atlas-order-actions>small{color:#856b18!important}
+
+#orders #ordersBody tr.order-card.order-invoiced,
+#orders #ordersBody tr.order-card.order-invoiced>td.atlas-order-cell,
+#orders #ordersBody tr.order-card.order-invoiced .atlas-order-layout,
+#orders #ordersBody tr.order-card.order-invoiced .atlas-order-field,
+#orders #ordersBody tr.order-card.order-invoiced .atlas-order-actions{
+ background:#d9f2df!important;color:#174b2b!important;border-color:#a9d8b4!important
+}
+#orders #ordersBody tr.order-card.order-invoiced .atlas-order-field strong{color:#174b2b!important}
+#orders #ordersBody tr.order-card.order-invoiced .atlas-order-field small,
+#orders #ordersBody tr.order-card.order-invoiced .atlas-order-actions>small{color:#287447!important}
 </style>
 
 
