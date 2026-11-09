@@ -1599,7 +1599,7 @@ return `
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
- <button type="button" class="atlas-load-driver-toggle" onclick="this.classList.toggle('shown');this.textContent=this.classList.contains('shown')?this.dataset.driver:'إظهار السائق'" data-driver="${esc(l.driver||'—')}" title="اضغط لإظهار اسم السائق">إظهار السائق</button>
+ <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
  <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
