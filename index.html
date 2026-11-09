@@ -2237,13 +2237,13 @@ async function editLoad(id){
  if(!['manager','plant','operator'].includes(currentRole)){toast('تعديل الحمولة متاح للمدير ومشغل المعمل فقط');return;}
  const l=data.loads.find(x=>String(x.id)===String(id));if(!l)return;
  openForm('تعديل الحمولة رقم '+l.no,[
-  {name:'driver',label:'اسم السائق',value:l.driver||'',required:false,type:'driverCombo',options:['',...(data.drivers||[]).map(x=>x.name)]},
+  {name:'driver',label:'اسم السائق',value:l.driver||'',required:false,type:'text'},
   {name:'vehicle',label:'الآلية',value:l.vehicle||'',required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
   {name:'qty',label:'الكمية م³',value:l.qty,type:'number',required:true}
  ],async v=>{
   try{
    const qty=Number(v.qty);if(!Number.isFinite(qty)||qty<=0)throw new Error('أدخل كمية صحيحة');
-   const driver=(v.custom_driver||'').trim()||(v.driver||'').trim();
+   const driver=String(v.driver||'').trim();
    const {data:updatedLoad,error}=await supabaseClient.from('loads')
      .update({driver:driver||null,vehicle:v.vehicle||null,qty})
      .eq('id',l.id)
