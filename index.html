@@ -2174,7 +2174,7 @@ async function openLoad(no) {
         {name:'driver', label:'اختيار السائق من القائمة', required:false, type:'driverCombo', options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true},
-        {name:'time', label:'وقت تجهيز الحمولة (اختياري)', type:'time', value:new Date().toTimeString().slice(0,5)}
+        {name:'time', label:'وقت تجهيز الحمولة (اختياري — اتركه فارغاً إن لم ترغب بإظهاره)', type:'time', required:false}
     ], v => {
         // إذا كُتب اسم خارجي نعتمده، وإلا نعتمد الاسم المختار من القائمة.
         v.driver = (v.custom_driver || '').trim() || (v.driver === '__custom__' ? '' : (v.driver || '').trim());
@@ -2233,7 +2233,7 @@ async function openLoad(no) {
                         driver: v.driver || null,
                         vehicle: v.vehicle || null,
                         qty: Number(v.qty),
-                        time: v.time || new Date().toTimeString().slice(0,5),
+                        time: v.time || null,
                         pump: o.pump || null,
                         admixture_type: o.admixture_type || null,
                         
