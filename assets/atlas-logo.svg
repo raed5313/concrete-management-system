@@ -1,24 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
-<title id="title">أطلس للكونكريت ATLAS</title><desc id="desc">شعار أطلس للكونكريت الجاهز باللونين الأسود والذهبي</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" role="img" aria-labelledby="title desc">
+<title id="title">ATLAS أطلس للكونكريت</title><desc id="desc">شعار أطلس الذهبي للخرسانة الجاهزة مع شاحنة خلاطة وصوامع</desc>
 <defs>
- <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0a8"/><stop offset=".24" stop-color="#f4c84f"/><stop offset=".55" stop-color="#a86b08"/><stop offset=".78" stop-color="#ffd96a"/><stop offset="1" stop-color="#8a5100"/></linearGradient>
- <linearGradient id="black" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#34343a"/><stop offset=".5" stop-color="#08090d"/><stop offset="1" stop-color="#24252a"/></linearGradient>
- <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="7"/><feComponentTransfer><feFuncA type="linear" slope=".28"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff9c9"/><stop offset=".18" stop-color="#fff06a"/><stop offset=".42" stop-color="#ffb900"/><stop offset=".62" stop-color="#fff5a1"/><stop offset=".82" stop-color="#c77b00"/><stop offset="1" stop-color="#fff0a0"/></linearGradient>
+<linearGradient id="side" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5b3500"/><stop offset=".5" stop-color="#171006"/><stop offset="1" stop-color="#000"/></linearGradient>
+<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<g filter="url(#shadow)">
- <path d="M210 360 440 28h115l230 332H650L500 120 350 360Z" fill="url(#black)"/>
- <path d="M500 28h55l230 332H650L500 120Z" fill="url(#gold)"/>
- <path d="M210 360 440 28h60L300 360Z" fill="#111217"/>
- <path d="M330 360h340l-20-24H350Z" fill="#111217"/>
- <g fill="url(#black)">
-  <path d="M365 352v-54l42-25v79z"/><path d="M425 352v-95l34-19v114z"/><path d="M480 352V220l38-24v156z"/><path d="M540 352V194l38 25v133z"/><path d="M600 352v-91l34 20v71z"/>
- </g>
- <path d="M140 355C300 180 590 100 865 145 675 122 430 205 255 360Z" fill="url(#gold)"/>
- <path d="M140 355C350 185 650 100 865 145 665 138 420 238 255 360Z" fill="none" stroke="#fff0b0" stroke-width="3" opacity=".65"/>
+<g filter="url(#glow)" stroke="url(#gold)" stroke-linejoin="round">
+<path d="M135 405 355 55h110l235 350H565L410 150 255 405Z" fill="url(#gold)" stroke-width="7"/>
+<path d="M350 405 410 285l63 120Z" fill="#130d04" stroke-width="5"/>
+<path d="M210 410Q500 120 850 215Q620 180 350 420Z" fill="url(#gold)" stroke-width="5"/>
+<g fill="url(#side)" stroke-width="7">
+<path d="M565 105h75v250h-75z"/><path d="M665 145h72v210h-72z"/>
+<path d="M575 105v-28h55v28m-55 36h55m-55 65h55m-55 65h55m-55 65h55"/>
+<path d="M675 145v-25h52v25m-52 36h52m-52 62h52m-52 62h52"/>
 </g>
-<text x="500" y="455" text-anchor="middle" direction="rtl" font-family="Tahoma,Arial,sans-serif" font-size="72" font-weight="900" fill="url(#black)">أطلس للكونكريت</text>
-<text x="500" y="545" text-anchor="middle" font-family="Arial,sans-serif" font-size="92" font-weight="900" letter-spacing="5" fill="url(#black)">ATLAS</text>
-<path d="M75 520h170m510 0h170" stroke="url(#gold)" stroke-width="8"/>
-<text x="500" y="600" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" letter-spacing="8" fill="#17181d">READY MIX CONCRETE</text>
-<path d="M210 625Q500 570 790 625" fill="none" stroke="url(#gold)" stroke-width="7"/>
+<g transform="translate(645 280)" fill="url(#gold)" stroke-width="6">
+<path d="M5 75h230l30 40v75H0v-80z"/><path d="M30 75 65 25h80l38 50z" fill="url(#side)"/>
+<path d="M70 28h70v45H38z" fill="#221604"/><path d="M165 25h45l32 50h-77z" fill="#241805"/>
+<path d="M20 105h235" fill="none"/><path d="M75 5q-45 25-5 70l100 0q45-45-5-70z" fill="url(#gold)"/>
+<circle cx="55" cy="190" r="27" fill="#080706"/><circle cx="55" cy="190" r="12" fill="url(#gold)"/><circle cx="210" cy="190" r="27" fill="#080706"/><circle cx="210" cy="190" r="12" fill="url(#gold)"/>
+</g>
+</g>
+<text x="500" y="570" text-anchor="middle" font-family="Arial,sans-serif" font-size="145" font-weight="900" letter-spacing="12" fill="url(#gold)" stroke="#6b4100" stroke-width="3" paint-order="stroke">ATLAS</text>
+<text x="500" y="655" text-anchor="middle" direction="rtl" font-family="Tahoma,Arial,sans-serif" font-size="66" font-weight="900" fill="url(#gold)">أطلس للكونكريت</text>
+<path d="M120 690h180m400 0h180" stroke="url(#gold)" stroke-width="6"/>
+<text x="500" y="735" text-anchor="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" letter-spacing="6" fill="url(#gold)">READY MIX CONCRETE</text>
 </svg>
