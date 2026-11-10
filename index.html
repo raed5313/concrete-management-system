@@ -1506,6 +1506,23 @@ function clearOrdersFilters(){
 render();
 }
 
+
+async function postWalletLinkedTransaction(kind,amount,description,referenceType,referenceId){
+ const value=Number(amount||0);if(!Number.isFinite(value)||value<=0)return;
+ const already=(data.walletTransactions||[]).some(t=>t.metadata&&t.metadata.reference_type===referenceType&&String(t.metadata.reference_id)===String(referenceId));
+ if(already)return;
+ let account=(data.walletAccounts||[]).find(a=>a.account_type==='cash'&&a.is_active);
+ if(!account){
+  const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
+  const {data:a,error}=await supabaseClient.from('wallet_accounts').insert({name:'الصندوق النقدي',account_type:'cash',currency:'IQD',connection_status:'internal',created_by:u.user.id}).select().single();
+  if(error)throw error;account=a;data.walletAccounts.push(a);
+ }
+ const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
+ const payload={transaction_type:kind,amount:value,currency:'IQD',from_account_id:kind==='expense'?account.id:null,to_account_id:kind==='income'?account.id:null,description,reference_no:String(referenceId),metadata:{reference_type:referenceType,reference_id:String(referenceId)},created_by:u.user.id,status:'posted'};
+ const {data:row,error}=await supabaseClient.from('wallet_transactions').insert(payload).select().single();
+ if(error)throw error;data.walletTransactions.unshift(row);
+}
+
 function walletBalances(){
  const balances={};(data.walletAccounts||[]).forEach(a=>balances[a.id]=0);
  (data.walletTransactions||[]).filter(t=>t.status==='posted').forEach(t=>{
@@ -1519,9 +1536,9 @@ function renderWallet(){
  if(!$('walletAccounts'))return;
  const accounts=data.walletAccounts||[], txs=data.walletTransactions||[], balances=walletBalances();
  const total=Object.values(balances).reduce((a,b)=>a+b,0);
- const income=txs.filter(t=>['income','deposit'].includes(t.transaction_type)&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
- const expense=txs.filter(t=>['expense','withdrawal'].includes(t.transaction_type)&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
- $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['إجمالي الإيرادات والإيداعات',fmt(income)+' د.ع'],['إجمالي المصروفات والسحوبات',fmt(expense)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('');
+ const income=txs.filter(t=>t.transaction_type==='income'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
+ const expense=txs.filter(t=>t.transaction_type==='expense'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
+ $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['الإيرادات المسجلة',fmt(income)+' د.ع'],['المصروفات المسجلة',fmt(expense)+' د.ع'],['صافي الإيرادات ناقص المصروفات',fmt(income-expense)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('');
  $('walletAccounts').innerHTML=accounts.map(a=>'<div class="detail"><span>'+esc(a.name)+'</span><strong>'+fmt(balances[a.id]||0)+' د.ع</strong><small style="display:block;color:#71818b">'+(a.connection_status==='connected'?'متصل':a.connection_status==='pending'?'بانتظار الربط':'داخلي')+'</small></div>').join('');
  const names=Object.fromEntries(accounts.map(a=>[a.id,a.name]));
  const types={income:'إيراد',expense:'مصروف',deposit:'إيداع',withdrawal:'سحب',transfer:'تحويل',adjustment:'تسوية'};
@@ -2457,7 +2474,8 @@ v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
 logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer} للأمر ${v.orderNo}`);
 if(!await save()){data.receipts.pop();data.nextRecNo--;data.audit.shift();render();return;}
-closeModal();toast('تم حفظ سند القبض وربطه بأمر التجهيز');
+try{await postWalletLinkedTransaction('income',v.amount,'سند قبض من '+v.customer+' لأمر التجهيز '+v.orderNo,'receipt',v.no);renderWallet();}catch(walletError){console.error(walletError);toast('حُفظ سند القبض، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));return;}
+closeModal();toast('تم حفظ سند القبض وإضافته تلقائياً إلى المحفظة');
 });
 const form=$('form');
 const customer=form.querySelector('[name="customer"]');
@@ -2493,7 +2511,8 @@ v.id = Date.now();
 data.expenses.push(v);
 logAction(currentUserName, 'تسجيل مصروف', `${v.title}: ${v.amount}`);
 if(!await save()){data.expenses.pop();data.audit.shift();render();return;}
-closeModal();toast('تم تسجيل المصروف وحفظه مركزياً');
+try{await postWalletLinkedTransaction('expense',v.amount,'مصروف: '+v.title,'expense',v.id);renderWallet();}catch(walletError){console.error(walletError);toast('حُفظ المصروف، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));return;}
+closeModal();toast('تم تسجيل المصروف وخصمه تلقائياً من المحفظة');
 });
 }
 
