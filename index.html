@@ -1531,11 +1531,12 @@ function openWalletAccount(){
  if(!['manager','accountant'].includes(currentRole))return;
  openForm('إضافة حساب للمحفظة',[
   {name:'name',label:'اسم الحساب',required:true},
-  {name:'account_type',label:'نوع الحساب',options:['cash','bank','mastercard','other'],required:true},
+  {name:'account_type',label:'نوع الحساب',options:['نقدي','مصرفي','Mastercard','أخرى'],required:true},
   {name:'currency',label:'العملة',value:'IQD',required:true}
  ],async v=>{
   const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
-  const {data:row,error}=await supabaseClient.from('wallet_accounts').insert({name:v.name.trim(),account_type:v.account_type,currency:v.currency||'IQD',connection_status:v.account_type==='cash'?'internal':'pending',created_by:u.user.id}).select().single();
+  const accountType={'نقدي':'cash','مصرفي':'bank','Mastercard':'mastercard','أخرى':'other'}[v.account_type];
+  const {data:row,error}=await supabaseClient.from('wallet_accounts').insert({name:v.name.trim(),account_type:accountType,currency:v.currency||'IQD',connection_status:accountType==='cash'?'internal':'pending',created_by:u.user.id}).select().single();
   if(error)throw error;data.walletAccounts.push(row);renderWallet();closeModal();toast('تمت إضافة الحساب');
  });
 }
@@ -1543,20 +1544,20 @@ function openWalletTransaction(){
  if(!['manager','accountant'].includes(currentRole))return;
  const accounts=(data.walletAccounts||[]).filter(a=>a.is_active);
  if(!accounts.length){toast('أضف حساباً للمحفظة أولاً');return;}
- const opts=accounts.map(a=>a.id);
- const labels=accounts.map(a=>a.name);
+ const accountNames=accounts.map(a=>a.name);
+ const accountIdByName=Object.fromEntries(accounts.map(a=>[a.name,a.id]));
  openForm('تسجيل حركة مالية',[
   {name:'transaction_type',label:'نوع الحركة',options:['إيراد','مصروف','إيداع','سحب','تحويل'],required:true},
   {name:'amount',label:'المبلغ بالدينار العراقي',type:'number',min:0.01,step:'0.01',required:true},
-  {name:'from_account_id',label:'من حساب',options:['',...opts].map((id,i)=>i===0?'':id),required:false},
-  {name:'to_account_id',label:'إلى حساب',options:['',...opts],required:false},
+  {name:'from_account_name',label:'من حساب',options:['',...accountNames],required:false},
+  {name:'to_account_name',label:'إلى حساب',options:['',...accountNames],required:false},
   {name:'description',label:'البيان / الوصف',type:'textarea',required:true},
   {name:'reference_no',label:'رقم مرجعي (اختياري)'}
  ],async v=>{
   const map={'إيراد':'income','مصروف':'expense','إيداع':'deposit','سحب':'withdrawal','تحويل':'transfer'};
   const type=map[v.transaction_type], amount=Number(v.amount);
   if(!Number.isFinite(amount)||amount<=0)throw new Error('أدخل مبلغاً صحيحاً أكبر من صفر');
-  let from=v.from_account_id||null,to=v.to_account_id||null;
+  let from=accountIdByName[v.from_account_name]||null,to=accountIdByName[v.to_account_name]||null;
   if(['income','deposit'].includes(type)){from=null;if(!to)throw new Error('اختر الحساب المستلم');}
   if(['expense','withdrawal'].includes(type)){to=null;if(!from)throw new Error('اختر الحساب الذي سيُخصم منه');}
   if(type==='transfer'&&(!from||!to||from===to))throw new Error('اختر حسابين مختلفين للتحويل');
