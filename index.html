@@ -1529,6 +1529,7 @@ async function postWalletLinkedTransaction(kind,amount,description,referenceType
  const payload={transaction_type:kind,amount:value,currency:'IQD',from_account_id:['expense','withdrawal'].includes(kind)?account.id:null,to_account_id:['income','deposit'].includes(kind)?account.id:null,description,reference_no:String(referenceId),metadata:{reference_type:referenceType,reference_id:String(referenceId)},created_by:u.user.id,status:'posted'};
  const {data:row,error}=await supabaseClient.from('wallet_transactions').insert(payload).select().single();
  if(error)throw error;data.walletTransactions.unshift(row);
+ try{logAction(currentUserName,'حركة محفظة تلقائية',description+' — '+fmt(value)+' د.ع');await save();}catch(auditError){console.warn('تعذر حفظ تدقيق حركة المحفظة:',auditError);}
 }
 
 function walletBalances(){
@@ -1568,7 +1569,7 @@ function openWalletAccount(){
   const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
   const accountType={'نقدي':'cash','مصرفي':'bank','Mastercard':'mastercard','أخرى':'other'}[v.account_type];
   const {data:row,error}=await supabaseClient.from('wallet_accounts').insert({name:v.name.trim(),account_type:accountType,currency:v.currency||'IQD',connection_status:accountType==='cash'?'internal':'pending',created_by:u.user.id}).select().single();
-  if(error)throw error;data.walletAccounts.push(row);renderWallet();closeModal();toast('تمت إضافة الحساب');
+  if(error)throw error;data.walletAccounts.push(row);logAction(currentUserName,'إضافة حساب محفظة',row.name);await save();renderWallet();closeModal();toast('تمت إضافة الحساب');
  });
 }
 function openWalletTransaction(){
@@ -1598,7 +1599,8 @@ function openWalletTransaction(){
   const {data:row,error}=await supabaseClient.from('wallet_transactions').insert({transaction_type:type,amount,currency:'IQD',from_account_id:from,to_account_id:to,description:v.description.trim(),reference_no:v.reference_no||null,created_by:u.user.id,status:'posted'}).select().single();
   if(error)throw error;
   data.walletTransactions.unshift(row);
-  try{await supabaseClient.from('audit_logs').insert({user_id:u.user.id,user_name:currentUserName,action:'حركة محفظة',details:(map[v.transaction_type]+' بمبلغ '+fmt(amount)+' د.ع — '+v.description)});}catch(e){console.warn('Wallet audit log:',e);}
+  logAction(currentUserName,'حركة محفظة',map[v.transaction_type]+' بمبلغ '+fmt(amount)+' د.ع — '+v.description);
+  try{await save();}catch(auditError){console.warn('Wallet audit persistence:',auditError);}
   renderWallet();closeModal();toast('تم تسجيل الحركة المالية بنجاح');
  });
 }
