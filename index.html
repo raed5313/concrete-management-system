@@ -2173,7 +2173,8 @@ async function openLoad(no) {
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
         {name:'driver', label:'اختيار السائق من القائمة', required:false, type:'driverCombo', options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
-        {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true}
+        {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true},
+        {name:'time', label:'وقت تجهيز الحمولة', type:'time', value:new Date().toTimeString().slice(0,5), required:true}
     ], v => {
         // إذا كُتب اسم خارجي نعتمده، وإلا نعتمد الاسم المختار من القائمة.
         v.driver = (v.custom_driver || '').trim() || (v.driver === '__custom__' ? '' : (v.driver || '').trim());
@@ -2232,6 +2233,7 @@ async function openLoad(no) {
                         driver: v.driver || null,
                         vehicle: v.vehicle || null,
                         qty: Number(v.qty),
+                        time: v.time || new Date().toTimeString().slice(0,5),
                         pump: o.pump || null,
                         admixture_type: o.admixture_type || null,
                         
@@ -2247,6 +2249,7 @@ async function openLoad(no) {
                 v.no = loadNo;
                 v.receiptNo = savedLoad.receipt_no;
                 v.date = new Date().toISOString().slice(0, 10);
+                v.time = savedLoad.time || v.time || '';
                 
                 v.id = savedLoad.id;
 
@@ -2790,7 +2793,7 @@ function receiptLoad(loadId) {
 <g transform="translate(250 55)"><path d="M0 88 H520" stroke="url(#atlasGold)" stroke-width="4"/><text x="260" y="165" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="bold" letter-spacing="9" fill="#20252B">ATLAS</text><text x="260" y="205" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" letter-spacing="4" fill="#A17B2C">READY MIX CONCRETE</text></g>
 </svg></div><h2 style="font-size:16px;color:#a47b20">شركة أطلس للكونكريت</h2><div style="font-weight:bold;font-size:12px">للخرسانة والكونكريت الجاهز</div><div class="en">ATLAS COMPANY FOR READY MIX CONCRETE</div></div>
         <div class="title" style="font-size:16px;padding:5px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">وصل تجهيز خرسانة</div>
-        <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>رقم الوصل<br><span class="no">${esc(receiptNumber)}</span></div></div>
+        <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>الوقت<br><span class="no" style="color:#111">${esc(l.time || '—')}</span></div><div>رقم الوصل<br><span class="no">${esc(receiptNumber)}</span></div></div>
         <style>.atlas-load-info td{font-size:13px!important;font-weight:700!important;padding:3px 5px!important;color:#20252b!important;line-height:1.15!important}.atlas-load-info td:last-child{font-size:13px!important;font-weight:800!important}.atlas-load-info tr:nth-child(4) td:last-child{color:#7f1d1d!important}.atlas-load-info tr:nth-child(7) td:last-child{color:#1565c0!important}.atlas-load-info tr:last-child td:last-child{font-size:15px!important;font-weight:900!important}
 @media print{
  @page{size:A5 portrait;margin:3mm}
