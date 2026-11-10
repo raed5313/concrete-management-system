@@ -1526,7 +1526,7 @@ async function postWalletLinkedTransaction(kind,amount,description,referenceType
   if(error)throw error;account=a;data.walletAccounts.push(a);
  }
  const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
- const payload={transaction_type:kind,amount:value,currency:'IQD',from_account_id:kind==='expense'?account.id:null,to_account_id:kind==='income'?account.id:null,description,reference_no:String(referenceId),metadata:{reference_type:referenceType,reference_id:String(referenceId)},created_by:u.user.id,status:'posted'};
+ const payload={transaction_type:kind,amount:value,currency:'IQD',from_account_id:['expense','withdrawal'].includes(kind)?account.id:null,to_account_id:['income','deposit'].includes(kind)?account.id:null,description,reference_no:String(referenceId),metadata:{reference_type:referenceType,reference_id:String(referenceId)},created_by:u.user.id,status:'posted'};
  const {data:row,error}=await supabaseClient.from('wallet_transactions').insert(payload).select().single();
  if(error)throw error;data.walletTransactions.unshift(row);
 }
@@ -1546,12 +1546,13 @@ function renderWallet(){
  const total=Object.values(balances).reduce((a,b)=>a+b,0);
  const income=txs.filter(t=>t.transaction_type==='income'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
  const expense=txs.filter(t=>t.transaction_type==='expense'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
+ const withdrawals=txs.filter(t=>t.transaction_type==='withdrawal'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
  const sales=(data.orders||[]).reduce((sum,o)=>{
   const delivered=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no)).reduce((n,l)=>n+(Number(l.qty)||0),0);
   return sum+delivered*(Number(o.price)||0);
  },0);
  const estimatedProfit=sales-expense;
- $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['قيمة الكميات المجهزة',fmt(sales)+' د.ع'],['المقبوض فعلياً',fmt(income)+' د.ع'],['المصروفات المسجلة',fmt(expense)+' د.ع'],['صافي تشغيلي تقديري',fmt(estimatedProfit)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('')+'<p class="muted" style="grid-column:1/-1">الصافي التقديري = قيمة الكميات المجهزة × أسعارها − المصروفات المسجلة. لا يُعد ربحاً نهائياً قبل تسجيل جميع التكاليف والالتزامات والضرائب إن وجدت.</p>';
+ $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['قيمة الكميات المجهزة',fmt(sales)+' د.ع'],['المقبوض فعلياً',fmt(income)+' د.ع'],['المصروفات التشغيلية',fmt(expense)+' د.ع'],['السحوبات والسلف',fmt(withdrawals)+' د.ع'],['صافي تشغيلي تقديري',fmt(estimatedProfit)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('')+'<p class="muted" style="grid-column:1/-1">الصافي التقديري = قيمة الكميات المجهزة × أسعارها − المصروفات المسجلة. لا يُعد ربحاً نهائياً قبل تسجيل جميع التكاليف والالتزامات والضرائب إن وجدت.</p>';
  $('walletAccounts').innerHTML=accounts.map(a=>'<div class="detail"><span>'+esc(a.name)+'</span><strong>'+fmt(balances[a.id]||0)+' د.ع</strong><small style="display:block;color:#71818b">'+(a.connection_status==='connected'?'متصل':a.connection_status==='pending'?'بانتظار الربط':'داخلي')+'</small></div>').join('');
  const names=Object.fromEntries(accounts.map(a=>[a.id,a.name]));
  const types={income:'إيراد',expense:'مصروف',deposit:'إيداع',withdrawal:'سحب',transfer:'تحويل',adjustment:'تسوية'};
@@ -1936,7 +1937,8 @@ function openOperationalForm(type,id){
    if(!old){
     const walletAmount=type==='maintenance'?Number(payload.cost||0):type==='spare_parts'?Number(payload.quantity||0)*Number(payload.unit_price||0):type==='payroll'?Number(payload.paid||0):type==='advances'?Number(payload.amount||0):['fuel','purchases'].includes(type)?Number(payload.total||0):0;
     if(walletAmount>0 && ['fuel','purchases','maintenance','spare_parts','payroll','advances'].includes(type)){
-     try{await postWalletLinkedTransaction('expense',walletAmount,'مصروف '+operationalConfig[type].title+' — '+(payload.vehicle||payload.asset||payload.employee||payload.item||''),'operational_'+type,saved.id);}
+     const walletKind=type==='advances'?'withdrawal':'expense';
+     try{await postWalletLinkedTransaction(walletKind,walletAmount,'مصروف '+operationalConfig[type].title+' — '+(payload.vehicle||payload.asset||payload.employee||payload.item||''),'operational_'+type,saved.id);}
      catch(walletError){console.error(walletError);toast('تم حفظ السجل، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));}
     }
    }
