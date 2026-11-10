@@ -668,6 +668,22 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 </section>
 
+<!-- المحفظة المالية -->
+<section id="wallet" class="hidden">
+<div class="panel">
+<div class="head"><h3>محفظة أطلس المالية — IQD</h3><span class="muted">دفتر مالي داخلي قابل للتكامل المصرفي</span></div>
+<div class="details" id="walletSummary"></div>
+<div class="head" style="margin-top:16px;flex-wrap:wrap">
+<h3>الحسابات والمحافظ</h3>
+<div class="actions"><button class="btn primary" onclick="openWalletTransaction()">＋ حركة مالية</button><button class="btn gold" onclick="openWalletAccount()">＋ إضافة حساب</button></div>
+</div>
+<div id="walletAccounts" class="details"></div>
+<div class="head" style="margin-top:18px"><h3>سجل الحركات المالية</h3></div>
+<div class="tablewrap"><table><thead><tr><th>رقم الحركة</th><th>التاريخ</th><th>النوع</th><th>من حساب</th><th>إلى حساب</th><th>المبلغ</th><th>البيان</th><th>الحالة</th></tr></thead><tbody id="walletTransactions"></tbody></table></div>
+<p class="muted" style="margin-top:12px">الحساب المصرفي وMastercard ظاهران كحسابات داخلية تجريبية لحين إتمام الربط مع مزود دفع مرخّص. لا تُدخل أرقام بطاقات أو كلمات مرور أو رموز تحقق هنا.</p>
+</div>
+</section>
+
 <!-- 9. الفواتير -->
 <section id="invoices" class="hidden">
 <div class="panel">
@@ -815,7 +831,7 @@ const loginAccounts = {
 
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
-inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],mixes:[],fuel:[],purchases:[],maintenance:[],spare_parts:[],
+inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],mixes:[],fuel:[],purchases:[],maintenance:[],spare_parts:[],walletAccounts:[],walletTransactions:[],
 nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 });
 
@@ -991,6 +1007,7 @@ async function logout(){
 const roleMenus = {
 manager: [
 ['dashboard','الرئيسية'],
+['wallet','المحفظة المالية'],
 ['orders','أوامر التجهيز'],
 ['mixes','الخلطات'],
 ['customers','العملاء'],
@@ -1028,6 +1045,7 @@ plant: [
 
 accountant: [
 ['dashboard','الرئيسية'],
+['wallet','المحفظة المالية'],
 ['customers','العملاء'],
 ['orders','أوامر التجهيز 👁'],
 ['plants','الحمولات 👁'],
@@ -1148,6 +1166,14 @@ if(mixesResult.error) throw mixesResult.error;
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
       data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
 data.mixes = mixesResult.data || [];
+      const [walletAccountsResult,walletTransactionsResult] = await Promise.all([
+        supabaseClient.from('wallet_accounts').select('*').order('created_at'),
+        supabaseClient.from('wallet_transactions').select('*').order('created_at',{ascending:false}).limit(500)
+      ]);
+      if(walletAccountsResult.error) throw walletAccountsResult.error;
+      if(walletTransactionsResult.error) throw walletTransactionsResult.error;
+      data.walletAccounts = walletAccountsResult.data || [];
+      data.walletTransactions = walletTransactionsResult.data || [];
       const {data: companyRow, error: companyError} = await supabaseClient
         .from('company_app_data').select('payload').eq('id', true).maybeSingle();
       if (companyError) throw companyError;
@@ -1479,6 +1505,72 @@ function clearOrdersFilters(){
 ['ordersFromDate','ordersToDate','ordersStatusFilter','ordersGeneralSearch'].forEach(id=>{const el=$(id);if(el)el.value='';});
 render();
 }
+
+function walletBalances(){
+ const balances={};(data.walletAccounts||[]).forEach(a=>balances[a.id]=0);
+ (data.walletTransactions||[]).filter(t=>t.status==='posted').forEach(t=>{
+  const n=Number(t.amount||0);
+  if(t.to_account_id&&balances[t.to_account_id]!==undefined)balances[t.to_account_id]+=n;
+  if(t.from_account_id&&balances[t.from_account_id]!==undefined)balances[t.from_account_id]-=n;
+ });
+ return balances;
+}
+function renderWallet(){
+ if(!$('walletAccounts'))return;
+ const accounts=data.walletAccounts||[], txs=data.walletTransactions||[], balances=walletBalances();
+ const total=Object.values(balances).reduce((a,b)=>a+b,0);
+ const income=txs.filter(t=>['income','deposit'].includes(t.transaction_type)&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
+ const expense=txs.filter(t=>['expense','withdrawal'].includes(t.transaction_type)&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
+ $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['إجمالي الإيرادات والإيداعات',fmt(income)+' د.ع'],['إجمالي المصروفات والسحوبات',fmt(expense)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('');
+ $('walletAccounts').innerHTML=accounts.map(a=>'<div class="detail"><span>'+esc(a.name)+'</span><strong>'+fmt(balances[a.id]||0)+' د.ع</strong><small style="display:block;color:#71818b">'+(a.connection_status==='connected'?'متصل':a.connection_status==='pending'?'بانتظار الربط':'داخلي')+'</small></div>').join('');
+ const names=Object.fromEntries(accounts.map(a=>[a.id,a.name]));
+ const types={income:'إيراد',expense:'مصروف',deposit:'إيداع',withdrawal:'سحب',transfer:'تحويل',adjustment:'تسوية'};
+ $('walletTransactions').innerHTML=txs.length?txs.map(t=>'<tr><td>'+esc(t.transaction_no)+'</td><td>'+esc(new Date(t.created_at).toLocaleString('ar-IQ'))+'</td><td>'+esc(types[t.transaction_type]||t.transaction_type)+'</td><td>'+esc(names[t.from_account_id]||'—')+'</td><td>'+esc(names[t.to_account_id]||'—')+'</td><td>'+fmt(t.amount)+' د.ع</td><td>'+esc(t.description)+'</td><td>'+esc(t.status==='posted'?'مرحّلة':t.status)+'</td></tr>').join(''):'<tr><td colspan="8">لا توجد حركات مالية مسجلة بعد</td></tr>';
+}
+function openWalletAccount(){
+ if(!['manager','accountant'].includes(currentRole))return;
+ openForm('إضافة حساب للمحفظة',[
+  {name:'name',label:'اسم الحساب',required:true},
+  {name:'account_type',label:'نوع الحساب',options:['cash','bank','mastercard','other'],required:true},
+  {name:'currency',label:'العملة',value:'IQD',required:true}
+ ],async v=>{
+  const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
+  const {data:row,error}=await supabaseClient.from('wallet_accounts').insert({name:v.name.trim(),account_type:v.account_type,currency:v.currency||'IQD',connection_status:v.account_type==='cash'?'internal':'pending',created_by:u.user.id}).select().single();
+  if(error)throw error;data.walletAccounts.push(row);renderWallet();closeModal();toast('تمت إضافة الحساب');
+ });
+}
+function openWalletTransaction(){
+ if(!['manager','accountant'].includes(currentRole))return;
+ const accounts=(data.walletAccounts||[]).filter(a=>a.is_active);
+ if(!accounts.length){toast('أضف حساباً للمحفظة أولاً');return;}
+ const opts=accounts.map(a=>a.id);
+ const labels=accounts.map(a=>a.name);
+ openForm('تسجيل حركة مالية',[
+  {name:'transaction_type',label:'نوع الحركة',options:['إيراد','مصروف','إيداع','سحب','تحويل'],required:true},
+  {name:'amount',label:'المبلغ بالدينار العراقي',type:'number',min:0.01,step:'0.01',required:true},
+  {name:'from_account_id',label:'من حساب',options:['',...opts].map((id,i)=>i===0?'':id),required:false},
+  {name:'to_account_id',label:'إلى حساب',options:['',...opts],required:false},
+  {name:'description',label:'البيان / الوصف',type:'textarea',required:true},
+  {name:'reference_no',label:'رقم مرجعي (اختياري)'}
+ ],async v=>{
+  const map={'إيراد':'income','مصروف':'expense','إيداع':'deposit','سحب':'withdrawal','تحويل':'transfer'};
+  const type=map[v.transaction_type], amount=Number(v.amount);
+  if(!Number.isFinite(amount)||amount<=0)throw new Error('أدخل مبلغاً صحيحاً أكبر من صفر');
+  let from=v.from_account_id||null,to=v.to_account_id||null;
+  if(['income','deposit'].includes(type)){from=null;if(!to)throw new Error('اختر الحساب المستلم');}
+  if(['expense','withdrawal'].includes(type)){to=null;if(!from)throw new Error('اختر الحساب الذي سيُخصم منه');}
+  if(type==='transfer'&&(!from||!to||from===to))throw new Error('اختر حسابين مختلفين للتحويل');
+  const balances=walletBalances();
+  if(from&&Number(balances[from]||0)<amount)throw new Error('الرصيد المتاح في الحساب لا يكفي لهذه الحركة');
+  const {data:u,error:ue}=await supabaseClient.auth.getUser();if(ue)throw ue;
+  const {data:row,error}=await supabaseClient.from('wallet_transactions').insert({transaction_type:type,amount,currency:'IQD',from_account_id:from,to_account_id:to,description:v.description.trim(),reference_no:v.reference_no||null,created_by:u.user.id,status:'posted'}).select().single();
+  if(error)throw error;
+  data.walletTransactions.unshift(row);
+  try{await supabaseClient.from('audit_logs').insert({user_id:u.user.id,user_name:currentUserName,action:'حركة محفظة',details:(map[v.transaction_type]+' بمبلغ '+fmt(amount)+' د.ع — '+v.description)});}catch(e){console.warn('Wallet audit log:',e);}
+  renderWallet();closeModal();toast('تم تسجيل الحركة المالية بنجاح');
+ });
+}
+
 function render(){
 if($('workshop')) renderWorkshop();
 let isManager = currentRole === 'manager';
@@ -1661,6 +1753,7 @@ return `<tr>
 }
 
 renderOperationalTables(isManager || isAccountant);
+renderWallet();
 [
 ['drivers','driversBody',['name','phone','note']],
 ['vehicles','vehiclesBody',['name','capacity','kind']],
