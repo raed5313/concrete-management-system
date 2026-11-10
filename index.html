@@ -2503,8 +2503,8 @@ v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
 logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer} للأمر ${v.orderNo}`);
 if(!await save()){data.receipts.pop();data.nextRecNo--;data.audit.shift();render();return;}
-try{await postWalletLinkedTransaction('income',v.amount,'سند قبض من '+v.customer+' لأمر التجهيز '+v.orderNo,'receipt',v.no);renderWallet();}catch(walletError){console.error(walletError);toast('حُفظ سند القبض، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));return;}
-closeModal();toast('تم حفظ سند القبض وإضافته تلقائياً إلى المحفظة');
+let walletLinked=true;try{await postWalletLinkedTransaction('income',v.amount,'سند قبض من '+v.customer+' لأمر التجهيز '+v.orderNo,'receipt',v.no);renderWallet();}catch(walletError){walletLinked=false;console.error(walletError);}
+closeModal();toast(walletLinked?'تم حفظ سند القبض وإضافته تلقائياً إلى المحفظة':'تم حفظ سند القبض، لكن تعذرت إضافته للمحفظة. أضف حركة إيراد يدوياً بعد التحقق من السجل.');
 });
 const form=$('form');
 const customer=form.querySelector('[name="customer"]');
@@ -2540,8 +2540,8 @@ v.id = Date.now();
 data.expenses.push(v);
 logAction(currentUserName, 'تسجيل مصروف', `${v.title}: ${v.amount}`);
 if(!await save()){data.expenses.pop();data.audit.shift();render();return;}
-try{await postWalletLinkedTransaction('expense',v.amount,'مصروف: '+v.title,'expense',v.id);renderWallet();}catch(walletError){console.error(walletError);toast('حُفظ المصروف، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));return;}
-closeModal();toast('تم تسجيل المصروف وخصمه تلقائياً من المحفظة');
+let walletLinked=true;try{await postWalletLinkedTransaction('expense',v.amount,'مصروف: '+v.title,'expense',v.id);renderWallet();}catch(walletError){walletLinked=false;console.error(walletError);}
+closeModal();toast(walletLinked?'تم تسجيل المصروف وخصمه تلقائياً من المحفظة':'تم حفظ المصروف، لكن تعذرت إضافته للمحفظة. أضف حركة مصروف يدوياً بعد التحقق من السجل.');
 });
 }
 
