@@ -1934,13 +1934,11 @@ function openOperationalForm(type,id){
    if(result.error)throw result.error;
    const saved={id:result.data.id,...(result.data.payload||{}),created_at:result.data.created_at,updated_at:result.data.updated_at};
    if(old){const idx=data[type].findIndex(x=>x.id===old.id);data[type][idx]=saved;}else data[type].push(saved);
-   if(!old){
-    const walletAmount=type==='maintenance'?Number(payload.cost||0):type==='spare_parts'?Number(payload.quantity||0)*Number(payload.unit_price||0):type==='payroll'?Number(payload.paid||0):type==='advances'?Number(payload.amount||0):['fuel','purchases'].includes(type)?Number(payload.total||0):0;
-    if(walletAmount>0 && ['fuel','purchases','maintenance','spare_parts','payroll','advances'].includes(type)){
-     const walletKind=type==='advances'?'withdrawal':'expense';
-     try{await postWalletLinkedTransaction(walletKind,walletAmount,'مصروف '+operationalConfig[type].title+' — '+(payload.vehicle||payload.asset||payload.employee||payload.item||''),'operational_'+type,saved.id);}
-     catch(walletError){console.error(walletError);toast('تم حفظ السجل، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));}
-    }
+   const walletAmount=type==='maintenance'?Number(payload.cost||0):type==='spare_parts'?Number(payload.quantity||0)*Number(payload.unit_price||0):type==='payroll'?Number(payload.paid||0):type==='advances'?Number(payload.amount||0):['fuel','purchases'].includes(type)?Number(payload.total||0):0;
+   if(walletAmount>0 && ['fuel','purchases','maintenance','spare_parts','payroll','advances'].includes(type)){
+    const walletKind=type==='advances'?'withdrawal':'expense';
+    try{await postWalletLinkedTransaction(walletKind,walletAmount,'مصروف '+operationalConfig[type].title+' — '+(payload.vehicle||payload.asset||payload.employee||payload.item||''),'operational_'+type,saved.id);}
+    catch(walletError){console.error(walletError);toast('تم حفظ السجل، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));}
    }
    logAction(currentUserName,old?'تعديل':'إضافة',operationalConfig[type].title);
    render();closeModal();toast('تم حفظ السجل مركزياً ومشاركته مع الحسابات المخوّلة');
