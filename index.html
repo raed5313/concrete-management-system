@@ -392,7 +392,7 @@ body.plant-role .side .nav{gap:2px!important}
 .atlas-login-card{width:min(480px,100%);padding:clamp(22px,3vw,38px);border:1px solid rgba(66,216,232,.48);border-top:3px solid #42d8e8;border-radius:13px;background:linear-gradient(145deg,#202d34,#172229);box-shadow:0 22px 60px rgba(0,0,0,.4);transform:none}
 .atlas-login-card:before{display:none}
 .atlas-login-brand{display:flex;align-items:center;justify-content:center;gap:15px;text-align:right}
-.atlas-login-brand svg{width:76px;height:72px;filter:drop-shadow(0 4px 5px #0008)}
+.atlas-login-brand svg,.atlas-login-brand .atlas-login-logo{width:112px;height:86px;object-fit:contain;filter:drop-shadow(0 0 8px #ffc400)}
 .atlas-login-name{font-size:36px;font-weight:900;letter-spacing:2px;color:#f4f5f2}
 .atlas-login-ar{font-size:17px;font-weight:bold;color:#42d8e8}
 .atlas-login-rule{height:1px;background:linear-gradient(90deg,transparent,#42d8e8,#b98d37,transparent);margin:18px 0}
@@ -454,7 +454,7 @@ body.plant-role .side .nav{gap:2px!important}
   <div class="atlas-login-panel">
     <div class="login-card atlas-login-card">
       <div class="atlas-login-brand">
-        <svg viewBox="0 0 100 90" role="img" aria-label="شعار أطلس"><defs><linearGradient id="loginGold" x2="1" y2="1"><stop stop-color="#fff0ad"/><stop offset=".5" stop-color="#d4a43d"/><stop offset="1" stop-color="#805713"/></linearGradient></defs><path d="M8 78L43 8l36 70H60L43 43 26 78z" fill="url(#loginGold)" stroke="#f8df94" stroke-width="2"/><path d="M48 63h33l10 15H55z" fill="#42d8e8"/><path d="M14 84h78" stroke="#d4a43d" stroke-width="4" stroke-linecap="round"/></svg>
+        <img class="atlas-login-logo" src="./assets/atlas-logo.svg?v=21" alt="ATLAS أطلس للكونكريت">
         <div><div class="atlas-login-name">ATLAS</div><div class="atlas-login-ar">أطلس للكونكريت الجاهز</div></div>
       </div>
       <div class="atlas-login-rule"></div>
@@ -476,7 +476,7 @@ body.plant-role .side .nav{gap:2px!important}
 <div class="app hidden" id="mainApp">
 <aside class="side">
 <div class="brand">
-<div class="atlas-brand-mark" role="img" aria-label="شعار أطلس للكونكريت ATLAS"><img class="atlas-full-logo" src="./assets/atlas-logo.svg" alt="ATLAS أطلس للكونكريت"></div>>
+<div class="atlas-brand-mark" role="img" aria-label="شعار أطلس للكونكريت ATLAS"><img class="atlas-full-logo" src="./assets/atlas-logo.svg?v=21" alt="ATLAS أطلس للكونكريت"></div>
 <small class="atlas-brand-caption">ATLAS READY MIX CONCRETE</small>
 </div>
 
@@ -2634,25 +2634,7 @@ try{
 }
 
 function atlasDocumentBrand(){
- return `<div class="atlas-doc-brand">
- <svg viewBox="0 0 800 245" role="img" aria-label="شعار أطلس للكونكريت ATLAS">
- <defs>
-  <linearGradient id="atlasDocGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1ad"/><stop offset=".22" stop-color="#e8bd55"/><stop offset=".5" stop-color="#9b6818"/><stop offset=".72" stop-color="#f5d77e"/><stop offset="1" stop-color="#805313"/></linearGradient>
-  <linearGradient id="atlasDocFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7d3"/><stop offset=".5" stop-color="#d8a83e"/><stop offset="1" stop-color="#805313"/></linearGradient>
-  <filter id="atlasDocShadow" x="-25%" y="-25%" width="150%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="3"/><feOffset dx="3" dy="5" result="o"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
- </defs>
- <g transform="translate(22 12)" filter="url(#atlasDocShadow)">
-  <path d="M108 8 L211 218 L171 218 L108 88 L45 218 L6 218 Z" fill="url(#atlasDocFace)" stroke="#725018" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M58 163 H158 L174 190 H42 Z" fill="url(#atlasDocGold)" stroke="#fff0b0" stroke-width="3"/>
-  <path d="M22 225 H194" stroke="#a77a25" stroke-width="8" stroke-linecap="round"/>
- </g>
- <g transform="translate(260 26)" filter="url(#atlasDocShadow)">
-  
-  <path d="M0 91 H520" stroke="url(#atlasDocGold)" stroke-width="4" stroke-linecap="round"/>
-  <text x="260" y="174" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="900" letter-spacing="9" fill="url(#atlasDocGold)" stroke="#674719" stroke-width="2" paint-order="stroke">ATLAS</text>
-  <text x="260" y="207" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" font-weight="bold" letter-spacing="4" fill="#267a8b">READY MIX CONCRETE</text>
- </g></svg>
- <div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE</div></div>`;
+ return '<div class="atlas-doc-brand"><img src="'+location.origin+location.pathname.replace(/[^/]*$/,'')+'assets/atlas-logo.svg?v=21" alt="ATLAS أطلس للكونكريت" style="display:block;width:230px;max-width:100%;height:auto;margin:0 auto"><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE</div></div>';
 }
 
 function printDocA5(title,content){
@@ -3384,7 +3366,7 @@ body{background:#ffffff!important}
 
 /* الشعار الذهبي المعتمد لأطلس */
 .brand .atlas-brand-mark{width:100%;max-width:190px;height:auto;margin:0 auto 6px;display:block;background:transparent;border:0;box-shadow:none}
-.brand .atlas-full-logo{display:block;width:100%!important;height:auto!important;max-height:150px;object-fit:contain}
+.brand .atlas-full-logo{display:block;width:100%!important;height:auto!important;max-height:150px;object-fit:contain}\n.atlas-login-brand .atlas-login-logo{width:112px;height:86px;object-fit:contain}\n.atlas-doc-brand img{filter:drop-shadow(0 0 5px #d99a00)}
 .atlas-brand-caption{color:#ffd34f!important;text-shadow:0 0 8px #ffb900;font-weight:800;letter-spacing:1px}
 </style>
 </body>
