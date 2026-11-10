@@ -1546,7 +1546,12 @@ function renderWallet(){
  const total=Object.values(balances).reduce((a,b)=>a+b,0);
  const income=txs.filter(t=>t.transaction_type==='income'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
  const expense=txs.filter(t=>t.transaction_type==='expense'&&t.status==='posted').reduce((n,t)=>n+Number(t.amount||0),0);
- $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['الإيرادات المسجلة',fmt(income)+' د.ع'],['المصروفات المسجلة',fmt(expense)+' د.ع'],['صافي الإيرادات ناقص المصروفات',fmt(income-expense)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('');
+ const sales=(data.orders||[]).reduce((sum,o)=>{
+  const delivered=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no)).reduce((n,l)=>n+(Number(l.qty)||0),0);
+  return sum+delivered*(Number(o.price)||0);
+ },0);
+ const estimatedProfit=sales-expense;
+ $('walletSummary').innerHTML=[['إجمالي الأرصدة',fmt(total)+' د.ع'],['قيمة الكميات المجهزة',fmt(sales)+' د.ع'],['المقبوض فعلياً',fmt(income)+' د.ع'],['المصروفات المسجلة',fmt(expense)+' د.ع'],['صافي تشغيلي تقديري',fmt(estimatedProfit)+' د.ع']].map(x=>'<div class="detail">'+x[0]+'<strong>'+x[1]+'</strong></div>').join('')+'<p class="muted" style="grid-column:1/-1">الصافي التقديري = قيمة الكميات المجهزة × أسعارها − المصروفات المسجلة. لا يُعد ربحاً نهائياً قبل تسجيل جميع التكاليف والالتزامات والضرائب إن وجدت.</p>';
  $('walletAccounts').innerHTML=accounts.map(a=>'<div class="detail"><span>'+esc(a.name)+'</span><strong>'+fmt(balances[a.id]||0)+' د.ع</strong><small style="display:block;color:#71818b">'+(a.connection_status==='connected'?'متصل':a.connection_status==='pending'?'بانتظار الربط':'داخلي')+'</small></div>').join('');
  const names=Object.fromEntries(accounts.map(a=>[a.id,a.name]));
  const types={income:'إيراد',expense:'مصروف',deposit:'إيداع',withdrawal:'سحب',transfer:'تحويل',adjustment:'تسوية'};
@@ -1851,6 +1856,13 @@ function openOperationalForm(type,id){
  if(id&&!old)return;
  openForm((old?'تعديل ':'')+operationalConfig[type].title,operationalFormFields(type,old||{}),async values=>{
   const payload={...values};
+  if(old && ['fuel','purchases','maintenance','spare_parts','payroll','advances'].includes(type)){
+   const linked=(data.walletTransactions||[]).some(t=>t.metadata&&t.metadata.reference_type==='operational_'+type&&String(t.metadata.reference_id)===String(old.id));
+   if(linked){
+    const financialAmount=r=>type==='maintenance'?Number(r.cost||0):type==='spare_parts'?Number(r.quantity||0)*Number(r.unit_price||0):type==='payroll'?Number(r.paid||0):Number(type==='advances'?r.amount:(r.total||0));
+    if(Number(financialAmount(payload).toFixed(2))!==Number(financialAmount(old).toFixed(2)))throw new Error('لا يمكن تغيير مبلغ سجل مرتبط بالمحفظة. سجّل حركة تصحيح مستقلة للمحافظة على السجل المالي.');
+   }
+  }
   ['quantity','unit_price','total','cost','base_salary','paid','remaining','amount','deducted','current','min'].forEach(k=>{if(payload[k]!==undefined&&payload[k]!=='')payload[k]=Number(payload[k]);});
   if(type==='advances'){
     payload.amount=Number(payload.amount||0); payload.deducted=Number(payload.deducted||0);
@@ -1921,6 +1933,13 @@ function openOperationalForm(type,id){
    if(result.error)throw result.error;
    const saved={id:result.data.id,...(result.data.payload||{}),created_at:result.data.created_at,updated_at:result.data.updated_at};
    if(old){const idx=data[type].findIndex(x=>x.id===old.id);data[type][idx]=saved;}else data[type].push(saved);
+   if(!old){
+    const walletAmount=type==='maintenance'?Number(payload.cost||0):type==='spare_parts'?Number(payload.quantity||0)*Number(payload.unit_price||0):type==='payroll'?Number(payload.paid||0):type==='advances'?Number(payload.amount||0):['fuel','purchases'].includes(type)?Number(payload.total||0):0;
+    if(walletAmount>0 && ['fuel','purchases','maintenance','spare_parts','payroll','advances'].includes(type)){
+     try{await postWalletLinkedTransaction('expense',walletAmount,'مصروف '+operationalConfig[type].title+' — '+(payload.vehicle||payload.asset||payload.employee||payload.item||''),'operational_'+type,saved.id);}
+     catch(walletError){console.error(walletError);toast('تم حفظ السجل، لكن تعذرت إضافته للمحفظة: '+(walletError.message||''));}
+    }
+   }
    logAction(currentUserName,old?'تعديل':'إضافة',operationalConfig[type].title);
    render();closeModal();toast('تم حفظ السجل مركزياً ومشاركته مع الحسابات المخوّلة');
   }catch(err){console.error(err);toast('تعذر الحفظ المركزي: '+(err.message||''));}
@@ -1960,6 +1979,8 @@ function openOperationalForm(type,id){
 function editOperationalRecord(type,id){openOperationalForm(type,id);}
 async function deleteOperationalRecord(type,id){
  if(!['manager','accountant'].includes(currentRole))return;
+ const linked=(data.walletTransactions||[]).some(t=>t.metadata&&t.metadata.reference_type==='operational_'+type&&String(t.metadata.reference_id)===String(id));
+ if(linked){toast('لا يمكن حذف سجل مرتبط بحركة مالية مرحّلة. سجّل حركة تصحيح مستقلة أولاً.');return;}
  if(!confirm('تأكيد حذف السجل؟'))return;
  try{
   const {error}=await supabaseClient.from('company_operational_records').delete().eq('id',id);
