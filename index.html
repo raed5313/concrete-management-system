@@ -1287,6 +1287,14 @@ data.mixes = mixesResult.data || [];
       {event:'*', schema:'public', table:'company_operational_records'},
       syncCloudData
     )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'wallet_accounts'},
+      syncCloudData
+    )
+    .on('postgres_changes',
+      {event:'*', schema:'public', table:'wallet_transactions'},
+      syncCloudData
+    )
     .subscribe();
 }
   
