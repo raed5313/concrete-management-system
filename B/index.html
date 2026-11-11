@@ -1918,7 +1918,7 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <span class="atlas-load-seq">${index+1}</span>
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
  <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
-  <small class="atlas-load-origin">مجهز من فرع (${esc(l.sourceBranch||o.sourceBranch||ATLAS_BRANCH_ID)})</small>
+  ${o.sourceBranch === 'A' && !String(l.sourceLoadId||'').startsWith('A:') ? '<small class="atlas-load-origin" style="color:#c00000;font-weight:900">مجهز من فرع <span style="font-size:1.4em;color:#e00000">B</span></small>' : ''}
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
