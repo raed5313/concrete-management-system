@@ -844,6 +844,11 @@ body.plant-role .side .nav{gap:2px!important}
 
 const KEY='sada-concrete-v8';
 const ATLAS_BRANCH_ID = location.pathname.split('/').includes('B') ? 'B' : 'A';
+if (ATLAS_BRANCH_ID === 'B') {
+  document.title = 'أطلس للكونكريت | ATLAS B - الفرع الثاني';
+  const appTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (appTitle) appTitle.content = 'ATLAS B';
+}
 let currentRole = '';
 let currentUserName = '';
 
@@ -873,7 +878,7 @@ const loginAccounts = {
 const blank=()=>({
 orders:[],loads:[],customers:[],drivers:[],vehicles:[],
 inventory:[],invoices:[],receipts:[],expenses:[],employees:[],audit:[],mixes:[],fuel:[],purchases:[],maintenance:[],spare_parts:[],walletAccounts:[],walletTransactions:[],
-nextOrder:744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
+nextOrder:ATLAS_BRANCH_ID === 'B' ? 1 : 744,nextLoad:1,nextInvNo:101,nextRecNo:501,lastSeenOrder:0
 });
 
 let data;
