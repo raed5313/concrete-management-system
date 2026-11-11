@@ -43,6 +43,7 @@ jobs:
           PY
 
           sed -i "s/^const CACHE_NAME = .*/const CACHE_NAME = \"atlas-b-shell-${GITHUB_SHA:0:8}\";/" B/service-worker.js
+          sed -i 's/key.startsWith("atlas-shell-")/key.startsWith("atlas-b-shell-")/' B/service-worker.js
 
       - name: Commit synchronized branch B
         run: |
