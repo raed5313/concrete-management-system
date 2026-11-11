@@ -843,8 +843,8 @@ body.plant-role .side .nav{gap:2px!important}
 <script>
 'use strict';
 
-const KEY = (ATLAS_BRANCH_ID === 'B') ? 'sada-concrete-v8-B' : 'sada-concrete-v8';
 const ATLAS_BRANCH_ID = location.pathname.split('/').includes('B') ? 'B' : 'A';
+const KEY = (ATLAS_BRANCH_ID === 'B') ? 'sada-concrete-v8-B' : 'sada-concrete-v8';
 if (ATLAS_BRANCH_ID === 'B') {
   document.title = 'أطلس للكونكريت | ATLAS B - الفرع الثاني';
   const appTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
