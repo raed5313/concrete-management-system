@@ -445,14 +445,6 @@ body.plant-role .side .nav{gap:2px!important}
   direction:rtl!important;
   align-items:center!important;
 }
-#orders #ordersBody .atlas-load-row .atlas-load-origin{
-  flex:0 0 auto!important;
-  color:#a32626!important;
-  font-size:10px!important;
-  font-weight:800!important;
-  white-space:nowrap!important;
-  margin-inline:6px!important;
-}
 #orders #ordersBody .atlas-load-row .atlas-load-spacer{
   flex:1 1 auto!important;
   width:auto!important;
@@ -978,14 +970,8 @@ const roleEntryNames = { plant:'المعمل', accountant:'المحاسب', mana
 const roleEntryHint = document.getElementById('roleEntryHint');
 if (roleEntryHint) {
   roleEntryHint.textContent = roleEntryNames[roleEntry]
-    ? 'رابط دخول مخصص: ' + roleEntryNames[roleEntry] + ' — فرع B'
+    ? 'رابط دخول مخصص: ' + roleEntryNames[roleEntry]
     : 'تسجيل الدخول الموحد لجميع الحسابات';
-}
-if (roleEntryNames[roleEntry]) {
-  const loginHeading = document.querySelector('#loginScreen h2');
-  const loginButton = document.querySelector('#loginForm button[type="submit"]');
-  if (loginHeading) loginHeading.textContent = 'تسجيل دخول ' + roleEntryNames[roleEntry] + ' — فرع B';
-  if (loginButton) loginButton.innerHTML = 'دخول ' + roleEntryNames[roleEntry] + ' <span>←</span>';
 }
 
 async function activateUserSession(user) {
@@ -1202,7 +1188,6 @@ if(mixesResult.error) throw mixesResult.error;
       const freshOrders = (ordersResult.data || []).map(x => ({
         id:x.id,
         no:x.order_no,
-        sourceBranch:x.source_branch||'',
         customer:x.customer,
         phone:x.phone,
         site:x.site,
@@ -1210,6 +1195,7 @@ if(mixesResult.error) throw mixesResult.error;
         grade:x.grade,
         pump:x.pump||'',
         admixture_type:x.admixture_type||'',
+        sentToB:!!x.sent_to_branch_b_at,
         qty:x.qty,
         price:x.price,
         date:x.date,
@@ -1247,8 +1233,6 @@ if(mixesResult.error) throw mixesResult.error;
         qty:x.qty,
         pump:x.pump,
         admixture_type:x.admixture_type||'',
-        sourceBranch:x.source_branch||'',
-        sourceLoadId:x.source_load_id||'',
         time:x.time || null,
         status:x.status,
         date:x.created_at
@@ -1882,6 +1866,7 @@ let stateClass = hasInvoice ? 'order-invoiced' : isOrderClosed ? 'order-locked' 
 let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
                   o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري العمل</span>' :
                   `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
+if(o.sentToB && o.status==='مكتمل ومجهز') statusBadge += ' <span style="display:inline-block;background:#e7f5eb;color:#176b35;border:1px solid #26934b;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:900;margin:3px">✔ تم تجهيزه من معمل B</span>';
 
 let canManageOrder = isManager || isPlant;
 let canPrintOnly = isAccountant;
@@ -1890,7 +1875,7 @@ return `
 <tr class="${stateClass} order-card">
 <td colspan="11" class="atlas-order-cell">
  <div class="atlas-order-layout">
-  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${o.sourceBranch === 'A' ? '<span style="color:#e00000;font-size:1.45em;font-weight:900">A/</span>' : ''}${esc(o.no)}</strong>${o.sourceBranch === 'A' ? '<small style="display:block;color:#c00000;font-weight:800;margin-top:3px">مرسل من فرع <span style="font-size:1.35em;font-weight:900;color:#e00000">A</span></small>' : ''} </div>
+  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${esc(o.no)}</strong></div>
   <div class="atlas-order-field atlas-order-date"><small>التاريخ</small><strong>${esc(dateOnly(o.date))}</strong></div>
   <div class="atlas-order-field atlas-order-customer"><small>اسم الزبون</small><strong>${esc(o.customer)}</strong><span dir="ltr">${esc(o.phone||"—")}</span></div>
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
@@ -1918,7 +1903,6 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <span class="atlas-load-seq">${index+1}</span>
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
  <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
-  ${o.sourceBranch === 'A' && !String(l.sourceLoadId||'').startsWith('A:') ? '<small class="atlas-load-origin" style="color:#c00000;font-weight:900">مجهز من فرع <span style="font-size:1.4em;color:#e00000">B</span></small>' : ''}
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
@@ -3075,7 +3059,7 @@ function receiptLoad(loadId) {
 <g transform="translate(35 20)"><path d="M105 12 L205 245 L165 245 L105 98 L45 245 L5 245 Z" fill="#20252B" stroke="url(#atlasGold)" stroke-width="8" stroke-linejoin="round"/><path d="M62 183 H148" stroke="url(#atlasGold)" stroke-width="12"/><path d="M20 255 H190" stroke="#20252B" stroke-width="5"/></g>
 <g transform="translate(250 55)"><path d="M0 88 H520" stroke="url(#atlasGold)" stroke-width="4"/><text x="260" y="165" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="bold" letter-spacing="9" fill="#20252B">ATLAS</text><text x="260" y="205" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" letter-spacing="4" fill="#A17B2C">READY MIX CONCRETE</text></g>
 </svg></div><h2 style="font-size:16px;color:#a47b20">شركة أطلس للكونكريت</h2><div style="font-weight:bold;font-size:12px">للخرسانة والكونكريت الجاهز</div><div class="en">ATLAS COMPANY FOR READY MIX CONCRETE</div></div>
-        <div class="title" style="font-size:16px;padding:5px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">وصل تجهيز خرسانة ${o.sourceBranch === 'A' && !String(l.sourceLoadId||'').startsWith('A:') ? '<span style="color:#e00000;font-size:0.85em;font-weight:900;margin-right:5px">B</span>' : ''} </div>
+        <div class="title" style="font-size:16px;padding:5px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">وصل تجهيز خرسانة</div>
         <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>الوقت<br><span class="no" style="color:#111">${esc(l.time || '—')}</span></div><div>رقم الوصل<br><span class="no">${esc(receiptNumber)}</span></div></div>
         <style>.atlas-load-info td{font-size:13px!important;font-weight:700!important;padding:3px 5px!important;color:#20252b!important;line-height:1.15!important}.atlas-load-info td:last-child{font-size:13px!important;font-weight:800!important}.atlas-load-info tr:nth-child(4) td:last-child{color:#7f1d1d!important}.atlas-load-info tr:nth-child(7) td:last-child{color:#1565c0!important}.atlas-load-info tr:last-child td:last-child{font-size:15px!important;font-weight:900!important}
 @media print{
