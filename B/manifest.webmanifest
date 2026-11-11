@@ -1,0 +1,21 @@
+{
+  "name": "أطلس للكونكريت | ATLAS B",
+  "short_name": "ATLAS B",
+  "description": "نظام إدارة الخرسانة الجاهزة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./?role=manager",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090d12",
+  "theme_color": "#090d12",
+  "icons": [
+    {
+      "src": "./icons/atlas.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
