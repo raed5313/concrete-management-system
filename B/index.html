@@ -2319,8 +2319,35 @@ openForm('تأكيد قفل الأمر رقم '+no,[
 {name:'deliveredDisplay',label:'إجمالي الكمية المجهزة فعلياً (m³) — ستعتمد عند القفل',value:delivered.toFixed(2),required:true},
 {name:'lockNote',label:'ملاحظات الإقفال',full:true}
 ],async v=>{
-o.actualQty=delivered;
 o.lockNote=v.lockNote||'';
+// أوامر A المستلمة في B يجب إغلاقها عبر وظيفة المزامنة حتى تصل الحالة والكمية إلى A.
+if(ATLAS_BRANCH_ID==='B'){
+ try{
+  const {data:branchOrder,error:branchLookupError}=await supabaseClient.from('atlas_branch_orders').select('source_order_id').eq('source_order_no',String(no)).maybeSingle();
+  if(branchLookupError)throw branchLookupError;
+  if(branchOrder?.source_order_id){
+   const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+   if(sessionError)throw sessionError;
+   const token=sessionData?.session?.access_token;
+   if(!token)throw new Error('انتهت جلسة الدخول؛ سجّل الدخول مجدداً');
+   const response=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({action:'close_order',source_order_id:branchOrder.source_order_id,lock_note:o.lockNote})
+   });
+   const result=await response.json();
+   if(!response.ok||!result.success)throw new Error(result.error||'تعذر إرسال إكمال الأمر إلى A');
+   o.actualQty=Number(result.actual_qty||delivered);
+   o.status='مكتمل ومجهز';
+   logAction(currentUserName,'إكمال أمر وارد من A',`الأمر: ${no} - الكمية الفعلية: ${o.actualQty}`);
+   await syncCloudData();closeModal();toast('تم إكمال الأمر وإرسال الكمية والحالة إلى A');return;
+  }
+ }catch(err){
+  console.error('ATLAS close-order sync:',err);
+  toast('فشل إكمال الأمر ومزامنته: '+(err.message||'تحقق من الاتصال'));
+  return;
+ }
+}
+o.actualQty=delivered;
 o.status='مكتمل ومجهز';
 try{
  const {error:closeError}=await supabaseClient.from('concrete_orders')
