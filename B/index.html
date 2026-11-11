@@ -1187,7 +1187,7 @@ if(mixesResult.error) throw mixesResult.error;
       // تذكّر آخر أمر تم استلامه على هذا الجهاز حتى لا تضيع نافذة التنبيه بعد إغلاق الموقع أو إعادة تحميله.
       // عند أول تشغيل فقط نضع خط أساس، ثم نعرض أحدث أمر وصل أثناء غياب المعمل.
       if (currentRole === 'plant' && freshOrders.length) {
-        const markerKey = 'atlas-plant-last-order-no';
+        const markerKey = 'atlas-plant-last-order-no-' + ATLAS_BRANCH_ID;
         const latestNo = Math.max(...freshOrders.map(o => Number(o.no) || 0));
         let lastNotifiedNo = 0;
         try { lastNotifiedNo = Number(localStorage.getItem(markerKey) || 0); } catch(e) {}
@@ -1281,9 +1281,9 @@ data.mixes = mixesResult.data || [];
   await syncCloudData();
   if(currentRole==='manager'){
     const today=new Date().toISOString().slice(0,10);
-    let lastBackupDay='';try{lastBackupDay=localStorage.getItem('atlas-last-cloud-backup-day')||'';}catch(e){}
+    let lastBackupDay='';try{lastBackupDay=localStorage.getItem('atlas-last-cloud-backup-day-' + ATLAS_BRANCH_ID)||'';}catch(e){}
     if(lastBackupDay!==today) setTimeout(()=>createAtlasBackup(false),1800);
-    else if($('atlasBackupStatus')) $('atlasBackupStatus').textContent='آخر نسخة سحابية ناجحة: '+(localStorage.getItem('atlas-last-cloud-backup-at')||today);
+    else if($('atlasBackupStatus')) $('atlasBackupStatus').textContent='آخر نسخة سحابية ناجحة: '+(localStorage.getItem('atlas-last-cloud-backup-at-' + ATLAS_BRANCH_ID)||today);
   }
   // مزامنة تلقائية بين حسابات المدير والمحاسب والمعمل حتى تظهر التغييرات الحديثة دون إعادة تسجيل الدخول.
   if (window.sadaCloudSyncTimer) clearInterval(window.sadaCloudSyncTimer);
@@ -1397,11 +1397,11 @@ async function createAtlasBackup(showToast=true){
    const payload=await collectAtlasBackup();
    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
    const day=new Date().toISOString().slice(0,10);
-   const path='backups/'+auth.user.id+'/atlas-full-'+day+'.json';
+   const path='backups/'+ATLAS_BRANCH_ID+'/'+auth.user.id+'/atlas-full-'+day+'.json';
    if(status)status.textContent='جارٍ رفع النسخة الآمنة إلى التخزين السحابي...';
    const {error:uploadError}=await supabaseClient.storage.from('atlas-backups').upload(path,blob,{contentType:'application/json',upsert:true});
    if(uploadError)throw uploadError;
-   try{localStorage.setItem('atlas-last-cloud-backup-day',day);localStorage.setItem('atlas-last-cloud-backup-at',payload.created_at);}catch(e){}
+   try{localStorage.setItem('atlas-last-cloud-backup-day-' + ATLAS_BRANCH_ID,day);localStorage.setItem('atlas-last-cloud-backup-at-' + ATLAS_BRANCH_ID,payload.created_at);}catch(e){}
    if(status)status.textContent='آخر نسخة سحابية ناجحة: '+new Date(payload.created_at).toLocaleString('ar-IQ')+' — '+Object.values(payload.tables).reduce((n,x)=>n+x.length,0)+' سجل';
    window.atlasLastBackupPayload=payload;
    if(showToast)toast('تم إنشاء النسخة الاحتياطية الشاملة بنجاح');
