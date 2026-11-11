@@ -26,20 +26,29 @@ jobs:
             --exclude='.github/' \
             --exclude='B/' \
             --exclude='README.md' \
-            --exclude='manifest.webmanifest' \
-            --exclude='service-worker.js' \
             ./ B/
 
           python3 - <<'PY'
           from pathlib import Path
-          p = Path("B/index.html")
-          s = p.read_text(encoding="utf-8")
-          s = s.replace('content="ATLAS">', 'content="ATLAS B">')
-          s = s.replace(
+          import json
+
+          index = Path("B/index.html")
+          html = index.read_text(encoding="utf-8")
+          html = html.replace('content="ATLAS">', 'content="ATLAS B">')
+          html = html.replace(
               '<title>أطلس للكونكريت | نظام إدارة الخرسانة الجاهزة</title>',
               '<title>أطلس للكونكريت | ATLAS B - الفرع الثاني</title>'
           )
-          p.write_text(s, encoding="utf-8")
+          index.write_text(html, encoding="utf-8")
+
+          manifest = Path("B/manifest.webmanifest")
+          data = json.loads(manifest.read_text(encoding="utf-8"))
+          data["name"] = "أطلس للكونكريت | ATLAS B - الفرع الثاني"
+          data["short_name"] = "ATLAS B"
+          manifest.write_text(
+              json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8"
+          )
           PY
 
           sed -i "s/^const CACHE_NAME = .*/const CACHE_NAME = \"atlas-b-shell-${GITHUB_SHA:0:8}\";/" B/service-worker.js
