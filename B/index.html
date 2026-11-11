@@ -884,11 +884,14 @@ const supabaseClient = window.supabase.createClient(
 const loginAccounts = {
   'مدير': 'raed@sada-alaamar.com',
   'مدير A': 'raed@sada-alaamar.com',
+  'مدير B': 'raed@sada-alaamar.com',
   'معمل': 'raed1@sada-alaamar.com',
   'معمل A': 'raed1@sada-alaamar.com',
+  'معمل B': 'raed1@sada-alaamar.com',
   'مشغل المعمل': 'raed1@sada-alaamar.com',
   'محاسب': 'raed2@sada-alaamar.com',
-  'محاسب A': 'raed2@sada-alaamar.com'
+  'محاسب A': 'raed2@sada-alaamar.com',
+  'محاسب B': 'raed2@sada-alaamar.com'
 };
 
 const blank=()=>({
@@ -3335,9 +3338,15 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
 }
 }
 
-/* استعادة جلسة المستخدم تلقائياً بعد تحديث الصفحة دون طلب تسجيل الدخول مجدداً */
+/* عند فتح رابط دور محدد، نلغي الجلسة السابقة محلياً حتى لا يفرض دور قديم واجهته على الرابط.
+   بعد ذلك يسجل المستخدم بالحساب المطابق للدور؛ وتبقى الصلاحيات معتمدة حصراً على user_profiles. */
 (async function restoreSadaSession(){
   try {
+    if (['plant','accountant','manager'].includes(roleEntry)) {
+      const { error } = await supabaseClient.auth.signOut({ scope: 'local' });
+      if (error) throw error;
+      return;
+    }
     const { data: sessionData, error } = await supabaseClient.auth.getSession();
     if (error) throw error;
     if (sessionData && sessionData.session && sessionData.session.user) {
@@ -3346,7 +3355,7 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
   } catch (err) {
     console.error('Session restore:', err);
     const msg = $('loginError');
-    if (msg) msg.textContent = 'تعذر استعادة الجلسة؛ تحقق من الاتصال ثم أعد المحاولة.';
+    if (msg) msg.textContent = 'تعذر تهيئة جلسة الدخول؛ تحقق من الاتصال ثم أعد المحاولة.';
   }
 })();
 </script>
