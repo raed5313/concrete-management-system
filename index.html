@@ -1397,7 +1397,7 @@ async function createAtlasBackup(showToast=true){
    const payload=await collectAtlasBackup();
    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
    const day=new Date().toISOString().slice(0,10);
-   const path='backups/'+ATLAS_BRANCH_ID+'/'+auth.user.id+'/atlas-full-'+day+'.json';
+   const path='backups/'+auth.user.id+'/'+ATLAS_BRANCH_ID+'/atlas-full-'+day+'.json';
    if(status)status.textContent='جارٍ رفع النسخة الآمنة إلى التخزين السحابي...';
    const {error:uploadError}=await supabaseClient.storage.from('atlas-backups').upload(path,blob,{contentType:'application/json',upsert:true});
    if(uploadError)throw uploadError;
