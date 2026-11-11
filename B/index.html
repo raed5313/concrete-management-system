@@ -445,6 +445,14 @@ body.plant-role .side .nav{gap:2px!important}
   direction:rtl!important;
   align-items:center!important;
 }
+#orders #ordersBody .atlas-load-row .atlas-load-origin{
+  flex:0 0 auto!important;
+  color:#a32626!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  margin-inline:6px!important;
+}
 #orders #ordersBody .atlas-load-row .atlas-load-spacer{
   flex:1 1 auto!important;
   width:auto!important;
@@ -1239,6 +1247,7 @@ if(mixesResult.error) throw mixesResult.error;
         qty:x.qty,
         pump:x.pump,
         admixture_type:x.admixture_type||'',
+        sourceBranch:x.source_branch||'',
         time:x.time || null,
         status:x.status,
         date:x.created_at
@@ -1908,6 +1917,7 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <span class="atlas-load-seq">${index+1}</span>
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
  <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
+  <small class="atlas-load-origin">مجهز من فرع (${esc(l.sourceBranch||o.sourceBranch||ATLAS_BRANCH_ID)})</small>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
