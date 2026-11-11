@@ -2312,7 +2312,23 @@ async function closeOrder(no){
 if(currentRole!=='plant' && currentRole!=='manager'){toast('لا تملك صلاحية تعديل الأمر');return;}
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o) return;
-if(o.status === 'مكتمل ومجهز'){toast('هذا الأمر مقفول بالفعل');return;}
+if(o.status === 'مكتمل ومجهز'){
+ if(ATLAS_BRANCH_ID==='B'){
+  try{
+   const {data:branchOrder,error:lookupError}=await supabaseClient.from('atlas_branch_orders').select('source_order_id,status').eq('source_order_no',String(no)).maybeSingle();
+   if(lookupError)throw lookupError;
+   if(branchOrder?.source_order_id && branchOrder.status!=='مكتمل ومجهز'){
+    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+    if(sessionError)throw sessionError;
+    const token=sessionData?.session?.access_token;if(!token)throw new Error('انتهت جلسة الدخول');
+    const response=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'close_order',source_order_id:branchOrder.source_order_id,actual_qty:Number(o.actualQty||0),lock_note:o.lockNote||''})});
+    const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||'تعذر إرسال الإكمال إلى A');
+    await syncCloudData();toast('تمت إعادة مزامنة إكمال الأمر إلى A');return;
+   }
+  }catch(err){console.error(err);toast('تعذرت إعادة المزامنة: '+(err.message||''));return;}
+ }
+ toast('هذا الأمر مقفول بالفعل');return;
+}
 const delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((sum,x)=>sum+(Number(x.qty)||0),0);
 if(delivered<=0){toast('لا يمكن قفل الأمر قبل تسجيل حمولة واحدة على الأقل');return;}
 openForm('تأكيد قفل الأمر رقم '+no,[
@@ -2332,7 +2348,7 @@ if(ATLAS_BRANCH_ID==='B'){
    if(!token)throw new Error('انتهت جلسة الدخول؛ سجّل الدخول مجدداً');
    const response=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-    body:JSON.stringify({action:'close_order',source_order_id:branchOrder.source_order_id,lock_note:o.lockNote})
+    body:JSON.stringify({action:'close_order',source_order_id:branchOrder.source_order_id,actual_qty:delivered,lock_note:o.lockNote})
    });
    const result=await response.json();
    if(!response.ok||!result.success)throw new Error(result.error||'تعذر إرسال إكمال الأمر إلى A');
