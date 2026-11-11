@@ -1,4 +1,1 @@
-window.SUPABASE_CONFIG = {
-  url: "https://lnccpommcksrilekelvk.supabase.co",
-  publishableKey: "sb_publishable_5nooVdw5hjgd97KuGVYEOw_SDcM2pAp"
-};
+window.SUPABASE_CONFIG = {\n  url: "https://lnccpommcksrilekelvk.supabase.co",\n  publishableKey: "sb_publishable_5nooVdw5hjgd97KuGVYEOw_SDcM2pAp"\n};\n
