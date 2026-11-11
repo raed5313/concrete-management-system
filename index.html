@@ -859,6 +859,9 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   {
+    global: {
+      headers: { 'x-atlas-branch': ATLAS_BRANCH_ID }
+    },
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -956,6 +959,7 @@ async function activateUserSession(user) {
     .from('user_profiles')
     .select('display_name,app_role,branch_id')
     .eq('user_id', user.id)
+    .eq('branch_id', ATLAS_BRANCH_ID)
     .single();
 
   if (error || !profile) {
