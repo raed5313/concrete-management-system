@@ -1587,6 +1587,30 @@ details: details
 if(data.audit.length > 100) data.audit.pop();
 }
 
+async function sendOrderToB(orderNo){
+ if(ATLAS_BRANCH_ID!=="A"||currentRole!=="manager")return;
+ if(!confirm("إرسال الأمر "+orderNo+" مع جميع حمولاته إلى معمل B؟"))return;
+ try{
+  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError)throw sessionError;
+  const token=sessionData?.session?.access_token;
+  if(!token)throw new Error("انتهت جلسة الدخول؛ سجّل الدخول مجدداً");
+  const {data:existing,error:checkError}=await supabaseClient.from("concrete_orders").select("sent_to_branch_b_at").eq("order_no",String(orderNo)).eq("branch_id","A").maybeSingle();
+  if(checkError)throw checkError;
+  if(existing?.sent_to_branch_b_at){toast("هذا الأمر مُرسل إلى معمل B مسبقاً");return;}
+  const response=await fetch(SUPABASE_URL+"/functions/v1/atlas-branch-transfer",{
+   method:"POST",
+   headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+   body:JSON.stringify({action:"send_order",order_no:String(orderNo)})
+  });
+  const result=await response.json();
+  if(!response.ok||!result.success)throw new Error(result.error||"تعذر إرسال الأمر");
+  toast("تم إرسال الأمر "+orderNo+" إلى B مع "+(result.imported_loads??0)+" حمولة");
+ }catch(err){
+  console.error("ATLAS branch transfer:",err);
+  toast("فشل الإرسال: "+(err?.message||"تحقق من الاتصال"));
+ }
+}
 function toast(s){
 $('toast').textContent=s;
 $('toast').style.display='block';
@@ -1859,6 +1883,7 @@ return `
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
   <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong></div>
   <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
+   ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
    ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
    ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
    <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
