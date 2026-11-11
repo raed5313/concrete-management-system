@@ -843,6 +843,7 @@ body.plant-role .side .nav{gap:2px!important}
 'use strict';
 
 const KEY='sada-concrete-v8';
+const ATLAS_BRANCH_ID = /\\/B(?:\\/|$)/.test(location.pathname) ? 'B' : 'A';
 let currentRole = '';
 let currentUserName = '';
 
@@ -858,7 +859,7 @@ const supabaseClient = window.supabase.createClient(
       autoRefreshToken: true,
       detectSessionInUrl: true,
       storage: window.localStorage,
-      storageKey: 'atlas-concrete-auth-session'
+      storageKey: 'atlas-concrete-auth-session-' + ATLAS_BRANCH_ID
     }
   }
 );
@@ -948,12 +949,16 @@ if (roleEntryHint) {
 async function activateUserSession(user) {
   const { data: profile, error } = await supabaseClient
     .from('user_profiles')
-    .select('display_name,app_role')
+    .select('display_name,app_role,branch_id')
     .eq('user_id', user.id)
     .single();
 
   if (error || !profile) {
     throw new Error('لم يتم العثور على صلاحية المستخدم.');
+  }
+  if (profile.branch_id !== ATLAS_BRANCH_ID) {
+    await supabaseClient.auth.signOut({ scope: 'local' });
+    throw new Error('هذا الحساب تابع للفرع ' + (profile.branch_id || 'غير محدد') + ' ولا يمكن استخدامه في هذا الرابط.');
   }
 
   const authenticatedRole = profile.app_role === 'operator' ? 'plant' : profile.app_role;
@@ -1215,7 +1220,7 @@ data.mixes = mixesResult.data || [];
       data.walletAccounts = walletAccountsResult.data || [];
       data.walletTransactions = walletTransactionsResult.data || [];
       const {data: companyRow, error: companyError} = await supabaseClient
-        .from('company_app_data').select('payload').eq('id', true).maybeSingle();
+        .from('company_app_data').select('payload').eq('branch_id', ATLAS_BRANCH_ID).eq('id', true).maybeSingle();
       if (companyError) throw companyError;
       const [operationalResult,auditResult] = await Promise.all([
         supabaseClient.from('company_operational_records').select('*').order('created_at'),
@@ -1573,7 +1578,7 @@ async function save(){
         nextInvNo:data.nextInvNo, nextRecNo:data.nextRecNo
       };
       const {data: savedRow, error} = await supabaseClient.from('company_app_data')
-        .upsert({id:true, payload, updated_by:userId, updated_at:new Date().toISOString()}, {onConflict:'id'})
+        .upsert({branch_id:ATLAS_BRANCH_ID, id:true, payload, updated_by:userId, updated_at:new Date().toISOString()}, {onConflict:'branch_id,id'})
         .select('id,updated_at')
         .single();
       if (error) throw error;
@@ -2423,7 +2428,8 @@ try{
    if(Object.values(values).some(x=>typeof x==='number'&&(!Number.isFinite(x)||x<0)))throw new Error('تأكد من إدخال كميات صحيحة');
    const {data:authData}=await supabaseClient.auth.getSession();
    values.updated_by=authData?.session?.user?.id||null;
-   const {error:saveError}=await supabaseClient.from('concrete_order_mix_recipes').upsert(values,{onConflict:'order_no'});
+   values.branch_id=ATLAS_BRANCH_ID;
+   const {error:saveError}=await supabaseClient.from('concrete_order_mix_recipes').upsert(values,{onConflict:'branch_id,order_no'});
    if(saveError)throw saveError;
    logAction(currentUserName,'تعديل مكونات خلطة أمر تجهيز','رقم الأمر: '+no);
    closeModal();toast('تم حفظ كميات مكونات الخلطة للمتر المكعب مركزياً');
