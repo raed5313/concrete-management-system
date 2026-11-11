@@ -1316,43 +1316,43 @@ data.mixes = mixesResult.data || [];
   window.sadaRealtimeChannel = supabaseClient
     .channel('sada-orders-loads')
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'concrete_orders'},
+      {event:'*', schema:'public', table:'concrete_orders', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'loads'},
+      {event:'*', schema:'public', table:'loads', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'customers'},
+      {event:'*', schema:'public', table:'customers', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'drivers'},
+      {event:'*', schema:'public', table:'drivers', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'vehicles'},
+      {event:'*', schema:'public', table:'vehicles', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'concrete_mix_recipes'},
+      {event:'*', schema:'public', table:'concrete_mix_recipes', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'company_app_data'},
+      {event:'*', schema:'public', table:'company_app_data', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'company_operational_records'},
+      {event:'*', schema:'public', table:'company_operational_records', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'wallet_accounts'},
+      {event:'*', schema:'public', table:'wallet_accounts', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .on('postgres_changes',
-      {event:'*', schema:'public', table:'wallet_transactions'},
+      {event:'*', schema:'public', table:'wallet_transactions', filter:'branch_id=eq.' + ATLAS_BRANCH_ID},
       syncCloudData
     )
     .subscribe();
