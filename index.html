@@ -2776,6 +2776,36 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 
 
 
+
+<style>
+/* موازنة أحجام بطاقات النوافذ والقائمة الجانبية */
+@media(min-width:801px){
+  .app{grid-template-columns:235px minmax(0,1fr)!important}
+  .side{padding:15px!important}
+}
+#mainApp .main > section .panel,
+#mainApp .main > section .stat{
+  padding:12px!important;
+  border-radius:11px!important;
+}
+#mainApp .main > section .layout{gap:9px!important}
+#mainApp .main > section .stats{gap:8px!important}
+.side .nav button{
+  font-size:12px!important;
+  padding:8px 9px!important;
+  min-height:32px!important;
+  line-height:1.2!important;
+}
+@media(max-width:800px){
+  .side{padding:9px!important}
+  .side .nav button{
+    font-size:11px!important;
+    padding:7px 8px!important;
+    min-height:29px!important;
+  }
+}
+</style>
+
 </body></html>`);
 w.document.close();
 }
