@@ -1,4 +1,4 @@
-const CACHE_NAME = "atlas-shell-v41";
+const CACHE_NAME = "atlas-shell-v42-role-routing";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
@@ -32,7 +32,7 @@ self.addEventListener("fetch", event => {
   // واجهة التطبيق فقط: الشبكة أولاً، ثم نسخة الهيكل المخزنة عند انقطاع الاتصال.
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request).catch(async () => {
+      fetch(new Request(request, { cache: "no-store" })).catch(async () => {
         const cache = await caches.open(CACHE_NAME);
         return (await cache.match("./index.html")) || Response.error();
       })
