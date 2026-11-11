@@ -1202,7 +1202,7 @@ if(mixesResult.error) throw mixesResult.error;
       const freshOrders = (ordersResult.data || []).map(x => ({
         id:x.id,
         no:x.order_no,
-        sourceBranch:x.source_branch||'',
+        sourceBranch:String(x.source_load_id||'').startsWith('A:')?'A':(x.branch_id||ATLAS_BRANCH_ID),
         customer:x.customer,
         phone:x.phone,
         site:x.site,
