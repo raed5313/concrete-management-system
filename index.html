@@ -410,6 +410,12 @@ body.plant-role .side .nav{gap:2px!important}
 @media(max-width:850px){#loginScreen.atlas-login{grid-template-columns:1fr}.atlas-login-visual{min-height:30vh;max-height:34vh}.atlas-plant-art{opacity:.65}.atlas-visual-caption{bottom:8%;left:6%;right:6%}.atlas-visual-caption strong{font-size:21px}.atlas-login-panel{padding:18px 14px;min-height:66vh}.atlas-login-card{width:min(500px,100%)}}
 @media(max-width:420px){.atlas-login-visual{min-height:25vh}.atlas-visual-caption small{font-size:11px}.atlas-login-brand svg{width:60px}.atlas-login-name{font-size:30px}.atlas-login-ar{font-size:14px}.atlas-login-footer{font-size:10px}}
 
+
+/* زر إضافة حمولة: علامة زائد صفراء بجانب الكمية المتراكمة */
+.atlas-load-total{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.atlas-add-load-total{display:inline-flex!important;align-items:center;justify-content:center;width:38px;height:38px;min-width:38px;padding:0!important;border:1px solid #d6a900!important;border-radius:9px!important;background:#ffd21f!important;color:#171717!important;font-size:25px!important;font-weight:900!important;line-height:1!important;box-shadow:0 2px 5px #0004}
+.atlas-add-load-total:active{transform:scale(.96)}
+
 </style>
 <style id="ATLAS-LOGO-CACHE-FIX">
 /* تثبيت عرض شعار أطلس الذهبي في الواجهة وشاشة الدخول والطباعة */
@@ -1818,7 +1824,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} m³</strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕ إضافة حمولة</button>` : ''} </div>
+<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} m³</strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : ''} </div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
