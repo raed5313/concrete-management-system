@@ -10,6 +10,11 @@ on:
 permissions:
   contents: write
 
+# Keep branch synchronization runs serialized to avoid competing pushes.
+concurrency:
+  group: atlas-branch-sync-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   sync-atlas-b:
     runs-on: ubuntu-latest
@@ -116,4 +121,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Sync shared ATLAS application updates to B"
+          git pull --rebase origin main
           git push
