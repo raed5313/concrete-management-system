@@ -881,15 +881,19 @@ const supabaseClient = window.supabase.createClient(
   }
 );
 
+const branchAccounts = ATLAS_BRANCH_ID === 'B'
+  ? { manager: 'braed@sada-alaamar.com', plant: 'braed1@sada-alaamar.com', accountant: 'braed2@sada-alaamar.com' }
+  : { manager: 'raed@sada-alaamar.com', plant: 'raed1@sada-alaamar.com', accountant: 'raed2@sada-alaamar.com' };
+
 const loginAccounts = {
-  'مدير': 'raed@sada-alaamar.com',
+  'مدير': branchAccounts.manager,
   'مدير A': 'raed@sada-alaamar.com',
   'مدير B': 'braed@sada-alaamar.com',
-  'معمل': 'raed1@sada-alaamar.com',
+  'معمل': branchAccounts.plant,
   'معمل A': 'raed1@sada-alaamar.com',
   'معمل B': 'braed1@sada-alaamar.com',
-  'مشغل المعمل': 'raed1@sada-alaamar.com',
-  'محاسب': 'raed2@sada-alaamar.com',
+  'مشغل المعمل': branchAccounts.plant,
+  'محاسب': branchAccounts.accountant,
   'محاسب A': 'raed2@sada-alaamar.com',
   'محاسب B': 'braed2@sada-alaamar.com'
 };
@@ -3338,15 +3342,12 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
 }
 }
 
-/* عند فتح رابط دور محدد، نلغي الجلسة السابقة محلياً حتى لا تفرض واجهة دور آخر.
-   الصلاحيات الفعلية تبقى معتمدة حصراً على user_profiles والفرع الحالي. */
+/* رابط الدور يعرض شاشة الدخول دائماً ولا يستعيد جلسة دور سابق.
+   لا ننفذ signOut هنا حتى لا يتداخل طلب الخروج مع تسجيل الدخول الجديد.
+   التحقق من الدور والفرع يتم بعد المصادقة عبر user_profiles. */
 (async function restoreSadaSession(){
   try {
-    if (['plant','accountant','manager'].includes(roleEntry)) {
-      const { error } = await supabaseClient.auth.signOut({ scope: 'local' });
-      if (error) throw error;
-      return;
-    }
+    if (['plant','accountant','manager'].includes(roleEntry)) return;
     const { data: sessionData, error } = await supabaseClient.auth.getSession();
     if (error) throw error;
     if (sessionData && sessionData.session && sessionData.session.user) {
