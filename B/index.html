@@ -970,8 +970,14 @@ const roleEntryNames = { plant:'المعمل', accountant:'المحاسب', mana
 const roleEntryHint = document.getElementById('roleEntryHint');
 if (roleEntryHint) {
   roleEntryHint.textContent = roleEntryNames[roleEntry]
-    ? 'رابط دخول مخصص: ' + roleEntryNames[roleEntry]
+    ? 'رابط دخول مخصص: ' + roleEntryNames[roleEntry] + ' — فرع B'
     : 'تسجيل الدخول الموحد لجميع الحسابات';
+}
+if (roleEntryNames[roleEntry]) {
+  const loginHeading = document.querySelector('#loginScreen h2');
+  const loginButton = document.querySelector('#loginForm button[type="submit"]');
+  if (loginHeading) loginHeading.textContent = 'تسجيل دخول ' + roleEntryNames[roleEntry] + ' — فرع B';
+  if (loginButton) loginButton.innerHTML = 'دخول ' + roleEntryNames[roleEntry] + ' <span>←</span>';
 }
 
 async function activateUserSession(user) {
