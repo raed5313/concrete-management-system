@@ -1,4 +1,4 @@
-const CACHE_NAME = "atlas-shell-v42-role-routing";
+const CACHE_NAME = "atlas-shell-v43-branch-login-fix";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
