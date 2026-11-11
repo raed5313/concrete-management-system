@@ -83,6 +83,15 @@ jobs:
           html = html.replace(old_branch, new_branch, 1)
           index.write_text(html, encoding="utf-8")
 
+          config = Path("B/supabase-config.js")
+          config.write_text(
+              'window.SUPABASE_CONFIG = {\\n'
+              '  url: "https://lnccpommcksrilekelvk.supabase.co",\\n'
+              '  publishableKey: "sb_publishable_5nooVdw5hjgd97KuGVYEOw_SDcM2pAp"\\n'
+              '};\\n',
+              encoding="utf-8"
+          )
+
           manifest = Path("B/manifest.webmanifest")
           if manifest.exists():
               data = json.loads(manifest.read_text(encoding="utf-8"))
