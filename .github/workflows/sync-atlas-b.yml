@@ -35,6 +35,16 @@ jobs:
           index = Path("B/index.html")
           html = index.read_text(encoding="utf-8")
           html = html.replace('content="ATLAS">', 'content="ATLAS B">')
+          # Keep B connected to its own independent Supabase project.
+          html = html.replace(
+              "const SUPABASE_URL = 'https://nwhmcbwjjpusvxyyquaz.supabase.co';",
+              "const SUPABASE_URL = 'https://lnccpommcksrilekelvk.supabase.co';"
+          )
+          html = html.replace(
+              "const SUPABASE_ANON_KEY = 'sb_publishable_N_nx0pUqoOFCGsrsPjK4Uw_6LgY9ZjL';",
+              "const SUPABASE_ANON_KEY = 'sb_publishable_5nooVdw5hjgd97KuGVYEOw_SDcM2pAp';"
+          )
+
           html = html.replace(
               '<title>أطلس للكونكريت | نظام إدارة الخرسانة الجاهزة</title>',
               '<title>أطلس للكونكريت | ATLAS B - الفرع الثاني</title>'
