@@ -763,7 +763,7 @@ body.plant-role .side .nav{gap:2px!important}
 <section id="settings" class="hidden">
 <div class="panel">
 <h3>النسخ الاحتياطي الشامل</h3>
-<p class="muted">يحفظ نسخة مشفرة بالنقل داخل مساحة تخزين خاصة في مشروع أطلس، وتشمل أوامر التجهيز والحمولات والعملاء والسائقين والآليات والمخزون والفواتير والسندات والمصروفات والموظفين والورشة والوقود والمشتريات والرواتب والسلف والوصفات وسجل التدقيق والمحفظة المالية.</p>
+<p class="muted">يحفظ نسخة مشفرة بالنقل داخل مساحة تخزين خاصة في مشروع أطلس، وتشمل أوامر التجهيز والحمولات والعملاء والسائقين والآليات والمخزون والفواتير والسندات والمصروفات والموظفين والورشة والوقود والمشتريات والرواتب والسلف والوصفات وسجل التدقيق والمحفظة المالية وسجل كل تغيير بالقيم القديمة والجديدة والنسخة التاريخية الأولية.</p>
 <div id="atlasBackupStatus" class="detail" style="margin:12px 0">حالة النسخ الاحتياطي: لم يتم إنشاء نسخة بعد</div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
 <button class="btn gold" onclick="createAtlasBackup(true)">إنشاء نسخة احتياطية الآن</button>
@@ -1301,7 +1301,8 @@ data.mixes = mixesResult.data || [];
 const ATLAS_BACKUP_TABLES = [
  'customers','drivers','vehicles','concrete_orders','loads','user_profiles',
  'company_app_data','company_operational_records','concrete_order_mix_recipes',
- 'audit_logs','concrete_mix_recipes','wallet_accounts','wallet_transactions'
+ 'audit_logs','concrete_mix_recipes','wallet_accounts','wallet_transactions',
+ 'atlas_change_history','atlas_backup_snapshots'
 ];
 async function collectAtlasBackup(){
  const {data:auth,error:authError}=await supabaseClient.auth.getUser();
