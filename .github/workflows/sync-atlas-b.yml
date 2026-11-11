@@ -39,16 +39,49 @@ jobs:
               '<title>أطلس للكونكريت | نظام إدارة الخرسانة الجاهزة</title>',
               '<title>أطلس للكونكريت | ATLAS B - الفرع الثاني</title>'
           )
+          html = html.replace(
+              'aria-label="رمز النظام A">A',
+              'aria-label="رمز النظام B">B'
+          )
+          html = html.replace(
+              'ATLAS READY MIX CONCRETE',
+              'ATLAS B · BRANCH B'
+          )
+          html = html.replace(
+              'شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE</div>',
+              'شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE · BRANCH B</div>'
+          )
+
+          marker_css = '#atlasBranchMarker{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;z-index:10001;background:#3a2c0b;color:#ffe08a;border:1px solid #d5a638;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:900;letter-spacing:.3px;box-shadow:0 3px 12px #0008;pointer-events:none}'
+          if 'atlasBranchMarker{' not in html:
+              html = html.replace('</style>', marker_css + '\\n</style>', 1)
+
+          old_branch = """  if (appTitle) appTitle.content = 'ATLAS B';
+          }"""
+          new_branch = """  if (appTitle) appTitle.content = 'ATLAS B';
+            document.documentElement.dataset.atlasBranch = 'B';
+            const branchMarker = document.createElement('div');
+            branchMarker.id = 'atlasBranchMarker';
+            branchMarker.textContent = 'ATLAS B · الفرع الثاني';
+            branchMarker.setAttribute('aria-label', 'أنت داخل نظام الفرع B');
+            const addBranchMarker = () => { if (document.body && !document.getElementById('atlasBranchMarker')) document.body.appendChild(branchMarker); };
+            addBranchMarker();
+            if (!document.body) document.addEventListener('DOMContentLoaded', addBranchMarker, {once:true});
+          }"""
+          if old_branch not in html:
+              raise SystemExit('Expected branch branding block not found; refusing to publish an unbranded B copy.')
+          html = html.replace(old_branch, new_branch, 1)
           index.write_text(html, encoding="utf-8")
 
           manifest = Path("B/manifest.webmanifest")
-          data = json.loads(manifest.read_text(encoding="utf-8"))
-          data["name"] = "أطلس للكونكريت | ATLAS B - الفرع الثاني"
-          data["short_name"] = "ATLAS B"
-          manifest.write_text(
-              json.dumps(data, ensure_ascii=False, indent=2) + "\n",
-              encoding="utf-8"
-          )
+          if manifest.exists():
+              data = json.loads(manifest.read_text(encoding="utf-8"))
+              data["name"] = "أطلس للكونكريت | ATLAS B - الفرع الثاني"
+              data["short_name"] = "ATLAS B"
+              manifest.write_text(
+                  json.dumps(data, ensure_ascii=False, indent=2) + "\\n",
+                  encoding="utf-8"
+              )
           PY
 
           sed -i "s/^const CACHE_NAME = .*/const CACHE_NAME = \"atlas-b-shell-${GITHUB_SHA:0:8}\";/" B/service-worker.js
