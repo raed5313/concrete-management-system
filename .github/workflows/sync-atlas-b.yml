@@ -1,0 +1,57 @@
+name: Sync ATLAS A updates to branch B
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'B/**'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-atlas-b:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copy shared application files into B
+        run: |
+          rsync -av --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='B/' \
+            --exclude='README.md' \
+            --exclude='manifest.webmanifest' \
+            --exclude='service-worker.js' \
+            ./ B/
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("B/index.html")
+          s = p.read_text(encoding="utf-8")
+          s = s.replace('content="ATLAS">', 'content="ATLAS B">')
+          s = s.replace(
+              '<title>أطلس للكونكريت | نظام إدارة الخرسانة الجاهزة</title>',
+              '<title>أطلس للكونكريت | ATLAS B - الفرع الثاني</title>'
+          )
+          p.write_text(s, encoding="utf-8")
+          PY
+
+          sed -i "s/^const CACHE_NAME = .*/const CACHE_NAME = \"atlas-b-shell-${GITHUB_SHA:0:8}\";/" B/service-worker.js
+
+      - name: Commit synchronized branch B
+        run: |
+          if git diff --quiet; then
+            echo "Branch B is already synchronized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add B
+          git commit -m "Sync shared ATLAS application updates to B"
+          git push
