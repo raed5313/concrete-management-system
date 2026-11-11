@@ -2832,6 +2832,20 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 }
 </style>
 
+
+<style>
+/* مسافة 15 سم بين قيمة الحمولة وزر طباعة وصلها في صف RTL */
+#orders #ordersBody .atlas-load-row > .atlas-load-qty{
+  margin-left:15cm!important;
+  margin-right:0!important;
+  flex:0 0 auto!important;
+}
+#orders #ordersBody .atlas-load-row > .atlas-load-qty + .atlas-load-print{
+  margin:0!important;
+  flex:0 0 24px!important;
+}
+</style>
+
 </body></html>`);
 w.document.close();
 }
