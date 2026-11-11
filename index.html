@@ -418,6 +418,31 @@ body.plant-role .side .nav{gap:2px!important}
 .atlas-login-brand .atlas-login-logo{display:block;width:112px;height:86px;object-fit:contain}
 .atlas-doc-brand img{display:block;width:min(100%,190mm);height:auto;max-height:35mm;object-fit:contain;margin:0 auto;filter:drop-shadow(0 0 5px #d99a00)}
 </style>
+
+<style id="atlas-load-spacing-main">
+/* بطاقة الحمولات: مسافة مرئية مباشرة بين الكمية والطباعة */
+#orders #ordersBody .atlas-load-row{
+  display:flex!important;
+  direction:rtl!important;
+  align-items:center!important;
+}
+#orders #ordersBody .atlas-load-row .atlas-load-spacer{
+  flex:0 0 0!important;
+  width:0!important;
+  min-width:0!important;
+}
+#orders #ordersBody .atlas-load-row .atlas-load-qty{
+  flex:0 0 auto!important;
+  margin-left:15cm!important;
+  margin-right:0!important;
+  min-width:48px!important;
+  white-space:nowrap!important;
+}
+#orders #ordersBody .atlas-load-row .atlas-load-print{
+  flex:0 0 28px!important;
+  margin:0!important;
+}
+</style>
 </head>
 <body>
 
