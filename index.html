@@ -1778,7 +1778,7 @@ return `
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
   <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong></div>
   <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
-   ${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : (isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : '')}
+   ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
    ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
    <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
    ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
@@ -1789,7 +1789,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} م³</strong></div>
+<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} م³</strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕ إضافة حمولة</button>` : ''} </div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
@@ -2815,6 +2815,10 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 }
 </style>
 
+<style>
+#orders #ordersBody .atlas-load-total{gap:14px!important;justify-content:center!important;flex-wrap:wrap!important}
+#orders #ordersBody .atlas-add-load-total{font-size:12px!important;font-weight:800!important;padding:6px 12px!important;min-height:32px!important;white-space:nowrap!important}
+</style>
 </body></html>`);
 w.document.close();
 }
