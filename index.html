@@ -514,7 +514,7 @@ body.plant-role .side .nav{gap:2px!important}
 <div class="stats">
 <div class="stat">أوامر التجهيز<strong id="statOrders">0</strong></div>
 <div class="stat">الحمولات<strong id="statLoads">0</strong></div>
-<div class="stat">المجهز م³<strong id="statQty">0</strong></div>
+<div class="stat">المجهز m³<strong id="statQty">0</strong></div>
 <div class="stat">قيد التجهيز<strong id="statPending">0</strong></div>
 </div>
 <div class="layout">
@@ -552,7 +552,7 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 <div class="tablewrap">
 <table>
-<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>رقم الهاتف</th><th>الموقع</th><th>الصب</th><th>م³ (تقديري / فعلي)</th><th>الإجراءات</th></tr></thead>
+<thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>رقم الهاتف</th><th>الموقع</th><th>الصب</th><th>m³ (تقديري / فعلي)</th><th>الإجراءات</th></tr></thead>
 <tbody id="ordersBody"></tbody>
 </table>
 </div>
@@ -586,7 +586,7 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 <div class="tablewrap">
 <table>
-<thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية م³</th><th>الوقت</th><th>طباعة A5</th></tr></thead>
+<thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية m³</th><th>الوقت</th><th>طباعة A5</th></tr></thead>
 <tbody id="plantLoadsBody"></tbody>
 </table>
 </div>
@@ -743,8 +743,8 @@ body.plant-role .side .nav{gap:2px!important}
 </div>
 <div class="report-kpis">
 <div class="report-kpi"><span>عدد الأوامر الرئيسية</span><strong id="reportOrders">0</strong></div>
-<div class="report-kpi"><span>إجمالي الكمية المطلوبة</span><strong id="reportRequired">0.00 م³</strong></div>
-<div class="report-kpi"><span>إجمالي ما تم تجهيزه فعلياً</span><strong id="reportQty">0.00 م³</strong></div>
+<div class="report-kpi"><span>إجمالي الكمية المطلوبة</span><strong id="reportRequired">0.00 m³</strong></div>
+<div class="report-kpi"><span>إجمالي ما تم تجهيزه فعلياً</span><strong id="reportQty">0.00 m³</strong></div>
 </div>
 <div class="report-table-wrap">
 <table class="report-table">
@@ -1436,7 +1436,7 @@ function triggerPlantAlert(order){
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
       const notice = new Notification('🚚 أمر تجهيز جديد للمعمل', {
-        body: 'الأمر رقم ' + order.no + ' — ' + (order.customer || '') + ' — ' + (order.qty || '') + ' م³',
+        body: 'الأمر رقم ' + order.no + ' — ' + (order.customer || '') + ' — ' + (order.qty || '') + ' m³',
         tag: 'sada-order-' + order.id,
         renotify: true
       });
@@ -1462,7 +1462,7 @@ function triggerPlantAlert(order){
         <div><b>موقع الصب:</b>${esc(order.site || '—')}</div>
         <div><b>نوع الصب:</b>${esc(order.pour || '—')}</div>
         <div><b>المواصفة:</b>${esc(order.grade || '—')}</div>
-        <div><b>الكمية التقديرية:</b>${esc(order.qty || '—')} م³</div>
+        <div><b>الكمية التقديرية:</b>${esc(order.qty || '—')} m³</div>
         <div style="grid-column:1/-1"><b>تاريخ الأمر:</b>${esc(dateOnly(order.date))}</div>
       </div>
       <div style="color:#bd2632;font-size:19px;font-weight:900;margin-top:12px">يرجى البدء بالتجهيز...</div>
@@ -1706,8 +1706,8 @@ if($('statLowInv')) $('statLowInv').textContent=lowInv.length;
 
 if($('reportOrders')) $('reportOrders').textContent=data.orders.length;
 if($('reportLoads')) $('reportLoads').textContent=data.loads.length;
-if($('reportQty')) $('reportQty').textContent=fmt(qty)+' م³';
-if($('reportRemaining')) $('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' م³';
+if($('reportQty')) $('reportQty').textContent=fmt(qty)+' m³';
+if($('reportRemaining')) $('reportRemaining').textContent=fmt(Math.max(0,est-qty))+' m³';
 renderDetailedReports();
 
 let totalSales = data.orders.reduce((s,o)=>s + ((+o.qty||0) * (+o.price||0)), 0);
@@ -1721,7 +1721,7 @@ if($('accRemaining')) $('accRemaining').textContent = fmt(Math.max(0, totalSales
 if($('recentOrders')) {
 $('recentOrders').innerHTML=tableRows(
 data.orders.slice(-5).reverse(),
-o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${fmt(o.qty)} م³</td></tr>`,
+o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.customer)}</td><td>${esc(o.pour)}</td><td>${fmt(o.qty)} m³</td></tr>`,
 4
 );
 }
@@ -1774,7 +1774,7 @@ return `
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
   <div class="atlas-order-field atlas-order-pour"><small>نوع الصب</small><strong>${esc(o.pour)}</strong></div>
   <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
-  <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong>${fmt(o.qty)} م³</strong>${o.actualQty?`<span class="atlas-order-actual">${fmt(o.actualQty)} م³ فعلي</span>`:''}</div>
+  <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong>${fmt(o.qty)} m³</strong>${o.actualQty?`<span class="atlas-order-actual">${fmt(o.actualQty)} m³ فعلي</span>`:''}</div>
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
   <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong></div>
   <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
@@ -1789,7 +1789,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} م³</strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕ إضافة حمولة</button>` : ''} </div>
+<div class="atlas-load-total"><strong>${fmt(totalLoadQty)} m³</strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="btn primary atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕ إضافة حمولة</button>` : ''} </div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
@@ -1818,7 +1818,7 @@ return `<tr>
 <td>${esc(o.customer||'—')}</td>
 <td>${esc(l.driver||'—')}</td>
 <td>${esc(l.vehicle||'—')}</td>
-<td>${fmt(l.qty)} م³</td>
+<td>${fmt(l.qty)} m³</td>
 <td>${esc(l.time||'—')}</td>
 <td><button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button></td>
 </tr>`;
@@ -1907,7 +1907,7 @@ function operationalFormFields(type,record={}){
   name,label,type:kind==='date'?'date':kind==='month'?'month':kind==='number'?'number':kind==='textarea'?'textarea':'text',
   options:Array.isArray(kind)?kind:
     type==='inventory_items' && name==='name'?['','أسمنت','رمل','حصى','مضاف']:
-    type==='inventory_items' && name==='unit'?['','طن','كغم','م³','لتر']:
+    type==='inventory_items' && name==='unit'?['','طن','كغم','m³','لتر']:
     name==='employee'?['',...(data.employees||[]).map(e=>e.name)]:
     name==='supplier'?['',...(data.suppliers||[]).map(e=>e.name)]:
     ['driver','driver_name','السائق'].includes(name)?['',...(data.drivers||[]).map(e=>e.name)]:
@@ -2116,7 +2116,7 @@ function openOrder(){
     {name:'grade',label:'المقاومة',options:['C-25','C-30','C-35','C-40','C-45']},
     {name:'pump',label:'رقم المضخة'},
     {name:'admixture_type',label:'اسم المادة المضافة (يدخله المدير)',type:'text'},
-    {name:'qty',label:'الكمية التقديرية م³',type:'number',required:true},
+    {name:'qty',label:'الكمية التقديرية m³',type:'number',required:true},
     {name:'price',label:'سعر المتر',type:'number',required:true,value:75000},
     {name:'date',label:'التاريخ',type:'date',value:new Date().toISOString().slice(0,10)}
   ], v => {
@@ -2208,7 +2208,7 @@ if(o.status === 'مكتمل ومجهز'){toast('هذا الأمر مقفول ب�
 const delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((sum,x)=>sum+(Number(x.qty)||0),0);
 if(delivered<=0){toast('لا يمكن قفل الأمر قبل تسجيل حمولة واحدة على الأقل');return;}
 openForm('تأكيد قفل الأمر رقم '+no,[
-{name:'deliveredDisplay',label:'إجمالي الكمية المجهزة فعلياً (م³) — ستعتمد عند القفل',value:delivered.toFixed(2),required:true},
+{name:'deliveredDisplay',label:'إجمالي الكمية المجهزة فعلياً (m³) — ستعتمد عند القفل',value:delivered.toFixed(2),required:true},
 {name:'lockNote',label:'ملاحظات الإقفال',full:true}
 ],async v=>{
 o.actualQty=delivered;
@@ -2255,7 +2255,7 @@ async function openLoad(no) {
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
         {name:'driver', label:'اختيار السائق من القائمة', required:false, type:'driverCombo', options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
-        {name:'qty', label:'الكمية المجهزة م³', type:'number', required:true},
+        {name:'qty', label:'الكمية المجهزة m³', type:'number', required:true},
         {name:'time', label:'وقت تجهيز الحمولة (اختياري — اتركه فارغاً إن لم ترغب بإظهاره)', type:'time', required:false}
     ], v => {
         // إذا كُتب اسم خارجي نعتمده، وإلا نعتمد الاسم المختار من القائمة.
@@ -2465,7 +2465,7 @@ async function editLoad(id){
  openForm('تعديل الحمولة رقم '+l.no,[
   {name:'driver',label:'اسم السائق',value:l.driver||'',required:false,type:'driverCombo',options:(data.drivers||[]).map(x=>x.name)},
   {name:'vehicle',label:'الآلية',value:l.vehicle||'',required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
-  {name:'qty',label:'الكمية م³',value:l.qty,type:'number',required:true}
+  {name:'qty',label:'الكمية m³',value:l.qty,type:'number',required:true}
  ],async v=>{
   try{
    const qty=Number(v.qty);if(!Number.isFinite(qty)||qty<=0)throw new Error('أدخل كمية صحيحة');
@@ -2501,7 +2501,7 @@ if(currentRole!=='manager' && !(currentRole==='accountant' && ['customer','drive
 let c={
 customer:['العملاء','customers',[['name','اسم العميل'],['phone','الهاتف'],['address','العنوان']]],
 driver:['السائقون','drivers',[['name','اسم السائق'],['phone','الهاتف'],['note','ملاحظات']]],
-vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity','السعة م³'],['kind','النوع']]]
+vehicle:['الآليات','vehicles',[['name','رقم الآلية'],['capacity','السعة m³'],['kind','النوع']]]
 }[t];
 openForm('إضافة '+c[0],c[2].map(([name,label])=>({name,label,required:name==='name'})),async v=>{
 try{
@@ -2593,7 +2593,7 @@ const updatePreview=()=>{
  if(!o){preview.textContent='لا يوجد أمر تجهيز مطابق لهذا العميل ورقم الأمر.';return;}
  const delivered=o.status==='مكتمل ومجهز' && Number.isFinite(Number(o.actualQty)) ? Number(o.actualQty) : data.loads.filter(l=>String(l.orderNo)===String(o.no)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
  const total=delivered*(Number(o.price)||0);
- preview.innerHTML='<div>العميل: '+esc(o.customer)+'</div><div>رقم الأمر: '+esc(o.no)+'</div><div>موقع الصب: '+esc(o.site||'—')+'</div><div>نوع الصب والمواصفة: '+esc(o.pour||'—')+' — '+esc(o.grade||'—')+'</div><div>الكمية المجهزة فعلياً: '+fmt(delivered)+' م³</div><div>سعر المتر: '+fmt(o.price)+'</div><div style="font-size:18px;color:#9b6410">المبلغ الكلي للكمية المجهزة: '+fmt(total)+' دينار</div>';
+ preview.innerHTML='<div>العميل: '+esc(o.customer)+'</div><div>رقم الأمر: '+esc(o.no)+'</div><div>موقع الصب: '+esc(o.site||'—')+'</div><div>نوع الصب والمواصفة: '+esc(o.pour||'—')+' — '+esc(o.grade||'—')+'</div><div>الكمية المجهزة فعلياً: '+fmt(delivered)+' m³</div><div>سعر المتر: '+fmt(o.price)+'</div><div style="font-size:18px;color:#9b6410">المبلغ الكلي للكمية المجهزة: '+fmt(total)+' دينار</div>';
 };
 customer.addEventListener('change',updatePreview);
 orderNo.addEventListener('input',updatePreview);
@@ -2819,6 +2819,19 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 #orders #ordersBody .atlas-load-total{gap:14px!important;justify-content:center!important;flex-wrap:wrap!important}
 #orders #ordersBody .atlas-add-load-total{font-size:12px!important;font-weight:800!important;padding:6px 12px!important;min-height:32px!important;white-space:nowrap!important}
 </style>
+
+<style>
+/* فجوة فعلية مقدارها 5 سم بين رقم الكمية وزر الطباعة */
+#orders #ordersBody .atlas-load-row > .atlas-load-qty + .atlas-load-print{
+  margin-right:5cm!important;
+  flex:0 0 24px!important;
+}
+#orders #ordersBody .atlas-load-row > .atlas-load-qty{
+  margin:0!important;
+  flex:0 0 auto!important;
+}
+</style>
+
 </body></html>`);
 w.document.close();
 }
@@ -2877,7 +2890,7 @@ printDocA5('وصل أمر تجهيز',`
 <tr><td>رقم الهاتف</td><td dir="ltr">${esc(o.phone||"—")}</td></tr>
 <tr><td>موقع الصب</td><td>${esc(o.site)}</td></tr>
 <tr><td>نوع الصب / المقاومة</td><td>${esc(o.pour)} — ${esc(o.grade)}</td></tr>
-<tr><td>الكمية التقديرية / الفعلية</td><td>${fmt(o.qty)} م³ ${o.actualQty?` (الفعلية: ${o.actualQty} م³)`:''}</td></tr>
+<tr><td>الكمية التقديرية / الفعلية</td><td>${fmt(o.qty)} m³ ${o.actualQty?` (الفعلية: ${o.actualQty} m³)`:''}</td></tr>
 </table>
 <div class="sign"><div>توقيع الزبون<br><br>________________</div><div>توقيع المعمل<br><br>________________</div></div>
 <div class="foot">أطلس للكونكريت للكونكريت الجاهز — وصل رسمي متناسق A5</div>
@@ -2935,12 +2948,12 @@ function receiptLoad(loadId) {
  .atlas-load-receipt .sign{margin-top:2px!important}
  .atlas-load-receipt .sign div{padding:6px 4px 10px!important}
  .atlas-load-receipt .foot{margin-top:3px!important;padding-top:2px!important}
-}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (م³)</td><td>${fmt(l.qty)} م³</td></tr></table>
+}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (m³)</td><td>${fmt(l.qty)} m³</td></tr></table>
         
         <div style="border:1px solid #b28a29;border-radius:4px;padding:5px 7px;margin:2px 0 4px;background:#fffdf6;color:#222;font-size:11px;line-height:1.5;min-height:24px"><b style="color:#805313">الملاحظات:</b> <span>${esc(l.note || o.note || '—')}</span></div>
          <div class="big" style="padding:4px;gap:8px;direction:rtl;align-items:stretch">
            <div style="flex:1;border:0;text-align:center"><b style="font-size:14px;font-weight:900">رقم الحمولة</b><strong class="atlas-load-number" style="font-size:13px;padding:3px;color:#a47b20">${loadLabel}</strong></div>
-           <div style="flex:1;border:0;border-right:1px solid #b28a29;text-align:center"><b style="font-size:16px;font-weight:800">الكمية المتراكمة (م³)</b><strong style="display:block;font-size:25px;font-weight:900;padding:3px;color:#991b1b">${fmtQty(accumulatedQty)}</strong></div>
+           <div style="flex:1;border:0;border-right:1px solid #b28a29;text-align:center"><b style="font-size:16px;font-weight:800">الكمية المتراكمة (m³)</b><strong style="display:block;font-size:25px;font-weight:900;padding:3px;color:#991b1b">${fmtQty(accumulatedQty)}</strong></div>
          </div>
          
          
@@ -2954,11 +2967,11 @@ function printDailyPlantReport(){
  const dayLoads=(data.loads||[]).filter(l=>String(l.date||'').slice(0,10)===pDate);
  const rows=dayLoads.map(l=>{
   const order=(data.orders||[]).find(o=>String(o.no)===String(l.orderNo))||{};
-  return '<tr><td>'+esc(l.no||'—')+'</td><td>'+esc(l.orderNo||'—')+'</td><td>'+esc(order.customer||'—')+'</td><td>'+esc(l.driver||'—')+'</td><td>'+esc(l.vehicle||'—')+'</td><td>'+fmt(l.qty)+' م³</td><td>'+esc(l.time||'—')+'</td></tr>';
+  return '<tr><td>'+esc(l.no||'—')+'</td><td>'+esc(l.orderNo||'—')+'</td><td>'+esc(order.customer||'—')+'</td><td>'+esc(l.driver||'—')+'</td><td>'+esc(l.vehicle||'—')+'</td><td>'+fmt(l.qty)+' m³</td><td>'+esc(l.time||'—')+'</td></tr>';
  }).join('');
  const w=window.open('','_blank','width=900,height=900');
  if(!w){toast('اسمح بالنوافذ المنبثقة للطباعة');return;}
- w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الحمولات اليومية</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:12px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #777;padding:7px;text-align:center;font-size:11px}th{background:#eee}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير الحمولات اليومية لتاريخ: '+esc(pDate)+'</h3><table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية</th><th>الوقت</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7">لا توجد حمولات مسجلة لهذا التاريخ</td></tr>')+'</tbody></table><p>إجمالي الكمية: '+fmt(dayLoads.reduce((n,l)=>n+(Number(l.qty)||0),0))+' م³</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الحمولات اليومية</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:12px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #777;padding:7px;text-align:center;font-size:11px}th{background:#eee}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير الحمولات اليومية لتاريخ: '+esc(pDate)+'</h3><table><thead><tr><th>رقم الحمولة</th><th>رقم الأمر</th><th>العميل</th><th>السائق</th><th>الآلية</th><th>الكمية</th><th>الوقت</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7">لا توجد حمولات مسجلة لهذا التاريخ</td></tr>')+'</tbody></table><p>إجمالي الكمية: '+fmt(dayLoads.reduce((n,l)=>n+(Number(l.qty)||0),0))+' m³</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
  w.document.close();
 }
 
@@ -2988,7 +3001,7 @@ function printCustomerStatement(custName){
   const delivered=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((n,l)=>n+(Number(l.qty)||0),0);
   const total=delivered*(Number(o.price)||0);
   const paid=receipts.filter(r=>String(r.orderNo)===String(o.no)).reduce((n,r)=>n+(Number(r.amount)||0),0);
-  return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.site||'—')+'</td><td>'+fmt(delivered)+' م³</td><td>'+fmt(o.price||0)+'</td><td>'+fmt(total)+'</td><td>'+fmt(paid)+'</td><td>'+fmt(total-paid)+'</td></tr>';
+  return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.site||'—')+'</td><td>'+fmt(delivered)+' m³</td><td>'+fmt(o.price||0)+'</td><td>'+fmt(total)+'</td><td>'+fmt(paid)+'</td><td>'+fmt(total-paid)+'</td></tr>';
  }).join('');
  const deliveredTotal=orders.reduce((n,o)=>{
   const loads=(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no));
@@ -3003,7 +3016,7 @@ function printCustomerStatement(custName){
  const receiptRows=receipts.map(r=>'<tr><td>'+esc(r.no)+'</td><td>'+esc(r.date||'—')+'</td><td>'+esc(r.orderNo||'—')+'</td><td>'+fmt(r.amount)+'</td><td>'+esc(r.method||'—')+'</td></tr>').join('');
  const w=window.open('','_blank','width=900,height=900');
  if(!w){toast('اسمح بالنوافذ المنبثقة لطباعة كشف الحساب');return;}
- w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب العميل</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}</style></head><body>'+atlasDocumentBrand()+'<h3>كشف حساب العميل: '+esc(custName)+'</h3><div class="summary"><div>قيمة المجهز فعلياً<br>'+fmt(valueTotal)+' د.ع</div><div>إجمالي المقبوض<br>'+fmt(paidTotal)+' د.ع</div><div>الرصيد<br>'+fmt(valueTotal-paidTotal)+' د.ع</div></div><h4>أوامر التجهيز — الحساب على الكمية المجهزة فعلياً</h4><table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الموقع</th><th>المجهز</th><th>سعر المتر</th><th>قيمة المجهز</th><th>المقبوض للأمر</th><th>الرصيد</th></tr></thead><tbody>'+(rows||'<tr><td colspan="8">لا توجد أوامر لهذا العميل</td></tr>')+'</tbody></table><h4>سندات القبض</h4><table><thead><tr><th>رقم السند</th><th>التاريخ</th><th>رقم الأمر</th><th>المبلغ</th><th>طريقة الدفع</th></tr></thead><tbody>'+(receiptRows||'<tr><td colspan="5">لا توجد سندات قبض</td></tr>')+'</tbody></table><p><b>إجمالي الكمية المجهزة:</b> '+fmt(deliveredTotal)+' م³</p><p><b>عدد أوامر التجهيز:</b> '+orders.length+'</p><p style="font-size:10px;text-align:center">تاريخ إصدار الكشف: '+new Date().toLocaleDateString('ar-IQ')+' — أطلس للكونكريت ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب العميل</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:7px;font-size:10px;text-align:center}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #aaa;padding:10px;text-align:center;font-weight:bold}</style></head><body>'+atlasDocumentBrand()+'<h3>كشف حساب العميل: '+esc(custName)+'</h3><div class="summary"><div>قيمة المجهز فعلياً<br>'+fmt(valueTotal)+' د.ع</div><div>إجمالي المقبوض<br>'+fmt(paidTotal)+' د.ع</div><div>الرصيد<br>'+fmt(valueTotal-paidTotal)+' د.ع</div></div><h4>أوامر التجهيز — الحساب على الكمية المجهزة فعلياً</h4><table><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الموقع</th><th>المجهز</th><th>سعر المتر</th><th>قيمة المجهز</th><th>المقبوض للأمر</th><th>الرصيد</th></tr></thead><tbody>'+(rows||'<tr><td colspan="8">لا توجد أوامر لهذا العميل</td></tr>')+'</tbody></table><h4>سندات القبض</h4><table><thead><tr><th>رقم السند</th><th>التاريخ</th><th>رقم الأمر</th><th>المبلغ</th><th>طريقة الدفع</th></tr></thead><tbody>'+(receiptRows||'<tr><td colspan="5">لا توجد سندات قبض</td></tr>')+'</tbody></table><p><b>إجمالي الكمية المجهزة:</b> '+fmt(deliveredTotal)+' m³</p><p><b>عدد أوامر التجهيز:</b> '+orders.length+'</p><p style="font-size:10px;text-align:center">تاريخ إصدار الكشف: '+new Date().toLocaleDateString('ar-IQ')+' — أطلس للكونكريت ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
  w.document.close();
 }
 
@@ -3038,7 +3051,7 @@ printDocA4('سند قبض',`
 <tr><td>استلمنا من السيد / الشركة</td><td><strong>${esc(rec.customer)}</strong></td></tr>
 ${rec.orderNo?'<tr><td>رقم أمر التجهيز</td><td>'+esc(rec.orderNo)+'</td></tr>':''}
 ${rec.orderSite?'<tr><td>موقع الصب</td><td>'+esc(rec.orderSite)+'</td></tr>':''}
-${rec.orderQty?'<tr><td>كمية الأمر</td><td>'+fmt(rec.orderQty)+' م³</td></tr>':''}
+${rec.orderQty?'<tr><td>كمية الأمر</td><td>'+fmt(rec.orderQty)+' m³</td></tr>':''}
 ${rec.orderTotal!==undefined?'<tr><td>المبلغ الكلي للأمر</td><td><strong>'+fmt(rec.orderTotal)+'</strong></td></tr>':''}
 <tr><td>المبلغ المقبوض</td><td><span style="font-size:16px;color:#a51d20">${fmt(rec.amount)}</span></td></tr>
 <tr><td>طريقة الدفع</td><td>${esc(rec.method)}</td></tr>
@@ -3067,16 +3080,16 @@ function renderDetailedReports(){
   const required=orders.reduce((s,o)=>s+(Number(o.qty)||0),0);
   const actual=orders.reduce((s,o)=>s+data.loads.filter(l=>String(l.orderNo)===String(o.no)).reduce((q,l)=>q+(Number(l.qty)||0),0),0);
   if($('reportOrders')) $('reportOrders').textContent=orders.length;
-  if($('reportRequired')) $('reportRequired').textContent=fmt(required.toFixed(2))+' م³';
-  if($('reportQty')) $('reportQty').textContent=fmt(actual.toFixed(2))+' م³';
+  if($('reportRequired')) $('reportRequired').textContent=fmt(required.toFixed(2))+' m³';
+  if($('reportQty')) $('reportQty').textContent=fmt(actual.toFixed(2))+' m³';
   const body=$('detailedReportsBody');
   if(!body)return;
   if(!orders.length){body.innerHTML='<tr><td colspan="6" class="report-empty">لا توجد أوامر مطابقة للبحث</td></tr>';return;}
   body.innerHTML=orders.map(o=>{
     const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
     const actualQty=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
-    const details=loads.length?loads.map((l,i)=>'<tr class="report-load-row"><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>السائق: '+esc(l.driver||'—')+' | الآلية: '+esc(l.vehicle||'—')+'</td><td>وقت/تاريخ: '+esc(l.time||dateOnly(l.date))+'</td><td>'+fmt(l.qty)+' م³</td><td class="report-actual">'+fmt(l.qty)+' م³</td></tr>').join(''):'<tr class="report-load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
-    return '<tr class="report-main-row"><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="report-customer">'+esc(o.customer||'—')+'<br><small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+'<br>'+esc(o.pour||'—')+'</td><td class="report-qty">'+fmt(o.qty)+' م³</td><td class="report-actual">'+fmt(actualQty)+' م³</td></tr>'+details;
+    const details=loads.length?loads.map((l,i)=>'<tr class="report-load-row"><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>السائق: '+esc(l.driver||'—')+' | الآلية: '+esc(l.vehicle||'—')+'</td><td>وقت/تاريخ: '+esc(l.time||dateOnly(l.date))+'</td><td>'+fmt(l.qty)+' m³</td><td class="report-actual">'+fmt(l.qty)+' m³</td></tr>').join(''):'<tr class="report-load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
+    return '<tr class="report-main-row"><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="report-customer">'+esc(o.customer||'—')+'<br><small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+'<br>'+esc(o.pour||'—')+'</td><td class="report-qty">'+fmt(o.qty)+' m³</td><td class="report-actual">'+fmt(actualQty)+' m³</td></tr>'+details;
   }).join('');
 }
 
@@ -3085,7 +3098,7 @@ function printFilteredOrdersReport(){
   const rows=orders.map(o=>{
     const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
     const total=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
-    return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' م³</td><td>'+fmt(total)+' م³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' م³</td></tr>').join('');
+    return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' m³</td><td>'+fmt(total)+' m³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' m³</td></tr>').join('');
   }).join('');
   printDocA4('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
 }
@@ -3112,10 +3125,10 @@ function printVehicleCostReport(){
  const summary=vehicles.map(v=>{const list=entries.filter(x=>x.vehicle===String(v.name)),sums={};list.forEach(x=>sums[x.type]=(sums[x.type]||0)+x.cost);const delivered=(data.loads||[]).filter(l=>String(l.vehicle||'').trim()===String(v.name).trim()&&inPeriod(l.date)).reduce((n,l)=>n+(Number(l.qty)||0),0);const total=list.reduce((n,x)=>n+x.cost,0);return {name:v.name,records:list.length,total,sums,delivered,costPerM3:delivered>0?total/delivered:0};});
  const all=entries.reduce((n,x)=>n+x.cost,0);
  const totalDelivered=summary.reduce((n,v)=>n+v.delivered,0);
- const rows=summary.map(v=>'<tr><td>'+esc(v.name)+'</td><td>'+fmt(v.records)+'</td><td>'+fmt(v.delivered)+' م³</td><td>'+fmt(v.sums['وقود / گاز']||0)+'</td><td>'+fmt(v.sums['صيانة وإصلاح']||0)+'</td><td>'+fmt(v.sums['مشتريات']||0)+'</td><td>'+fmt(v.sums['قطع غيار']||0)+'</td><td>'+fmt(v.sums['مصروف آلية']||0)+'</td><td><b>'+fmt(v.total)+'</b></td><td>'+ (v.delivered>0?fmt(v.costPerM3)+' د.ع/م³':'—')+'</td></tr>').join('');
+ const rows=summary.map(v=>'<tr><td>'+esc(v.name)+'</td><td>'+fmt(v.records)+'</td><td>'+fmt(v.delivered)+' m³</td><td>'+fmt(v.sums['وقود / گاز']||0)+'</td><td>'+fmt(v.sums['صيانة وإصلاح']||0)+'</td><td>'+fmt(v.sums['مشتريات']||0)+'</td><td>'+fmt(v.sums['قطع غيار']||0)+'</td><td>'+fmt(v.sums['مصروف آلية']||0)+'</td><td><b>'+fmt(v.total)+'</b></td><td>'+ (v.delivered>0?fmt(v.costPerM3)+' د.ع/m³':'—')+'</td></tr>').join('');
  const detailRows=entries.sort((a,b)=>String(a.date).localeCompare(String(b.date))).map(x=>'<tr><td>'+esc(x.date)+'</td><td>'+esc(x.vehicle)+'</td><td>'+esc(x.type)+'</td><td>'+esc(x.detail)+'</td><td>'+esc(x.qty)+'</td><td>'+fmt(x.cost)+'</td></tr>').join('');
  const w=window.open('','_blank','width=1000,height=900');if(!w){toast('اسمح بالنوافذ المنبثقة للطباعة');return;}
- w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تكلفة الآليات — ATLAS</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:6px;font-size:10px;text-align:center}th{background:#eee}.summary{border:1px solid #888;padding:12px;margin:12px 0;font-weight:bold;text-align:center}.note{font-size:10px;line-height:1.8}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير تكلفة الآليات — ATLAS</h3><p>الفترة: '+esc(from||'بداية السجلات')+' إلى '+esc(to||'آخر السجلات')+'</p><div class="summary">إجمالي تكلفة الآليات: '+fmt(all)+' د.ع — الكمية المجهزة بالآليات المسجلة: '+fmt(totalDelivered)+' م³ — عدد الآليات: '+fmt(summary.length)+'</div><h4>ملخص تكلفة كل آلية</h4><table><thead><tr><th>الآلية</th><th>عدد الحركات</th><th>الكمية المجهزة</th><th>وقود / گاز</th><th>صيانة</th><th>مشتريات</th><th>قطع غيار</th><th>مصروفات أخرى</th><th>الإجمالي</th><th>تكلفة المتر المجهز</th></tr></thead><tbody>'+(rows||'<tr><td colspan="10">لا توجد سجلات مرتبطة بالآليات في الفترة المحددة</td></tr>')+'</tbody></table><h4>تفاصيل السجلات</h4><table><thead><tr><th>التاريخ</th><th>الآلية</th><th>نوع السجل</th><th>التفاصيل / السائق / الأمر</th><th>الكمية</th><th>الكلفة</th></tr></thead><tbody>'+(detailRows||'<tr><td colspan="6">لا توجد تفاصيل</td></tr>')+'</tbody></table><p class="note">يعتمد التقرير على السجلات المرتبطة برقم الآلية أو اسمها المطابق. لا يشمل المصروفات العامة غير المرتبطة بآلية. راجع اكتمال ربط السجلات قبل اعتماد النتائج محاسبياً.</p><p style="text-align:center;font-size:10px">تاريخ الإصدار: '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تكلفة الآليات — ATLAS</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #777;padding:6px;font-size:10px;text-align:center}th{background:#eee}.summary{border:1px solid #888;padding:12px;margin:12px 0;font-weight:bold;text-align:center}.note{font-size:10px;line-height:1.8}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير تكلفة الآليات — ATLAS</h3><p>الفترة: '+esc(from||'بداية السجلات')+' إلى '+esc(to||'آخر السجلات')+'</p><div class="summary">إجمالي تكلفة الآليات: '+fmt(all)+' د.ع — الكمية المجهزة بالآليات المسجلة: '+fmt(totalDelivered)+' m³ — عدد الآليات: '+fmt(summary.length)+'</div><h4>ملخص تكلفة كل آلية</h4><table><thead><tr><th>الآلية</th><th>عدد الحركات</th><th>الكمية المجهزة</th><th>وقود / گاز</th><th>صيانة</th><th>مشتريات</th><th>قطع غيار</th><th>مصروفات أخرى</th><th>الإجمالي</th><th>تكلفة المتر المجهز</th></tr></thead><tbody>'+(rows||'<tr><td colspan="10">لا توجد سجلات مرتبطة بالآليات في الفترة المحددة</td></tr>')+'</tbody></table><h4>تفاصيل السجلات</h4><table><thead><tr><th>التاريخ</th><th>الآلية</th><th>نوع السجل</th><th>التفاصيل / السائق / الأمر</th><th>الكمية</th><th>الكلفة</th></tr></thead><tbody>'+(detailRows||'<tr><td colspan="6">لا توجد تفاصيل</td></tr>')+'</tbody></table><p class="note">يعتمد التقرير على السجلات المرتبطة برقم الآلية أو اسمها المطابق. لا يشمل المصروفات العامة غير المرتبطة بآلية. راجع اكتمال ربط السجلات قبل اعتماد النتائج محاسبياً.</p><p style="text-align:center;font-size:10px">تاريخ الإصدار: '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
  w.document.close();
 }
 
@@ -3159,7 +3172,7 @@ function printProfitLossReport(){
  const period=(from||'بداية السجلات')+' إلى '+(to||'آخر السجلات');
  const w=window.open('','_blank','width=950,height=900');
  if(!w){toast('اسمح بالنوافذ المنبثقة لطباعة التقرير');return;}
- w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الأرباح والخسائر</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{border:1px solid #777;padding:9px;font-size:11px;text-align:right}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #999;padding:12px;text-align:center;font-weight:bold}.profit{font-size:18px;font-weight:bold}.note{font-size:10px;line-height:1.8;color:#444}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير الأرباح والخسائر — ATLAS</h3><p style="text-align:center">الفترة: '+esc(period)+'</p><div class="summary"><div>قيمة الخرسانة المجهزة<br>'+money(sales)+'</div><div>إجمالي التكاليف والمصروفات<br>'+money(totalCosts)+'</div><div>النتيجة التقديرية<br><span class="profit">'+money(profit)+'</span></div></div><h4>الإيرادات والإنتاج</h4><table><tr><th>البيان</th><th>القيمة</th></tr><tr><td>عدد الحمولات ضمن الفترة</td><td>'+fmt(loadRows.length)+'</td></tr><tr><td>الكمية المجهزة فعلياً</td><td>'+fmt(totalQty)+' م³</td></tr><tr><td>قيمة التجهيز حسب أسعار أوامر العملاء</td><td>'+money(sales)+'</td></tr><tr><td>المقبوضات المسجلة خلال الفترة (للمتابعة النقدية)</td><td>'+money(receipts)+'</td></tr></table><h4>تفصيل التكاليف والمصروفات</h4><table><tr><th>نوع التكلفة</th><th>المبلغ</th></tr><tr><td>المصروفات العامة</td><td>'+money(generalExpenses)+'</td></tr><tr><td>الوقود والگاز</td><td>'+money(fuel)+'</td></tr><tr><td>الصيانة والإصلاح</td><td>'+money(maintenance)+'</td></tr><tr><td>المشتريات</td><td>'+money(purchases)+'</td></tr><tr><td>قطع الغيار</td><td>'+money(spareParts)+'</td></tr><tr><td>صافي الرواتب المحتسبة</td><td>'+money(payroll)+'</td></tr><tr><th>إجمالي التكاليف</th><th>'+money(totalCosts)+'</th></tr></table><p class="note">ملاحظة محاسبية: هذا تقرير إداري تقديري مبني على السجلات المتاحة وتواريخها، وليس قائمة مالية مدققة. لا تُضاف دفعات الموردين مرة أخرى إلى المصروفات لتجنب ازدواج احتساب المشتريات. المكافآت والغرامات مدرجة ضمن صافي الراتب إذا كانت محتسبة في سجل الرواتب؛ لذلك لا تضاف منفصلة إلى إجمالي التكاليف. تُعرض المقبوضات كمؤشر نقدي ولا تُطرح من الإيرادات لحساب الربح.</p><p style="text-align:center;font-size:10px">تاريخ الإصدار: '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير الأرباح والخسائر</title><style>@page{size:A4;margin:12mm}body{font-family:Tahoma,Arial;padding:10px;color:#111}h2,h3{text-align:center}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{border:1px solid #777;padding:9px;font-size:11px;text-align:right}th{background:#eee}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.summary div{border:1px solid #999;padding:12px;text-align:center;font-weight:bold}.profit{font-size:18px;font-weight:bold}.note{font-size:10px;line-height:1.8;color:#444}</style></head><body>'+atlasDocumentBrand()+'<h3>تقرير الأرباح والخسائر — ATLAS</h3><p style="text-align:center">الفترة: '+esc(period)+'</p><div class="summary"><div>قيمة الخرسانة المجهزة<br>'+money(sales)+'</div><div>إجمالي التكاليف والمصروفات<br>'+money(totalCosts)+'</div><div>النتيجة التقديرية<br><span class="profit">'+money(profit)+'</span></div></div><h4>الإيرادات والإنتاج</h4><table><tr><th>البيان</th><th>القيمة</th></tr><tr><td>عدد الحمولات ضمن الفترة</td><td>'+fmt(loadRows.length)+'</td></tr><tr><td>الكمية المجهزة فعلياً</td><td>'+fmt(totalQty)+' m³</td></tr><tr><td>قيمة التجهيز حسب أسعار أوامر العملاء</td><td>'+money(sales)+'</td></tr><tr><td>المقبوضات المسجلة خلال الفترة (للمتابعة النقدية)</td><td>'+money(receipts)+'</td></tr></table><h4>تفصيل التكاليف والمصروفات</h4><table><tr><th>نوع التكلفة</th><th>المبلغ</th></tr><tr><td>المصروفات العامة</td><td>'+money(generalExpenses)+'</td></tr><tr><td>الوقود والگاز</td><td>'+money(fuel)+'</td></tr><tr><td>الصيانة والإصلاح</td><td>'+money(maintenance)+'</td></tr><tr><td>المشتريات</td><td>'+money(purchases)+'</td></tr><tr><td>قطع الغيار</td><td>'+money(spareParts)+'</td></tr><tr><td>صافي الرواتب المحتسبة</td><td>'+money(payroll)+'</td></tr><tr><th>إجمالي التكاليف</th><th>'+money(totalCosts)+'</th></tr></table><p class="note">ملاحظة محاسبية: هذا تقرير إداري تقديري مبني على السجلات المتاحة وتواريخها، وليس قائمة مالية مدققة. لا تُضاف دفعات الموردين مرة أخرى إلى المصروفات لتجنب ازدواج احتساب المشتريات. المكافآت والغرامات مدرجة ضمن صافي الراتب إذا كانت محتسبة في سجل الرواتب؛ لذلك لا تضاف منفصلة إلى إجمالي التكاليف. تُعرض المقبوضات كمؤشر نقدي ولا تُطرح من الإيرادات لحساب الربح.</p><p style="text-align:center;font-size:10px">تاريخ الإصدار: '+new Date().toLocaleDateString('ar-IQ')+' — ATLAS</p><script>window.onload=function(){setTimeout(function(){window.print();},300)};<\/script></body></html>');
  w.document.close();
 }
 
@@ -3196,7 +3209,7 @@ function printReportGeneral(){
  <table class="data">
  <tr><td>عدد أوامر التجهيز</td><td>${(data.orders||[]).length}</td></tr>
  <tr><td>عدد الحمولات المسجلة</td><td>${(data.loads||[]).length}</td></tr>
- <tr><td>إجمالي الكمية المجهزة فعلياً</td><td><strong>${fmt(deliveredQty)} م³</strong></td></tr>
+ <tr><td>إجمالي الكمية المجهزة فعلياً</td><td><strong>${fmt(deliveredQty)} m³</strong></td></tr>
  <tr><td>عدد العملاء المسجلين</td><td>${(data.customers||[]).length}</td></tr>
  </table>
  <h3>ثانياً: ملخص الإيرادات والمقبوضات</h3>
