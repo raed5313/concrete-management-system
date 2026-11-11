@@ -416,6 +416,18 @@ body.plant-role .side .nav{gap:2px!important}
 .atlas-add-load-total{display:inline-flex!important;align-items:center;justify-content:center;width:30px;height:30px;min-width:30px;padding:0!important;border:1px solid #d6a900!important;border-radius:7px!important;background:#ffd21f!important;color:#171717!important;font-size:19px!important;font-weight:900!important;line-height:1!important;box-shadow:0 2px 5px #0004}
 .atlas-add-load-total:active{transform:scale(.96)}
 
+
+/* الرمز الرسمي A بجانب شعار أطلس في النظام والمستندات */
+.atlas-brand-mark{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important}
+.atlas-brand-mark .atlas-full-logo{width:min(100%,165px)!important;max-height:130px}
+.atlas-system-symbol{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto;width:34px;height:34px;border:2px solid #d6a83d;border-radius:9px;background:linear-gradient(145deg,#fff0b5,#c38c20);color:#17130a;font-family:Arial,sans-serif;font-size:23px;font-weight:900;line-height:1;box-shadow:0 2px 7px #0004}
+.atlas-login-logo-wrap{display:flex;align-items:center;gap:8px}
+.atlas-login-logo-wrap .atlas-login-logo{width:112px;height:86px}
+.atlas-doc-brand-line{display:flex;align-items:center;justify-content:center;gap:10px}
+.atlas-doc-brand-line img{display:block;width:min(230px,75%);max-width:75%;height:auto;max-height:35mm;object-fit:contain;margin:0}
+.atlas-doc-brand-line .atlas-system-symbol{width:30px;height:30px;font-size:20px}
+@media(max-width:800px){.atlas-brand-mark .atlas-full-logo{width:min(100%,125px)!important}.atlas-system-symbol{width:29px;height:29px;font-size:20px}}
+
 </style>
 <style id="ATLAS-LOGO-CACHE-FIX">
 /* تثبيت عرض شعار أطلس الذهبي في الواجهة وشاشة الدخول والطباعة */
@@ -496,7 +508,7 @@ body.plant-role .side .nav{gap:2px!important}
   <div class="atlas-login-panel">
     <div class="login-card atlas-login-card">
       <div class="atlas-login-brand">
-        <img class="atlas-login-logo" src="./assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت">
+        <span class="atlas-login-logo-wrap"><img class="atlas-login-logo" src="./assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز النظام A">A</span></span>
         <div><div class="atlas-login-name">ATLAS</div><div class="atlas-login-ar">أطلس للكونكريت الجاهز</div></div>
       </div>
       <div class="atlas-login-rule"></div>
@@ -518,7 +530,7 @@ body.plant-role .side .nav{gap:2px!important}
 <div class="app hidden" id="mainApp">
 <aside class="side">
 <div class="brand">
-<div class="atlas-brand-mark" role="img" aria-label="شعار أطلس للكونكريت ATLAS"><img class="atlas-full-logo" src="./assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت"></div>
+<div class="atlas-brand-mark" aria-label="شعار أطلس للكونكريت ATLAS"><img class="atlas-full-logo" src="./assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز النظام A">A</span></div>
 <small class="atlas-brand-caption">ATLAS READY MIX CONCRETE</small>
 </div>
 
@@ -2761,7 +2773,7 @@ try{
 }
 
 function atlasDocumentBrand(){
- return '<div class="atlas-doc-brand"><img src="'+location.origin+location.pathname.replace(/[^/]*$/,'')+'assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت" style="display:block;width:230px;max-width:100%;height:auto;margin:0 auto"><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE</div></div>';
+ return '<div class="atlas-doc-brand"><div class="atlas-doc-brand-line"><img src="'+location.origin+location.pathname.replace(/[^/]*$/,'')+'assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز النظام A">A</span></div><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE</div></div>';
 }
 
 function printDocA5(title,content){
