@@ -843,7 +843,7 @@ body.plant-role .side .nav{gap:2px!important}
 'use strict';
 
 const KEY='sada-concrete-v8';
-const ATLAS_BRANCH_ID = /\\/B(?:\\/|$)/.test(location.pathname) ? 'B' : 'A';
+const ATLAS_BRANCH_ID = location.pathname.split('/').includes('B') ? 'B' : 'A';
 let currentRole = '';
 let currentUserName = '';
 
