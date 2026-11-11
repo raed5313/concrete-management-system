@@ -54,7 +54,7 @@ jobs:
 
           marker_css = '#atlasBranchMarker{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;z-index:10001;background:#3a2c0b;color:#ffe08a;border:1px solid #d5a638;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:900;letter-spacing:.3px;box-shadow:0 3px 12px #0008;pointer-events:none}'
           if 'atlasBranchMarker{' not in html:
-              html = html.replace('</style>', marker_css + '\\n</style>', 1)
+              html = html.replace('</style>', marker_css + '\n</style>', 1)
 
           old_branch = """  if (appTitle) appTitle.content = 'ATLAS B';
           }"""
@@ -79,7 +79,7 @@ jobs:
               data["name"] = "أطلس للكونكريت | ATLAS B - الفرع الثاني"
               data["short_name"] = "ATLAS B"
               manifest.write_text(
-                  json.dumps(data, ensure_ascii=False, indent=2) + "\\n",
+                  json.dumps(data, ensure_ascii=False, indent=2) + "\n",
                   encoding="utf-8"
               )
           PY
