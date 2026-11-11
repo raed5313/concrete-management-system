@@ -1188,6 +1188,7 @@ if(mixesResult.error) throw mixesResult.error;
       const freshOrders = (ordersResult.data || []).map(x => ({
         id:x.id,
         no:x.order_no,
+        sourceBranch:x.source_branch||'',
         customer:x.customer,
         phone:x.phone,
         site:x.site,
@@ -1873,7 +1874,7 @@ return `
 <tr class="${stateClass} order-card">
 <td colspan="11" class="atlas-order-cell">
  <div class="atlas-order-layout">
-  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${esc(o.no)}</strong></div>
+  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${o.sourceBranch === 'A' ? 'A/' : ''}${esc(o.no)}</strong></div>
   <div class="atlas-order-field atlas-order-date"><small>التاريخ</small><strong>${esc(dateOnly(o.date))}</strong></div>
   <div class="atlas-order-field atlas-order-customer"><small>اسم الزبون</small><strong>${esc(o.customer)}</strong><span dir="ltr">${esc(o.phone||"—")}</span></div>
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
