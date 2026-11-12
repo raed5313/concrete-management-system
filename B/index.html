@@ -1874,6 +1874,7 @@ let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
 const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
 const qtyB = ls.filter(isBBranchLoad).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+const isSharedOrder = !!(o.sentToB || (o.sourceBranch === 'A' && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
 const unitPrice = Number(o.price)||0;
 const valueA = qtyA*unitPrice;
 const valueB = qtyB*unitPrice;
@@ -1899,7 +1900,7 @@ return `
 <tr class="${stateClass} order-card">
 <td colspan="11" class="atlas-order-cell">
  <div class="atlas-order-layout">
-  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${o.sourceBranch === "A" && o.sourceOrderId ? '<span style="color:#e00020;font-size:27px;font-weight:1000;line-height:1">A</span>/' : ""}${esc(o.no)}</strong>${o.sourceBranch === "A" && o.sourceOrderId ? '<span style="display:inline-block;color:#e00020;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع A</span>' : ""}</div>
+  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${isSharedOrder ? '<span style="color:#e00020;font-size:27px;font-weight:1000;line-height:1">A</span>/' : ""}${esc(o.no)}</strong>${(o.sourceBranch === "A" && o.sourceOrderId) ? '<span style="display:inline-block;color:#e00020;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع A</span>' : ""}</div>
   <div class="atlas-order-field atlas-order-date"><small>التاريخ</small><strong>${esc(dateOnly(o.date))}</strong></div>
   <div class="atlas-order-field atlas-order-customer"><small>اسم الزبون</small><strong>${esc(o.customer)}</strong><span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-weight:900"><span aria-hidden="true">📲📞</span><b dir="ltr">${esc(formatOrderPhone(o.phone)||"—")}</b></span></div>
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
@@ -1907,7 +1908,7 @@ return `
   <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
   <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong>${fmt(o.qty)} m³</strong>${o.actualQty?`<span class="atlas-order-actual">${fmt(o.actualQty)} m³ فعلي</span>`:''}</div>
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
-  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${o.sentToB && isOrderClosed && qtyB > 0 ? `<div style="margin-top:4px;color:#176b35;font-size:10px;font-weight:900;line-height:1.4">${qtyA > 0 ? "تم اكمال تجهيزه من معمل B" : "تم تجهيزه من معمل B"}</div>` : ""}${o.sentToB && isOrderClosed ? `<div style="margin-top:5px;padding:3px 5px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:9px;font-weight:800;line-height:1.5;white-space:normal"><div>فرع <span style="color:#d71920;font-size:12px;font-weight:1000">A</span>: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع <span style="color:#16813a;font-size:12px;font-weight:1000">B</span>: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
+  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${isSharedOrder && isOrderClosed && qtyB > 0 ? `<div style="margin-top:4px;color:#176b35;font-size:10px;font-weight:900;line-height:1.4">${qtyA > 0 ? "تم اكمال تجهيزه من معمل B" : "تم تجهيزه من معمل B"}</div>` : ""}${isSharedOrder && isOrderClosed ? `<div style="margin-top:5px;padding:3px 5px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:9px;font-weight:800;line-height:1.5;white-space:normal"><div>فرع <span style="color:#d71920;font-size:12px;font-weight:1000">A</span>: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع <span style="color:#16813a;font-size:12px;font-weight:1000">B</span>: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
   <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
    ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
    ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
@@ -1926,7 +1927,7 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
- <span class="atlas-load-vehicle" style="position:relative;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;white-space:nowrap"><strong>${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</strong>${o.sentToB ? ((l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:")) ? '<small style="color:#176b35;background:#e7f5eb;border:1px solid #26934b;border-radius:4px;padding:1px 4px;font-size:12px;font-weight:1000;line-height:1">B</small>' : '<small style="color:#d71920;background:#fff0f0;border:1px solid #d71920;border-radius:4px;padding:1px 4px;font-size:12px;font-weight:1000;line-height:1">A</small>') : ''}</span>
+ <span class="atlas-load-vehicle" style="position:relative;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;white-space:nowrap"><strong>${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</strong>${isSharedOrder ? ((l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:")) ? '<small style="color:#176b35;background:#e7f5eb;border:1px solid #26934b;border-radius:4px;padding:1px 4px;font-size:12px;font-weight:1000;line-height:1">B</small>' : '<small style="color:#d71920;background:#fff0f0;border:1px solid #d71920;border-radius:4px;padding:1px 4px;font-size:12px;font-weight:1000;line-height:1">A</small>') : ''}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
