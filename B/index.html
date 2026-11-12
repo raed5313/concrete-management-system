@@ -1841,7 +1841,7 @@ if($('mixesBody')){
  $('mixesBody').innerHTML=tableRows(data.mixes||[],m=>`<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.grade||'—')}</td><td>${fmt(m.cement_kg)}</td><td>${fmt(m.gravel_kg)}</td><td>${fmt(m.sand_kg)}</td><td>${fmt(m.water_l)}</td><td>${fmt(m.admixture_l)}</td><td>${canEditMixes?`<button class="btn" onclick="openMixRecipe('${esc(m.id)}')">تعديل</button> <button class="btn danger" onclick="deleteMixRecipe('${esc(m.id)}')">حذف</button>`:'عرض فقط'}</td></tr>`,8);
 }
 function formatOrderPhone(value){
- return String(value||'').trim().replace(/[\\s().-]/g,'');
+ return String(value||'').trim().replace(/[\s().-]/g,'');
 }
 if($('ordersBody')){
 $('ordersBody').innerHTML=tableRows(
