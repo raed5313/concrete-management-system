@@ -1844,6 +1844,12 @@ return (!from||(orderDate&&orderDate>=from))&&(!to||(orderDate&&orderDate<=to))&
 o=>{
 let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
+const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
+const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+const qtyB = ls.filter(isBBranchLoad).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+const unitPrice = Number(o.price)||0;
+const valueA = qtyA*unitPrice;
+const valueB = qtyB*unitPrice;
  let vehicleTotals = Object.values(ls.reduce((groups, l) => {
    const vehicleName = String(l.vehicle || 'غير محددة');
    if (!groups[vehicleName]) groups[vehicleName] = { vehicle: vehicleName, qty: 0, count: 0 };
@@ -1875,7 +1881,7 @@ return `
   <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
   <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong>${fmt(o.qty)} m³</strong>${o.actualQty?`<span class="atlas-order-actual">${fmt(o.actualQty)} m³ فعلي</span>`:''}</div>
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
-  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong></div>
+  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${isOrderClosed ? `<div style="margin-top:5px;padding:4px 6px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:10px;font-weight:800;line-height:1.55;white-space:nowrap"><div>فرع A: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع B: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
   <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
    ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
    ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
@@ -1893,9 +1899,8 @@ return `
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
- ${l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:") ? '<small style="color:#176b35;background:#e7f5eb;border:1px solid #26934b;border-radius:5px;padding:2px 5px;font-weight:900">جهزت من B</small>' : ''}
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
- <span class="atlas-load-vehicle">${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</span>
+ <span class="atlas-load-vehicle" style="position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px"><strong>${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</strong>${l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:") ? '<small style="color:#176b35;background:#e7f5eb;border:1px solid #26934b;border-radius:4px;padding:1px 4px;font-size:9px;font-weight:900;line-height:1.2">جهزت من B</small>' : ''}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty">${fmt(l.qty)}</strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
@@ -3052,7 +3057,7 @@ function receiptLoad(loadId) {
 <g transform="translate(35 20)"><path d="M105 12 L205 245 L165 245 L105 98 L45 245 L5 245 Z" fill="#20252B" stroke="url(#atlasGold)" stroke-width="8" stroke-linejoin="round"/><path d="M62 183 H148" stroke="url(#atlasGold)" stroke-width="12"/><path d="M20 255 H190" stroke="#20252B" stroke-width="5"/></g>
 <g transform="translate(250 55)"><path d="M0 88 H520" stroke="url(#atlasGold)" stroke-width="4"/><text x="260" y="165" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="bold" letter-spacing="9" fill="#20252B">ATLAS</text><text x="260" y="205" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" letter-spacing="4" fill="#A17B2C">READY MIX CONCRETE</text></g>
 </svg></div><h2 style="font-size:16px;color:#a47b20">شركة أطلس للكونكريت</h2><div style="font-weight:bold;font-size:12px">للخرسانة والكونكريت الجاهز</div><div class="en">ATLAS COMPANY FOR READY MIX CONCRETE</div></div>
-        <div class="title" style="font-size:16px;padding:5px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">وصل تجهيز خرسانة ${l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:") ? '<span style="color:#176b35;font-size:12px">— جهزت من B</span>' : ''}</div>
+        <div class="title" style="font-size:16px;padding:5px;background:#f3eedf!important;color:#59451f!important;border:1px solid #b28a29">وصل تجهيز خرسانة</div>
         <div class="top" style="direction:rtl"><div>التاريخ<br><span class="no" style="color:#111">${esc(d)}</span></div><div>الوقت<br><span class="no" style="color:#111">${esc(l.time || '—')}</span></div><div>رقم الوصل<br><span class="no">${esc(receiptNumber)}</span></div></div>
         <style>.atlas-load-info td{font-size:13px!important;font-weight:700!important;padding:3px 5px!important;color:#20252b!important;line-height:1.15!important}.atlas-load-info td:last-child{font-size:13px!important;font-weight:800!important}.atlas-load-info tr:nth-child(4) td:last-child{color:#7f1d1d!important}.atlas-load-info tr:nth-child(7) td:last-child{color:#1565c0!important}.atlas-load-info tr:last-child td:last-child{font-size:15px!important;font-weight:900!important}
 @media print{
@@ -3070,7 +3075,7 @@ function receiptLoad(loadId) {
  .atlas-load-receipt .sign{margin-top:2px!important}
  .atlas-load-receipt .sign div{padding:6px 4px 10px!important}
  .atlas-load-receipt .foot{margin-top:3px!important;padding-top:2px!important}
-}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (m³)</td><td>${fmt(l.qty)} m³</td></tr></table>
+}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)} ${l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:") ? '<span style="color:#16813a;font-size:20px;font-weight:1000;margin-right:7px;vertical-align:middle">B</span>' : ''}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (m³)</td><td>${fmt(l.qty)} m³</td></tr></table>
         
         <div style="border:1px solid #b28a29;border-radius:4px;padding:5px 7px;margin:2px 0 4px;background:#fffdf6;color:#222;font-size:11px;line-height:1.5;min-height:24px"><b style="color:#805313">الملاحظات:</b> <span>${esc(l.note || o.note || '—')}</span></div>
          <div class="big" style="padding:4px;gap:8px;direction:rtl;align-items:stretch">
