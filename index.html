@@ -3095,7 +3095,7 @@ function printDailyPlantReport(){
  const dayLoads=(data.loads||[]).filter(l=>String(l.date||'').slice(0,10)===pDate);
  const rows=dayLoads.map(l=>{
   const order=(data.orders||[]).find(o=>String(o.no)===String(l.orderNo))||{};
-  return '<tr><td>'+esc(l.no||'—')+'</td><td>'+esc(l.orderNo||'—')+'</td><td>'+esc(order.customer||'—')+'</td><td>'+esc(l.driver||'—')+'</td><td>'+esc(l.vehicle||'—')+'</td><td>'+fmt(l.qty)+' m³</td><td>'+esc(l.time||'—')+'</td></tr>';
+  return '<tr><td>'+reportBranchBadge(reportLoadBranch(l))+esc(l.no||'—')+'</td><td>'+reportBranchBadge(reportOrderBranch(order))+esc(l.orderNo||'—')+'</td><td>'+esc(order.customer||'—')+'</td><td>'+esc(l.driver||'—')+'</td><td>'+esc(l.vehicle||'—')+'</td><td>'+fmt(l.qty)+' m³</td><td>'+esc(l.time||'—')+'</td></tr>';
  }).join('');
  const w=window.open('','_blank','width=900,height=900');
  if(!w){toast('اسمح بالنوافذ المنبثقة للطباعة');return;}
@@ -3129,7 +3129,7 @@ function printCustomerStatement(custName){
   const delivered=o.status==='مكتمل ومجهز'&&Number.isFinite(Number(o.actualQty))?Number(o.actualQty):loads.reduce((n,l)=>n+(Number(l.qty)||0),0);
   const total=delivered*(Number(o.price)||0);
   const paid=receipts.filter(r=>String(r.orderNo)===String(o.no)).reduce((n,r)=>n+(Number(r.amount)||0),0);
-  return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.site||'—')+'</td><td>'+fmt(delivered)+' m³</td><td>'+fmt(o.price||0)+'</td><td>'+fmt(total)+'</td><td>'+fmt(paid)+'</td><td>'+fmt(total-paid)+'</td></tr>';
+  return '<tr><td>'+reportBranchBadge(reportOrderBranch(o))+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.site||'—')+'</td><td>'+fmt(delivered)+' m³</td><td>'+fmt(o.price||0)+'</td><td>'+fmt(total)+'</td><td>'+fmt(paid)+'</td><td>'+fmt(total-paid)+'</td></tr>';
  }).join('');
  const deliveredTotal=orders.reduce((n,o)=>{
   const loads=(data.loads||[]).filter(l=>String(l.orderNo)===String(o.no));
@@ -3190,6 +3190,19 @@ ${rec.orderTotal!==undefined?'<tr><td>المبلغ الكلي للأمر</td><td
 </div>`);
 }
 
+function reportBranchBadge(branch){
+  const isA=String(branch)==='A';
+  return '<span style="display:inline-block;margin:0 3px;padding:1px 5px;border-radius:5px;font-size:12px;font-weight:1000;line-height:1.4;color:'+(isA?'#d71920':'#176b35')+';background:'+(isA?'#fff0f0':'#e7f5eb')+';border:1px solid '+(isA?'#d71920':'#26934b')+'">'+(isA?'A':'B')+'</span>';
+}
+function reportOrderBranch(o){
+  return (ATLAS_BRANCH_ID==='A'||(o.sourceBranch==='A'&&o.sourceOrderId))?'A':'B';
+}
+function reportLoadBranch(l){
+  const id=String(l.sourceLoadId||'');
+  if(ATLAS_BRANCH_ID==='A') return id&&!id.startsWith('A:')?'B':'A';
+  return id.startsWith('A:')?'A':'B';
+}
+
 function getFilteredReportOrders(){
   const from=$('reportFrom')?.value || '';
   const to=$('reportTo')?.value || '';
@@ -3216,8 +3229,8 @@ function renderDetailedReports(){
   body.innerHTML=orders.map(o=>{
     const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
     const actualQty=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
-    const details=loads.length?loads.map((l,i)=>'<tr class="report-load-row"><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>السائق: '+esc(l.driver||'—')+' | الآلية: '+esc(l.vehicle||'—')+'</td><td>وقت/تاريخ: '+esc(l.time||dateOnly(l.date))+'</td><td>'+fmt(l.qty)+' m³</td><td class="report-actual">'+fmt(l.qty)+' m³</td></tr>').join(''):'<tr class="report-load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
-    return '<tr class="report-main-row"><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="report-customer">'+esc(o.customer||'—')+'<br><small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+'<br>'+esc(o.pour||'—')+'</td><td class="report-qty">'+fmt(o.qty)+' m³</td><td class="report-actual">'+fmt(actualQty)+' m³</td></tr>'+details;
+    const details=loads.length?loads.map((l,i)=>'<tr class="report-load-row"><td colspan="2">حمولة '+reportBranchBadge(reportLoadBranch(l))+esc(l.no||i+1)+'</td><td>السائق: '+esc(l.driver||'—')+' | الآلية: '+esc(l.vehicle||'—')+'</td><td>وقت/تاريخ: '+esc(l.time||dateOnly(l.date))+'</td><td>'+fmt(l.qty)+' m³</td><td class="report-actual">'+fmt(l.qty)+' m³</td></tr>').join(''):'<tr class="report-load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
+    return '<tr class="report-main-row"><td>'+reportBranchBadge(reportOrderBranch(o))+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="report-customer">'+esc(o.customer||'—')+'<br><small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+'<br>'+esc(o.pour||'—')+'</td><td class="report-qty">'+fmt(o.qty)+' m³</td><td class="report-actual">'+fmt(actualQty)+' m³</td></tr>'+details;
   }).join('');
 }
 
@@ -3226,7 +3239,7 @@ function printFilteredOrdersReport(){
   const rows=orders.map(o=>{
     const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
     const total=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
-    return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' m³</td><td>'+fmt(total)+' m³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' m³</td></tr>').join('');
+    return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' m³</td><td>'+fmt(total)+' m³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+reportBranchBadge(reportLoadBranch(l))+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' m³</td></tr>').join('');
   }).join('');
   printDocA4('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
 }
