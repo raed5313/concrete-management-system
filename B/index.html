@@ -1867,6 +1867,7 @@ let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert
                   o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري العمل</span>' :
                   `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
 if(o.sentToB && o.status==='مكتمل ومجهز') statusBadge += ' <span style="display:inline-block;background:#e7f5eb;color:#176b35;border:1px solid #26934b;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:900;margin:3px">✔ تم تجهيزه من معمل B</span>';
+if(ATLAS_BRANCH_ID==='B' && isOrderClosed && currentRole==='plant') statusBadge += ' <button class="btn gold" style="margin:6px" title="إعادة إرسال الإكمال إلى A" onclick="closeOrder(\''+esc(o.no)+'\')">🔄 إعادة مزامنة إلى A</button>';
 
 let canManageOrder = isManager || isPlant;
 let canPrintOnly = isAccountant;
