@@ -1,0 +1,38 @@
+name: ATLAS feature integrity
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  protect-shared-features:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Verify protected features in both branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in index.html B/index.html; do
+            test -f "$file"
+            for feature in \
+              'const isSharedOrder = !!(' \
+              'isSharedOrder && isOrderClosed && qtyB > 0' \
+              'isSharedOrder && isOrderClosed ?' \
+              'function reportBranchBadge' \
+              'function reportOrderBranch' \
+              'function reportLoadBranch' \
+              'function formatOrderPhone' \
+              'C-15' \
+              'C-50' \
+              'atlas-load-vehicle'; do
+              if ! grep -Fq "$feature" "$file"; then
+                echo "Missing protected ATLAS feature: $feature in $file"
+                exit 1
+              fi
+            done
+            echo "Protected features OK: $file"
+          done
