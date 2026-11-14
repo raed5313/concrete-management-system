@@ -2452,6 +2452,14 @@ try{
  o.status='قيد العمل';delete o.actualQty;
  toast('تعذر حفظ قفل الأمر في قاعدة البيانات');console.error(err);return;
 }
+if(o.sentToB){
+ try{
+  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();if(sessionError)throw sessionError;
+  const token=sessionData?.session?.access_token;if(!token)throw new Error('انتهت جلسة الدخول');
+  const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_shared_status',order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote})});
+  const result=await transfer.json();if(!transfer.ok||!result.success)throw new Error(result.error||'تعذرت مزامنة القفل إلى B');
+ }catch(syncErr){console.error('Shared order status sync:',syncErr);toast('تم القفل في A لكن تعذرت مزامنته إلى B');}
+}
 if(o.sourceBranch==='B' && o.sourceOrderId){
  try{
   const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();if(sessionError)throw sessionError;
