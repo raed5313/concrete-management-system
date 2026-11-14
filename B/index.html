@@ -1402,6 +1402,15 @@ data.mixes = mixesResult.data || [];
   }
   window.sadaCloudSyncNow = syncCloudData;
 
+  // مزامنة فورية عند وصول أو إضافة حمولة أو أمر مشترك.
+  if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') supabaseClient.removeChannel(window.atlasRealtimeChannel);
+  let atlasRealtimeB = supabaseClient.channel('atlas-live-b');
+  atlasRealtimeB = atlasRealtimeB.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  atlasRealtimeB = atlasRealtimeB.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_orders'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  atlasRealtimeB = atlasRealtimeB.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_loads'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  window.atlasRealtimeChannel = atlasRealtimeB.subscribe();
+
+
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
   const allowedPages = roleMenus[currentRole] || roleMenus.manager;
   const requestedPage = decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);
