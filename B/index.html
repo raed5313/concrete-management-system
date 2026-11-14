@@ -1264,6 +1264,11 @@ if(mixesResult.error) throw mixesResult.error;
         }
         try { localStorage.setItem(markerKey, String(Math.max(lastNotifiedNo, latestNo))); } catch(e) {}
       }
+      const previouslyKnownOrderIds = window.sadaKnownOrderIds;
+      if (currentRole === 'plant' && previouslyKnownOrderIds) {
+        const newlyReceivedFromB = freshOrders.filter(o => o.sourceBranch === 'B' && o.sourceOrderId && !previouslyKnownOrderIds.has(String(o.id)));
+        if (newlyReceivedFromB.length) triggerPlantAlert(newlyReceivedFromB[newlyReceivedFromB.length - 1]);
+      }
       window.sadaKnownOrderIds = new Set(freshOrders.filter(o=>o.id).map(o=>String(o.id)));
       data.orders = freshOrders;
 
