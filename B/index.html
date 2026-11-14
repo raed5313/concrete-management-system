@@ -2804,10 +2804,9 @@ if(!['manager','plant','operator'].includes(currentRole)){toast('حذف الحم
 if(!confirm('حذف الحمولة من المعملين؟'))return;
 const load=data.loads.find(x=>String(x.id)===String(id));if(!load)return;
 try{
- const {data:result,error}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'delete_load',load_id:String(load.id||''),source_load_id:String(load.sourceLoadId||('B:'+String(load.id||'')))}});
+ const {data:result,error}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'delete_load',load_id:String(load.id||''),source_load_id:String(load.sourceLoadId||'')}});
  if(error)throw error;
  if(!result||result.success!==true)throw new Error(result?.error||'لم تؤكد قاعدة البيانات حذف الحمولة');
- // دالة الحذف المركزية تحذف سجل الأصل في B والمرآة المقابلة في A؛ لا نكرر DELETE من الواجهة.
  data.loads=data.loads.filter(x=>x!==load);
  logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+load.no);
  render();toast('تم حذف الحمولة من المعملين ومزامنة الحذف');
