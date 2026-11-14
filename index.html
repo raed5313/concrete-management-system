@@ -1211,8 +1211,7 @@ async function initSystem(){
     sadaSyncRunning = true;
     try {
       // اجلب بيانات النظام في دفعة متوازية واحدة لتقليل زمن انتظار فتح النظام.
-      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
-        walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = await Promise.all([
+      const loadCloudSnapshot = () => Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
         supabaseClient.from('customers').select('*').order('created_at'),
@@ -1225,6 +1224,24 @@ async function initSystem(){
         supabaseClient.from('company_operational_records').select('*').order('created_at'),
         supabaseClient.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(500)
       ]);
+
+      // إذا انتهت صلاحية JWT أثناء بقاء الصفحة مفتوحة، جدّد الجلسة ثم أعد قراءة كل البيانات مرة واحدة.
+      const isAuthFailure = result => !!(result && result.error &&
+        (Number(result.error.status) === 401 ||
+         /jwt|token.*(expired|invalid)|unauthorized|invalid.*claim/i.test(String(result.error.message || '') + ' ' + String(result.error.code || ''))));
+      let cloudResults = await loadCloudSnapshot();
+      if (cloudResults.some(isAuthFailure)) {
+        const { data: refreshedSession, error: refreshError } = await supabaseClient.auth.refreshSession();
+        if (refreshError || !refreshedSession?.session) {
+          throw new Error('انتهت صلاحية جلسة الدخول. سجّل الدخول مجدداً لتحديث البيانات.');
+        }
+        cloudResults = await loadCloudSnapshot();
+        if (cloudResults.some(isAuthFailure)) {
+          throw new Error('تعذر تجديد صلاحية الاتصال بقاعدة البيانات. سجّل الخروج ثم الدخول مجدداً.');
+        }
+      }
+      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
+        walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = cloudResults;
 
       if(ordersResult.error) throw ordersResult.error;
       if(loadsResult.error) throw loadsResult.error;
@@ -1337,7 +1354,7 @@ data.mixes = mixesResult.data || [];
 
     } catch(err) {
       console.error('Supabase sync:', err);
-      toast('تعذر تحديث البيانات من قاعدة البيانات');
+      toast(err && /جلسة الدخول|صلاحية الاتصال/.test(String(err.message||'')) ? err.message : 'تعذر تحديث البيانات من قاعدة البيانات');
     } finally {
       sadaSyncRunning = false;
       if (sadaSyncPending) {
