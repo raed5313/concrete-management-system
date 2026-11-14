@@ -1225,6 +1225,8 @@ async function initSystem(){
 
       if(ordersResult.error) throw ordersResult.error;
       if(loadsResult.error) throw loadsResult.error;
+      if(atlasOrdersResult.error) throw atlasOrdersResult.error;
+      if(atlasLoadsResult.error) throw atlasLoadsResult.error;
       if(customersResult.error) throw customersResult.error;
       if(driversResult.error) throw driversResult.error;
       if(vehiclesResult.error) throw vehiclesResult.error;
@@ -1399,6 +1401,14 @@ data.mixes = mixesResult.data || [];
     });
   }
   window.sadaCloudSyncNow = syncCloudData;
+
+  if (window.atlasLoadsRealtimeChannel) supabaseClient.removeChannel(window.atlasLoadsRealtimeChannel);
+  window.atlasLoadsRealtimeChannel = supabaseClient.channel('atlas-live-loads-B')
+    .on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_loads'},()=>{if(document.visibilityState==='visible')syncCloudData();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_orders'},()=>{if(document.visibilityState==='visible')syncCloudData();})
+    .subscribe();
+
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
   const allowedPages = roleMenus[currentRole] || roleMenus.manager;
   const requestedPage = decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);
