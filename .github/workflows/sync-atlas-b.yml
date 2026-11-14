@@ -90,6 +90,20 @@ jobs:
           if old_branch not in html:
               raise SystemExit('Expected branch branding block not found; refusing to publish an unbranded B copy.')
           html = html.replace(old_branch, new_branch, 1)
+
+          # Keep B's live-sync channel branch-specific after every A-to-B copy.
+          html = html.replace(
+              "supabaseClient.channel('atlas-live-a')",
+              "supabaseClient.channel('atlas-live-b')",
+              1
+          )
+          live_load_listener = """  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});"""
+          if live_load_listener not in html:
+              raise SystemExit('Expected shared live-load listener not found; refusing to publish B without realtime load sync.')
+          branch_live_listeners = live_load_listener + """
+          atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
+          atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});"""
+          html = html.replace(live_load_listener, branch_live_listeners, 1)
           index.write_text(html, encoding="utf-8")
 
           config = Path("B/supabase-config.js")
