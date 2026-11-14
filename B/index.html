@@ -3844,7 +3844,7 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
 })();
 </script>
 <script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("../service-worker.js").catch(err => console.warn("PWA registration failed", err))); }
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(err => console.warn("PWA registration failed", err))); }
 </script>
 
 <!-- صوت الصلاة على النبي عند فتح نظام أطلس -->
