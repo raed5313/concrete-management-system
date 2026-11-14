@@ -2488,24 +2488,45 @@ try{
  o.status='قيد العمل';delete o.actualQty;
  toast('تعذر حفظ قفل الأمر في قاعدة البيانات');console.error(err);return;
 }
-if(o.sentToB){
- try{
-  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();if(sessionError)throw sessionError;
-  const token=sessionData?.session?.access_token;if(!token)throw new Error('انتهت جلسة الدخول');
-  const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_shared_status',order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote})});
-  const result=await transfer.json();if(!transfer.ok||!result.success)throw new Error(result.error||'تعذرت مزامنة القفل إلى B');
- }catch(syncErr){console.error('Shared order status sync:',syncErr);toast('تم القفل في A لكن تعذرت مزامنته إلى B');}
-}
-if(o.sourceBranch==='B' && o.sourceOrderId){
- try{
-  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();if(sessionError)throw sessionError;
-  const token=sessionData?.session?.access_token;if(!token)throw new Error('انتهت جلسة الدخول');
-  const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_reverse_status',source_order_id:o.sourceOrderId,status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote})});
-  const result=await transfer.json();if(!transfer.ok||!result.success)throw new Error(result.error||'تعذرت مزامنة حالة الأمر مع B');
- }catch(syncErr){console.error('Reverse order status sync:',syncErr);toast('تم قفل الأمر في A لكن تعذرت مزامنة القفل إلى B');}
+let peerSyncOK=true;
+try{
+ const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+ if(sessionError)throw sessionError;
+ const token=sessionData?.session?.access_token;
+ if(!token)throw new Error('انتهت جلسة الدخول');
+ let action=null,payload={};
+ if(ATLAS_BRANCH_ID==='A' && o.sentToB){
+   action='send_shared_status';
+   payload={order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
+ }else if(ATLAS_BRANCH_ID==='A' && o.sourceBranch==='B' && o.sourceOrderId){
+   action='send_reverse_status';
+   payload={source_order_id:o.sourceOrderId,status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
+ }else if(ATLAS_BRANCH_ID==='B' && o.sourceBranch==='A' && o.sourceOrderId){
+   // أمر مرسل أصلاً من A: قفل سجل المشاركة وتحديث الأمر الأصلي في A معاً.
+   action='close_order';
+   payload={source_order_id:o.sourceOrderId,actual_qty:delivered,lock_note:o.lockNote};
+ }else if(ATLAS_BRANCH_ID==='B' && o.sentToA && !o.sourceBranch){
+   // أمر منشؤه B وتم تحويله إلى A.
+   action='send_origin_status';
+   payload={order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
+ }
+ if(action){
+   const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
+     method:'POST',
+     headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+     body:JSON.stringify({action,...payload})
+   });
+   const result=await transfer.json();
+   if(!transfer.ok||!result.success)throw new Error(result.error||'تعذرت مزامنة قفل الأمر إلى المعمل الآخر');
+ }
+}catch(syncErr){
+ peerSyncOK=false;
+ console.error('ATLAS shared order close sync:',syncErr);
 }
 logAction(currentUserName,'قفل أمر وتسجيل كمية',`الأمر: ${no} - الكمية الفعلية المجهزة: ${delivered}`);
-await save();closeModal();toast('تم قفل الأمر على إجمالي الكمية المجهزة فعلياً');
+await save();closeModal();render();
+if(peerSyncOK)toast('تم قفل أمر التجهيز في المعملين معاً');
+else toast('تم القفل محلياً، لكن تعذرت مزامنته إلى المعمل الآخر؛ أعد المحاولة بعد عودة الاتصال');
 });
 }
 async function openLoad(no) {
