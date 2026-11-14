@@ -2392,17 +2392,23 @@ function openOrder(){
 
     (async()=>{
       try{
+        // الترقيم مستقل لكل معمل: لا تدخل أوامر المعمل الآخر المحوّلة (A- / B-) في التسلسل.
         const {data: existing, error: readError} = await supabaseClient
           .from('concrete_orders')
           .select('order_no')
+          .eq('branch_id', ATLAS_BRANCH_ID)
+          .is('source_branch', null)
           .order('order_no',{ascending:false})
           .limit(1);
 
         if(readError) throw readError;
 
-        const lastNo = existing && existing.length
-          ? parseInt(existing[0].order_no,10) || 0
-          : 0;
+        const lastNo = (existing || []).reduce((max, row) => {
+          const value = String(row.order_no || '');
+          if (!/^\\d+$/.test(value)) return max;
+          const number = parseInt(value,10);
+          return Number.isFinite(number) ? Math.max(max,number) : max;
+        }, 0);
 
         const orderNo = String(lastNo + 1).padStart(7,'0');
 
