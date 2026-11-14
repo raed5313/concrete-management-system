@@ -1173,13 +1173,20 @@ async function initSystem(){
     if (sadaSyncRunning) { sadaSyncPending = true; return; }
     sadaSyncRunning = true;
     try {
-      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult] = await Promise.all([
+      // اجلب بيانات النظام في دفعة متوازية واحدة لتقليل زمن انتظار فتح النظام.
+      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
+        walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
         supabaseClient.from('customers').select('*').order('created_at'),
         supabaseClient.from('drivers').select('*').order('created_at'),
         supabaseClient.from('vehicles').select('*').order('created_at'),
-supabaseClient.from('concrete_mix_recipes').select('*').order('name')
+        supabaseClient.from('concrete_mix_recipes').select('*').order('name'),
+        supabaseClient.from('wallet_accounts').select('*').order('created_at'),
+        supabaseClient.from('wallet_transactions').select('*').order('created_at',{ascending:false}).limit(500),
+        supabaseClient.from('company_app_data').select('payload').eq('branch_id', ATLAS_BRANCH_ID).eq('id', true).maybeSingle(),
+        supabaseClient.from('company_operational_records').select('*').order('created_at'),
+        supabaseClient.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(500)
       ]);
 
       if(ordersResult.error) throw ordersResult.error;
@@ -1248,21 +1255,12 @@ if(mixesResult.error) throw mixesResult.error;
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
       data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
 data.mixes = mixesResult.data || [];
-      const [walletAccountsResult,walletTransactionsResult] = await Promise.all([
-        supabaseClient.from('wallet_accounts').select('*').order('created_at'),
-        supabaseClient.from('wallet_transactions').select('*').order('created_at',{ascending:false}).limit(500)
-      ]);
       if(walletAccountsResult.error) throw walletAccountsResult.error;
       if(walletTransactionsResult.error) throw walletTransactionsResult.error;
       data.walletAccounts = walletAccountsResult.data || [];
       data.walletTransactions = walletTransactionsResult.data || [];
-      const {data: companyRow, error: companyError} = await supabaseClient
-        .from('company_app_data').select('payload').eq('branch_id', ATLAS_BRANCH_ID).eq('id', true).maybeSingle();
+      const {data: companyRow, error: companyError} = companyResult;
       if (companyError) throw companyError;
-      const [operationalResult,auditResult] = await Promise.all([
-        supabaseClient.from('company_operational_records').select('*').order('created_at'),
-        supabaseClient.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(500)
-      ]);
       if (operationalResult.error) throw operationalResult.error;
       if (auditResult.error) throw auditResult.error;
       ['fuel','purchases','suppliers','supplier_payments','maintenance','spare_parts','attendance','payroll','advances','bonuses','fines','inventory_items'].forEach(k => data[k] = []);
