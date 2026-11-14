@@ -1249,7 +1249,7 @@ if(mixesResult.error) throw mixesResult.error;
         actualQty:x.actual_qty,
         lockNote:x.lock_note,
         status:x.status
-      }));];
+      }));
 
       // تذكّر آخر أمر تم استلامه على هذا الجهاز حتى لا تضيع نافذة التنبيه بعد إغلاق الموقع أو إعادة تحميله.
       // عند أول تشغيل فقط نضع خط أساس، ثم نعرض أحدث أمر وصل أثناء غياب المعمل.
@@ -1288,7 +1288,7 @@ if(mixesResult.error) throw mixesResult.error;
         time:x.time || null,
         status:x.status,
         date:x.created_at
-      }));;
+      }));
       data.customers = (customersResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',address:x.address||''}));
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
       data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
