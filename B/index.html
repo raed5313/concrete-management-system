@@ -1677,7 +1677,7 @@ if(data.audit.length > 100) data.audit.pop();
 }
 
 async function sendOrderToB(orderNo){
- if(ATLAS_BRANCH_ID!=="A"||!["manager","plant"].includes(currentRole))return;
+ if(ATLAS_BRANCH_ID!=="A"||currentRole!=="manager"){toast("إرسال أو تحويل أمر التجهيز من صلاحية المدير فقط");return;}
  if(!confirm("إرسال الأمر "+orderNo+" مع جميع حمولاته إلى معمل B؟"))return;
  try{
   const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
@@ -1701,7 +1701,7 @@ async function sendOrderToB(orderNo){
  }
 }
 async function sendOrderToA(orderNo){
- if(ATLAS_BRANCH_ID!=="B"||!["plant","manager"].includes(currentRole))return;
+ if(ATLAS_BRANCH_ID!=="B"||currentRole!=="manager"){toast("إرسال أو تحويل أمر التجهيز من صلاحية المدير فقط");return;}
  if(!confirm("إرسال الأمر "+orderNo+" مع جميع حمولاته إلى معمل A؟"))return;
  try{
   const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
@@ -2003,8 +2003,8 @@ return `
 
  </div>
 <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
- ${ATLAS_BRANCH_ID === 'B' && ['plant','manager'].includes(currentRole) && !o.sentToA ? '<button class="btn gold" title="إرسال الأمر إلى معمل A" aria-label="إرسال إلى معمل A" onclick="sendOrderToA(\''+esc(o.no)+'\')">↗️ إرسال إلى A</button>' : ''}
- ${ATLAS_BRANCH_ID === 'A' && ['manager','plant'].includes(currentRole) && !o.sentToB ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
+ ${ATLAS_BRANCH_ID === 'B' && currentRole === 'manager' && !o.sentToA ? '<button class="btn gold" title="إرسال الأمر إلى معمل A" aria-label="إرسال إلى معمل A" onclick="sendOrderToA(\''+esc(o.no)+'\')">↗️ إرسال إلى A</button>' : ''}
+ ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' && !o.sentToB ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
  ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
  ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
  <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
