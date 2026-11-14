@@ -1352,6 +1352,12 @@ data.mixes = mixesResult.data || [];
     });
   }
   window.sadaCloudSyncNow = syncCloudData;
+
+  if (window.atlasLoadsRealtimeChannel) supabaseClient.removeChannel(window.atlasLoadsRealtimeChannel);
+  window.atlasLoadsRealtimeChannel = supabaseClient.channel('atlas-live-loads-A')
+    .on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();})
+    .subscribe();
+
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
   const allowedPages = roleMenus[currentRole] || roleMenus.manager;
   const requestedPage = decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);
