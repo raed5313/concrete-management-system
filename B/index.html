@@ -2821,12 +2821,9 @@ if(!['manager','plant','operator'].includes(currentRole)){toast('حذف الحم
 if(!confirm('حذف الحمولة؟'))return;
 const load=data.loads.find(x=>String(x.id)===String(id));if(!load)return;
 try{
- const sharedId=String(load.sourceLoadId||'');
- if(sharedId && sharedId.startsWith('A:')){
-   const {error}=await supabaseClient.from('atlas_branch_loads').delete().eq('source_load_id',sharedId);
-   if(error)throw error;
- }else if(sharedId && sharedId.startsWith('B:')){
-   const {error}=await supabaseClient.from('atlas_branch_loads').delete().eq('source_load_id',sharedId);
+ const mirroredAtlasRow=String(load.id||'').startsWith('A:') || String(load.id||'').startsWith('B:');
+ if(mirroredAtlasRow){
+   const {error}=await supabaseClient.from('atlas_branch_loads').delete().eq('source_load_id',String(load.sourceLoadId||load.id));
    if(error)throw error;
  }else if(load.id){
    const {error}=await supabaseClient.from('loads').delete().eq('id',load.id);
