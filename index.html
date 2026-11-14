@@ -2723,14 +2723,16 @@ async function editLoad(id){
 
 async function delLoad(id){
 if(!['manager','plant','operator'].includes(currentRole)){toast('حذف الحمولة متاح للمدير ومشغل المعمل فقط');return;}
-if(!confirm('حذف الحمولة؟'))return;
+if(!confirm('حذف الحمولة من المعملين؟'))return;
 const load=data.loads.find(x=>String(x.id)===String(id));if(!load)return;
 try{
-if(load.id){const {error}=await supabaseClient.from('loads').delete().eq('id',load.id);if(error)throw error;}
-data.loads=data.loads.filter(x=>x!==load);
-logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+load.no);
-await save();toast('تم حذف الحمولة من قاعدة البيانات');
-}catch(err){console.error(err);toast('تعذر حذف الحمولة: '+(err.message||''));}
+ const {data:result,error}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'delete_load',load_id:String(load.id||''),source_load_id:String(load.sourceLoadId||'')}});
+ if(error)throw error;
+ if(!result||result.success!==true)throw new Error(result?.error||'لم تؤكد قاعدة البيانات حذف الحمولة');
+ data.loads=data.loads.filter(x=>x!==load);
+ logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+load.no);
+ render();toast('تم حذف الحمولة من المعملين ومزامنة الحذف');
+}catch(err){console.error(err);toast('تعذر حذف الحمولة: '+(err.message||'تحقق من الاتصال والصلاحيات'));}
 }
 
 async function openSimple(t){
