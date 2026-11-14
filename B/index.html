@@ -1220,9 +1220,10 @@ async function initSystem(){
     sadaSyncRunning = true;
     try {
       // اجلب بيانات النظام في دفعة متوازية واحدة لتقليل زمن انتظار فتح النظام.
-      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
+      const [ordersResult, sharedOrdersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
         walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
+        supabaseClient.from('atlas_branch_orders').select('source_order_id,status,actual_qty,lock_note,updated_at').order('updated_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
         supabaseClient.from('customers').select('*').order('created_at'),
         supabaseClient.from('drivers').select('*').order('created_at'),
@@ -1236,6 +1237,7 @@ async function initSystem(){
       ]);
 
       if(ordersResult.error) throw ordersResult.error;
+      if(sharedOrdersResult.error) throw sharedOrdersResult.error;
       if(loadsResult.error) throw loadsResult.error;
       if(customersResult.error) throw customersResult.error;
       if(driversResult.error) throw driversResult.error;
@@ -1285,6 +1287,18 @@ if(mixesResult.error) throw mixesResult.error;
         if (newlyReceivedFromB.length) triggerPlantAlert(newlyReceivedFromB[newlyReceivedFromB.length - 1]);
       }
       window.sadaKnownOrderIds = new Set(freshOrders.filter(o=>o.id).map(o=>String(o.id)));
+      // حالة الأمر المشتركة من جدول المزامنة هي المرجع النهائي لبطاقات B للأوامر الواردة من A.
+      const sharedStatusById = new Map((sharedOrdersResult.data || []).map(x => [String(x.source_order_id), x]));
+      freshOrders.forEach(o => {
+        if (o.sourceBranch === 'A' && o.sourceOrderId) {
+          const shared = sharedStatusById.get(String(o.sourceOrderId));
+          if (shared) {
+            o.status = shared.status || o.status;
+            o.actualQty = shared.actual_qty ?? o.actualQty;
+            o.lockNote = shared.lock_note ?? o.lockNote;
+          }
+        }
+      });
       data.orders = freshOrders;
 
       data.loads = (loadsResult.data || []).map(x => ({
@@ -1414,6 +1428,7 @@ data.mixes = mixesResult.data || [];
   if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') supabaseClient.removeChannel(window.atlasRealtimeChannel);
   let atlasRealtimeA = supabaseClient.channel('atlas-live-a');
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_orders'},()=>{if(document.visibilityState==='visible'){syncCloudData();}});
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
   window.atlasRealtimeChannel = atlasRealtimeA.subscribe();
 
