@@ -1969,9 +1969,9 @@ const valueB = qtyB*unitPrice;
  }, {}));
 let isOrderClosed = o.status === 'مكتمل ومجهز';
 let hasInvoice = data.invoices.some(inv => String(inv.orderNo || '') === String(o.no)) || data.receipts.some(rec => String(rec.orderNo || '') === String(o.no) && Number(rec.amount || 0) > 0);
-let stateClass = hasInvoice ? 'order-invoiced' : isOrderClosed ? 'order-locked' : 'order-open';
+let stateClass = isSharedOrder ? (isOrderClosed ? 'order-locked' : 'order-open') : (hasInvoice ? 'order-invoiced' : isOrderClosed ? 'order-locked' : 'order-open');
 
-let statusBadge = o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
+let statusBadge = isSharedOrder && isOrderClosed ? '<span style="color:#0756a6;font-weight:1000">🔒 مقفل</span>' : o.status==='قيد التجهيز' ? '<span class="badge-alert">جديد / قيد التجهيز</span>' :
                   o.status==='قيد العمل' ? '<span style="color:#e4b84f;font-weight:bold">⏳ جاري العمل</span>' :
                   `<span style="color:#174b2b;font-weight:bold">✔ ${esc(o.status)}</span>`;
 
@@ -3328,7 +3328,47 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 #orders #ordersBody .atlas-order-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important;width:100%!important;box-sizing:border-box!important;margin:8px 0 0!important;padding:7px 9px!important;background:rgba(255,255,255,.78)!important;border:1px solid rgba(110,125,140,.35)!important;border-radius:7px!important}
 #orders #ordersBody .atlas-order-actions>small{font-weight:900!important;color:#263746!important}
 #orders #ordersBody .atlas-order-actions .actions{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:5px!important}
-</style>\n</body></html>`);
+</style>\n
+<style id="atlas-shared-order-blue-final">
+/* الأوامر المشتركة: أزرق فاتح أثناء التجهيز، وأزرق أوضح عند القفل في كلا المعملين */
+#orders #ordersBody tr.order-card.shared-order-card,
+#orders #ordersBody tr.order-card.shared-order-card > td.atlas-order-cell,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-layout,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-actions{
+  background:#d9efff!important;
+  color:#123b5d!important;
+  border-color:#9bcdf0!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card.order-locked,
+#orders #ordersBody tr.order-card.shared-order-card.order-locked > td.atlas-order-cell,
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-layout,
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-field,
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-actions{
+  background:#8fc8f5!important;
+  color:#073b70!important;
+  border-color:#378ed2!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field strong,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field small,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-actions>small{
+  color:#12456f!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-field strong,
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-field small,
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-actions>small{
+  color:#073b70!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card.order-locked .atlas-order-status strong{
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:6px;
+  background:#d9efff!important;
+  border:1px solid #378ed2!important;
+}
+</style>
+
+</body></html>`);
 w.document.close();
 }
 
