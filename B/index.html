@@ -2785,16 +2785,15 @@ async function editLoad(id){
   try{
    const qty=Number(v.qty);if(!Number.isFinite(qty)||qty<=0)throw new Error('أدخل كمية صحيحة');
    const driver=String(v.driver||'').trim();
-   const {data:updatedLoad,error}=await supabaseClient.from('loads')
-     .update({driver:driver||null,vehicle:v.vehicle||null,qty})
-     .eq('id',l.id)
-     .select('id,driver,vehicle,qty')
-     .maybeSingle();
-   if(error)throw error;
-   if(!updatedLoad)throw new Error('لم تؤكد قاعدة البيانات تحديث الحمولة؛ تحقق من صلاحية التعديل واتصال الحساب');
-   Object.assign(l,{driver:updatedLoad.driver||'',vehicle:updatedLoad.vehicle||'',qty:Number(updatedLoad.qty)||qty});
+   const {data:updatedResult,error:updateError}=await supabaseClient.functions.invoke('atlas-branch-transfer',{
+     body:{action:'update_load',load_id:String(l.id),source_load_id:String(l.sourceLoadId||''),fields:{driver:driver||null,vehicle:v.vehicle||null,qty}}
+   });
+   if(updateError)throw updateError;
+   if(!updatedResult||updatedResult.success!==true)throw new Error(updatedResult?.error||'لم تؤكد قاعدة البيانات تحديث الحمولة ومزامنتها');
+   Object.assign(l,{driver:driver||'',vehicle:v.vehicle||'',qty});
    logAction(currentUserName,'تعديل حمولة','رقم الحمولة: '+l.no+' — الأمر: '+l.orderNo);
-   await save();closeModal();render();toast('تم تعديل الحمولة وحفظها مركزياً');
+   if(!await save())throw new Error('تعذر حفظ سجل التعديلات المركزي');
+   closeModal();render();toast('تم تعديل الحمولة ومزامنتها بين المعملين');
   }catch(err){console.error(err);toast('تعذر تعديل الحمولة: '+(err.message||''));}
  });
 }
