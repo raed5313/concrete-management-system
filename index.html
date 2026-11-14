@@ -1353,6 +1353,14 @@ data.mixes = mixesResult.data || [];
   }
   window.sadaCloudSyncNow = syncCloudData;
 
+  // مزامنة فورية للطلبات والحمولات المشتركة بين الفرعين.
+  if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') supabaseClient.removeChannel(window.atlasRealtimeChannel);
+  let atlasRealtimeA = supabaseClient.channel('atlas-live-a');
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  window.atlasRealtimeChannel = atlasRealtimeA.subscribe();
+
+
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
   const allowedPages = roleMenus[currentRole] || roleMenus.manager;
   const requestedPage = decodeURIComponent(location.hash.replace(/^#\/?/, '').split(/[?&]/)[0]);
