@@ -1963,7 +1963,7 @@ return `<tr>
 <td>${l.sourceLoadId && !String(l.sourceLoadId).startsWith("A:") ? '<b style="color:#176b35">جهزت من B</b>' : ''} ${esc(o.customer||'—')}</td>
 <td>${esc(l.driver||'—')}</td>
 <td>${esc(l.vehicle||'—')}</td>
-<td><bdi dir="ltr">${fmt(l.qty)}&nbsp;&nbsp;m³</bdi></td>
+<td><bdi dir="ltr">${(Number(l.qty)||0).toFixed(3)}</bdi></td>
 <td>${esc(l.time||'—')}</td>
 <td><button class="btn gold" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button></td>
 </tr>`;
@@ -3232,7 +3232,7 @@ function receiptLoad(loadId) {
  .atlas-load-receipt .sign{margin-top:2px!important}
  .atlas-load-receipt .sign div{padding:6px 4px 10px!important}
  .atlas-load-receipt .foot{margin-top:3px!important;padding-top:2px!important}
-}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية (m³)</td><td><bdi dir="ltr">${fmt(l.qty)}&nbsp;&nbsp;m³</bdi></td></tr></table>
+}</style><table class="data atlas-load-info"><tr><td>اسم الزبون</td><td>${esc(o.customer || '—')}</td></tr><tr><td>موقع الصب</td><td>${esc(o.site || '—')}</td></tr><tr><td>نوع الصب</td><td>${esc(o.pour || '—')}</td></tr><tr><td>المواصفة</td><td>${esc(o.grade || '—')}</td></tr><tr><td>رقم الآلية</td><td>${esc(vehicleReceiptCode)}</td></tr><tr><td>رقم المضخة</td><td>${esc(l.pump || '—')}</td></tr><tr><td>اسم السائق</td><td>${esc(l.driver || '—')}</td></tr><tr><td>الكمية</td><td><bdi dir="ltr">${(Number(l.qty)||0).toFixed(3)}</bdi></td></tr></table>
         
         <div style="border:1px solid #b28a29;border-radius:4px;padding:5px 7px;margin:2px 0 4px;background:#fffdf6;color:#222;font-size:11px;line-height:1.5;min-height:24px"><b style="color:#805313">الملاحظات:</b> <span>${esc(l.note || o.note || '—')}</span></div>
          <div class="big" style="padding:4px;gap:8px;direction:rtl;align-items:stretch">
@@ -3841,9 +3841,9 @@ body{background:#ffffff!important}
 /* لون الكمية المسجلة في كل حمولة - أولوية نهائية */
 #orders #ordersBody .atlas-load-row > strong.atlas-load-qty,
 #orders #ordersBody .atlas-load-row > strong.atlas-load-qty bdi{
- color:#fff2a6!important;
- -webkit-text-fill-color:#fff2a6!important;
- text-shadow:0 0 1px rgba(255,242,166,.18)!important;
+ color:#ffe66d!important;
+ -webkit-text-fill-color:#ffe66d!important;
+ text-shadow:0 1px 2px rgba(0,0,0,.45)!important;
 }
 </style>
 </body>
