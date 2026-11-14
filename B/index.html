@@ -1353,10 +1353,21 @@ data.mixes = mixesResult.data || [];
     }
   }
 
+  async function syncSharedLoadsToOtherBranch(){
+    const now=Date.now();
+    if(window.atlasSharedLoadTransferAt&&now-window.atlasSharedLoadTransferAt<15000)return;
+    window.atlasSharedLoadTransferAt=now;
+    try{
+      const {data:transferData,error:transferError}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'sync_shared_loads'}});
+      if(transferError)throw transferError;
+      if(transferData&&transferData.success!==true)throw new Error(transferData.error||'SHARED_LOAD_SYNC_FAILED');
+    }catch(err){console.warn('Atlas shared load transfer retry B:',err);}
+  }
+  await syncSharedLoadsToOtherBranch();
   await syncCloudData();
   if(window.atlasSharedSyncTimerB)clearInterval(window.atlasSharedSyncTimerB);
   window.atlasSharedSyncTimerB=setInterval(()=>{
-    if(document.visibilityState==='visible'&&navigator.onLine)syncCloudData();
+    if(document.visibilityState==='visible'&&navigator.onLine){syncCloudData();syncSharedLoadsToOtherBranch();}
   },5000);
   if(!window.atlasSharedSyncEventsBoundB){
     window.atlasSharedSyncEventsBoundB=true;
