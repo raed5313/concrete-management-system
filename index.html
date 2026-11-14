@@ -1370,13 +1370,18 @@ data.mixes = mixesResult.data || [];
 
   async function syncSharedLoadsToOtherBranch(){
     const now=Date.now();
-    if(window.atlasSharedLoadTransferAt&&now-window.atlasSharedLoadTransferAt<5000)return;
+    if(window.atlasSharedLoadTransferPromise)return window.atlasSharedLoadTransferPromise;
+    if(window.atlasSharedLoadTransferAt&&now-window.atlasSharedLoadTransferAt<1000)return;
     window.atlasSharedLoadTransferAt=now;
-    try{
+    window.atlasSharedLoadTransferPromise=(async()=>{
       const {data:transferData,error:transferError}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'sync_shared_loads'}});
       if(transferError)throw transferError;
       if(transferData&&transferData.success!==true)throw new Error(transferData.error||'SHARED_LOAD_SYNC_FAILED');
-    }catch(err){console.warn('Atlas shared load transfer retry A:',err);}
+      return transferData;
+    })();
+    try{return await window.atlasSharedLoadTransferPromise;}
+    catch(err){console.warn('Atlas shared load transfer retry '+ATLAS_BRANCH_ID+':',err);}
+    finally{window.atlasSharedLoadTransferPromise=null;}
   }
   // افتح أول صفحة مسموحة للدور الحالي؛ مشغّل المعمل يبدأ بأوامر التجهيز دون لوحة التحكم.
   const allowedPages = roleMenus[currentRole] || roleMenus.manager;
@@ -1426,8 +1431,7 @@ data.mixes = mixesResult.data || [];
   if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') supabaseClient.removeChannel(window.atlasRealtimeChannel);
   let atlasRealtimeA = supabaseClient.channel('atlas-live-a');
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
-  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
-  window.atlasRealtimeChannel = atlasRealtimeA.subscribe();
+  window.atlasRealtimeChannel = atlasRealtimeA.subscribe((status)=>{if(status==='SUBSCRIBED'){console.info('ATLAS A realtime connected');}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){console.warn('ATLAS A realtime disconnected:',status);}});
 
 
   if(window.sadaRealtimeChannel){
