@@ -1965,7 +1965,7 @@ let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
 const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
 const qtyB = ls.filter(isBBranchLoad).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
-const isSharedOrder = !!(o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
+const isSharedOrder = !!(o.sentToA || o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
 const unitPrice = Number(o.price)||0;
 const valueA = qtyA*unitPrice;
 const valueB = qtyB*unitPrice;
@@ -1976,7 +1976,7 @@ const valueB = qtyB*unitPrice;
    groups[vehicleName].count += 1;
    return groups;
  }, {}));
-let isOrderClosed = o.status === 'مكتمل ومجهز';
+let isOrderClosed = ['مكتمل ومجهز','مقفل','مكتمل'].includes(String(o.status||'').trim());
 let hasInvoice = data.invoices.some(inv => String(inv.orderNo || '') === String(o.no)) || data.receipts.some(rec => String(rec.orderNo || '') === String(o.no) && Number(rec.amount || 0) > 0);
 let stateClass = isSharedOrder ? (isOrderClosed ? 'order-locked' : 'order-open') : (hasInvoice ? 'order-invoiced' : isOrderClosed ? 'order-locked' : 'order-open');
 
