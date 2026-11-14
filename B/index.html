@@ -2550,6 +2550,15 @@ async function openLoad(no) {
                     const transferResult=await transfer.json();
                     if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
+                else if (ATLAS_BRANCH_ID === 'B' && o.sourceBranch === 'A' && o.sourceOrderId) {
+                    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+                    if(sessionError)throw sessionError;
+                    const token=sessionData?.session?.access_token;
+                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع A');
+                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_load',load:{...savedLoad,source_order_id:o.sourceOrderId}})});
+                    const transferResult=await transfer.json();
+                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل A');
+                }
 
                 v.driver = v.driver || '';
                 v.orderNo = o.no;
