@@ -1367,8 +1367,8 @@ data.mixes = mixesResult.data || [];
   // افتح الواجهة فوراً ولا تنتظر نقل البيانات بين الفرعين.
   void syncCloudData();
   void syncSharedLoadsToOtherBranch();
-  if(window.atlasSharedSyncTimerB)clearInterval(window.atlasSharedSyncTimerA);
-  window.atlasSharedSyncTimerA=setInterval(()=>{
+  if(window.atlasSharedSyncTimerB)clearInterval(window.atlasSharedSyncTimerB);
+  window.atlasSharedSyncTimerB=setInterval(()=>{
     if(document.visibilityState==='visible'&&navigator.onLine)syncSharedLoadsToOtherBranch();
   },15000);
   if(!window.atlasSharedSyncEventsBoundA){
