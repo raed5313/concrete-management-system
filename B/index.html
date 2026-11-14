@@ -2756,7 +2756,7 @@ if(!['manager','plant','operator'].includes(currentRole)){toast('حذف الحم
 if(!confirm('حذف الحمولة من المعملين؟'))return;
 const load=data.loads.find(x=>String(x.id)===String(id));if(!load)return;
 try{
- const {data:result,error}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'delete_load',load_id:String(load.id||''),source_load_id:String(load.sourceLoadId||'')}});
+ const {data:result,error}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'delete_load',load_id:String(load.id||''),source_load_id:String(load.sourceLoadId||('B:'+String(load.id||'')))}});
  if(error)throw error;
  if(!result||result.success!==true)throw new Error(result?.error||'لم تؤكد قاعدة البيانات حذف الحمولة');
  // احذف أيضاً نسخة الحمولة الموجودة في جدول loads المحلي بفرع B؛ بعض السجلات القديمة لا تملك source_load_id.
