@@ -20,7 +20,7 @@ jobs:
             test -f "$file"
             for feature in \
               'const isSharedOrder = !!(' \
-              'isSharedOrder && isOrderClosed && qtyB > 0' \
+              'isSharedOrder && isOrderClosed && (o.sourceBranch === "B" ? (qtyA + qtyB > 0)' \
               'isSharedOrder && isOrderClosed ?' \
               'function reportBranchBadge' \
               'function reportOrderBranch' \
