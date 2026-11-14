@@ -1929,7 +1929,7 @@ return `
 
  </div>
 <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
- ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
+ ${ATLAS_BRANCH_ID === 'A' && ['manager','plant'].includes(currentRole) && !o.sentToB ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
  ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
  ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
  <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
