@@ -1900,8 +1900,7 @@ return `
   <div class="atlas-order-field atlas-order-date"><small>التاريخ</small><strong>${esc(dateOnly(o.date))}</strong></div>
   <div class="atlas-order-field atlas-order-customer"><small>اسم الزبون</small><strong>${esc(o.customer)}</strong><span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-weight:900"><span aria-hidden="true">📲📞</span><b dir="ltr">${esc(formatOrderPhone(o.phone)||"—")}</b></span></div>
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
-  <div class="atlas-order-field atlas-order-pour"><small>نوع الصب</small><strong>${esc(o.pour)}</strong></div>
-  <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
+  <div class="atlas-order-field atlas-order-pour"><small>نوع الصب</small><strong>${esc(o.pour)}</strong><span class="atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></span></div>
   <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong><bdi dir="ltr">${fmt(o.qty)}&nbsp;&nbsp;m³</bdi></strong>${o.actualQty?`<span class="atlas-order-actual"><bdi dir="ltr">${fmt(o.actualQty)}&nbsp;&nbsp;m³</bdi> فعلي</span>`:''}</div>
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
   <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${isSharedOrder && isOrderClosed && qtyB > 0 ? `<div style="margin-top:4px;color:#176b35;font-size:11px;font-weight:900;line-height:1.45">${qtyA > 0 ? "تم اكمال تجهيزه من معمل B" : "تم تجهيزه من معمل B"}</div>` : ""}${isSharedOrder && isOrderClosed ? `<div style="margin-top:5px;padding:3px 5px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:10px;font-weight:800;line-height:1.55;white-space:normal"><div>فرع <span style="color:#d71920;font-size:12px;font-weight:1000">A</span>: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع <span style="color:#16813a;font-size:12px;font-weight:1000">B</span>: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
@@ -1918,7 +1917,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : ''} </div>
+<div class="atlas-load-heading">الكمية الفعلية والحمولات</div><div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : ''} </div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
@@ -3039,6 +3038,38 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 #orders #ordersBody .atlas-order-qty sup,
 #orders #ordersBody .atlas-load-total sup{font-size:.68em;vertical-align:super;line-height:0}
 #orders #ordersBody .atlas-order-actual{color:#1680e8!important}
+</style>
+
+<style id="atlas-reference-card-layout">
+/* ترتيب بطاقة الأمر والحمولات وفق الصورة المرجعية، مع إبقاء جميع البيانات والإجراءات */
+#orders #ordersBody .atlas-order-layout{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ direction:rtl!important;
+ background:#fff!important;
+ color:#34343a!important;
+}
+#orders #ordersBody .atlas-order-no{grid-column:2!important;grid-row:1!important}
+#orders #ordersBody .atlas-order-date{grid-column:1!important;grid-row:1!important}
+#orders #ordersBody .atlas-order-customer{grid-column:1/-1!important;grid-row:2!important}
+#orders #ordersBody .atlas-order-site{grid-column:1/-1!important;grid-row:3!important}
+#orders #ordersBody .atlas-order-pour{grid-column:2!important;grid-row:4!important}
+#orders #ordersBody .atlas-order-qty{grid-column:1!important;grid-row:4!important}
+#orders #ordersBody .atlas-order-price{grid-column:2!important;grid-row:5!important}
+#orders #ordersBody .atlas-order-status{grid-column:1!important;grid-row:5!important}
+#orders #ordersBody .atlas-order-actions{grid-column:1/-1!important;grid-row:6!important}
+#orders #ordersBody .atlas-order-pour .atlas-order-grade{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;margin-top:3px!important}
+#orders #ordersBody .atlas-order-pour .atlas-order-grade small{font-size:10px!important;color:#896b77!important}
+#orders #ordersBody .atlas-order-pour .atlas-order-grade strong{font-size:13px!important;color:#8b1d2c!important}
+#orders #ordersBody .atlas-load-list{background:#071b30!important;color:#f4f5f6!important;border:1px solid #314b65!important;border-radius:8px!important;padding:5px!important}
+#orders #ordersBody .atlas-load-heading{font-size:11px!important;font-weight:800!important;color:#b8c5d3!important;text-align:right!important;padding:1px 5px 3px!important}
+#orders #ordersBody .atlas-load-total strong{color:#6ebc8a!important;font-size:19px!important;font-weight:900!important}
+#orders #ordersBody .atlas-load-row{background:#071b30!important;border-top:1px solid #40546a!important}
+#orders #ordersBody .atlas-load-qty{color:#f3d28a!important}
+@media(max-width:520px){
+ #orders #ordersBody .atlas-order-field{min-height:58px!important;padding:7px 9px!important}
+ #orders #ordersBody .atlas-order-pour .atlas-order-grade strong{font-size:12px!important}
+}
 </style>
 </body></html>`);
 w.document.close();
