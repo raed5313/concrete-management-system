@@ -1,4 +1,4 @@
-const CACHE_NAME = "atlas-shell-v43-branch-login-fix";
+const CACHE_NAME = "atlas-shell-live-sync-10ca5cbf";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
