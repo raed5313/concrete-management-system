@@ -502,6 +502,20 @@ input,button,select,textarea{
   outline-offset:1px;
 }
 </style>
+
+<style id="atlas-shared-load-branch-totals">
+/* مربعا الكميات المتراكمة لكل معمل في الأوامر المشتركة فقط */
+#orders #ordersBody .atlas-load-total{gap:7px!important;flex-wrap:wrap!important}
+#orders #ordersBody .atlas-add-load-total{width:25px!important;height:25px!important;min-width:25px!important;font-size:15px!important;border-radius:6px!important}
+#orders #ordersBody .atlas-shared-branch-totals{display:inline-flex!important;align-items:center!important;gap:5px!important;flex:0 0 auto!important}
+#orders #ordersBody .atlas-branch-total{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;min-width:68px!important;height:25px!important;padding:2px 6px!important;border-radius:6px!important;border:1px solid!important;font-size:11px!important;font-weight:900!important;line-height:1!important;box-sizing:border-box!important}
+#orders #ordersBody .atlas-branch-total b{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:16px!important;height:16px!important;border-radius:4px!important;font-size:11px!important;font-weight:1000!important}
+#orders #ordersBody .atlas-branch-total strong{font-size:12px!important;font-weight:1000!important;white-space:nowrap!important}
+#orders #ordersBody .atlas-branch-total-a{background:#fff0f0!important;border-color:#d71920!important;color:#b5121b!important}
+#orders #ordersBody .atlas-branch-total-a b{background:#d71920!important;color:#fff!important}
+#orders #ordersBody .atlas-branch-total-b{background:#e9f7ed!important;border-color:#16813a!important;color:#12652e!important}
+#orders #ordersBody .atlas-branch-total-b b{background:#16813a!important;color:#fff!important}
+</style>
 </head>
 <body>
 
@@ -2001,7 +2015,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-heading">الكمية الفعلية والحمولات</div><div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : ''} </div>
+<div class="atlas-load-heading">الكمية الفعلية والحمولات</div><div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : ''}${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''} </div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
