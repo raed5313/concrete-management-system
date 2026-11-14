@@ -1915,7 +1915,7 @@ let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
 const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
 const qtyB = ls.filter(isBBranchLoad).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
-const isSharedOrder = !!(o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
+const isSharedOrder = !!(o.sentToB || o.sentToA || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
 const unitPrice = Number(o.price)||0;
 const valueA = qtyA*unitPrice;
 const valueB = qtyB*unitPrice;
