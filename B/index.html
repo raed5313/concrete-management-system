@@ -1363,7 +1363,10 @@ data.mixes = mixesResult.data || [];
 
     } catch(err) {
       console.error('Supabase sync:', err);
-      toast(err && /جلسة الدخول|صلاحية الاتصال/.test(String(err.message||'')) ? err.message : 'تعذر تحديث البيانات من قاعدة البيانات');
+      const cloudTableNames = {"concrete_orders":"أوامر التجهيز","loads":"الحمولات","customers":"العملاء","drivers":"السائقون","vehicles":"الآليات","concrete_mix_recipes":"الخلطات","wallet_accounts":"الحسابات","wallet_transactions":"حركات الحسابات","company_app_data":"البيانات المركزية","company_operational_records":"السجلات التشغيلية","audit_logs":"سجل المتابعة"};
+      const detail = String(err && err.message || err || 'خطأ غير معروف');
+      const status = err && (err.status || err.code) ? ' (' + (err.status || err.code) + ')' : '';
+      toast('تعذر تحديث البيانات: ' + detail.slice(0,180) + status);
     } finally {
       sadaSyncRunning = false;
       if (sadaSyncPending) {
