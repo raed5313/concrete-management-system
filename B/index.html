@@ -2612,22 +2612,12 @@ async function openLoad(no) {
                     const transferResult=await transfer.json();
                     if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
-                else if (o.sourceBranch === 'B' && o.sourceOrderId) {
-                    const sourceLoadId = 'A:' + String(savedLoad.id);
+                else if (ATLAS_BRANCH_ID === 'B' && o.sourceBranch === 'B' && o.sourceOrderId) {
+                    // هذا أمر أصله معمل B؛ أي حمولة تسجل هنا يجب أن تبقى موسومة B.
+                    const sourceLoadId = 'B:' + String(savedLoad.id);
                     const {error:tagError} = await supabaseClient.from('loads').update({source_load_id:sourceLoadId}).eq('id',savedLoad.id);
                     if (tagError) throw tagError;
                     savedLoad.source_load_id = sourceLoadId;
-                    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
-                    if(sessionError)throw sessionError;
-                    const token=sessionData?.session?.access_token;
-                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع B');
-                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
-                      method:'POST',
-                      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-                      body:JSON.stringify({action:'send_reverse_load',source_order_id:o.sourceOrderId,load:savedLoad})
-                    });
-                    const transferResult=await transfer.json();
-                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
                 else if (o.sentToB && !o.sourceBranch) {
                     const sourceLoadId = 'A:' + String(savedLoad.id);
