@@ -3410,12 +3410,11 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
 }
 }
 
-/* رابط الدور يعرض شاشة الدخول دائماً ولا يستعيد جلسة دور سابق.
-   لا ننفذ signOut هنا حتى لا يتداخل طلب الخروج مع تسجيل الدخول الجديد.
-   التحقق من الدور والفرع يتم بعد المصادقة عبر user_profiles. */
+/* استعادة جلسة Supabase المحفوظة عند فتح الصفحة أو تحديثها.
+   يشمل ذلك الروابط المخصصة role=plant/accountant/manager؛ ويُتحقق من تطابق الدور والفرع داخل activateUserSession.
+   لا يتم تسجيل الخروج عند التحديث، والخروج يتم فقط من زر تسجيل الخروج. */
 (async function restoreSadaSession(){
   try {
-    if (['plant','accountant','manager'].includes(roleEntry)) return;
     const { data: sessionData, error } = await supabaseClient.auth.getSession();
     if (error) throw error;
     if (sessionData && sessionData.session && sessionData.session.user) {
