@@ -2917,9 +2917,11 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 <style>
 /* موازنة أحجام بطاقات النوافذ والقائمة الجانبية */
 @media(min-width:801px){
-  .app{grid-template-columns:250px minmax(0,1fr)!important}
+  .app{grid-template-columns:265px minmax(0,1fr)!important}
   .side{padding:15px!important}
 }
+/* توسيع بطاقات جميع عناصر القائمة الجانبية قليلاً */
+.side .nav button{width:100%;box-sizing:border-box}
 #mainApp .main > section .panel,
 #mainApp .main > section .stat{
   padding:12px!important;
