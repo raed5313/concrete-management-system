@@ -1206,12 +1206,10 @@ async function initSystem(){
     sadaSyncRunning = true;
     try {
       // اجلب بيانات النظام في دفعة متوازية واحدة لتقليل زمن انتظار فتح النظام.
-      const [ordersResult, loadsResult, atlasOrdersResult, atlasLoadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
+      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
         walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
-        supabaseClient.from('atlas_branch_orders').select('*').order('sent_at'),
-        supabaseClient.from('atlas_branch_loads').select('*').order('created_at'),
         supabaseClient.from('customers').select('*').order('created_at'),
         supabaseClient.from('drivers').select('*').order('created_at'),
         supabaseClient.from('vehicles').select('*').order('created_at'),
@@ -1225,8 +1223,6 @@ async function initSystem(){
 
       if(ordersResult.error) throw ordersResult.error;
       if(loadsResult.error) throw loadsResult.error;
-      if(atlasOrdersResult.error) throw atlasOrdersResult.error;
-      if(atlasLoadsResult.error) throw atlasLoadsResult.error;
       if(customersResult.error) throw customersResult.error;
       if(driversResult.error) throw driversResult.error;
       if(vehiclesResult.error) throw vehiclesResult.error;
@@ -1253,28 +1249,7 @@ if(mixesResult.error) throw mixesResult.error;
         actualQty:x.actual_qty,
         lockNote:x.lock_note,
         status:x.status
-      })).concat((atlasOrdersResult.data || []).map(x => ({
-        id:String(x.source_order_id),
-        no:x.source_order_no,
-        customer:x.customer,
-        phone:x.phone,
-        site:x.site,
-        pour:x.pour,
-        grade:x.grade,
-        pump:x.pump||'',
-        admixture_type:x.admixture_type||'',
-        sentToA:false,
-        sentToB:true,
-        sourceBranch:'A',
-        sourceOrderId:String(x.source_order_id),
-        qty:x.qty,
-        price:x.price,
-        date:x.date,
-        note:x.note,
-        actualQty:x.actual_qty,
-        lockNote:x.lock_note,
-        status:x.status
-      })));
+      }));
 
       // تذكّر آخر أمر تم استلامه على هذا الجهاز حتى لا تضيع نافذة التنبيه بعد إغلاق الموقع أو إعادة تحميله.
       // عند أول تشغيل فقط نضع خط أساس، ثم نعرض أحدث أمر وصل أثناء غياب المعمل.
@@ -1313,24 +1288,6 @@ if(mixesResult.error) throw mixesResult.error;
         time:x.time || null,
         status:x.status,
         date:x.created_at
-      })).concat((atlasLoadsResult.data || []).map(x => {
-        const parent=(atlasOrdersResult.data || []).find(o=>String(o.source_order_id)===String(x.source_order_id));
-        return {
-          id:x.source_load_id,
-          no:x.load_no,
-          receiptNo:parent?.source_order_no||'',
-          sourceLoadId:x.source_load_id||'',
-          orderId:String(x.source_order_id),
-          orderNo:parent?.source_order_no||'',
-          driver:x.driver,
-          vehicle:x.vehicle,
-          qty:x.qty,
-          pump:x.pump,
-          admixture_type:'',
-          time:x.load_time||null,
-          status:x.status,
-          date:x.created_at
-        };
       }));
       data.customers = (customersResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',address:x.address||''}));
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
@@ -2006,11 +1963,11 @@ return `
   <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
   <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong><bdi dir="ltr">${fmt(o.qty)}&nbsp;&nbsp;m³</bdi></strong>${o.actualQty?`<span class="atlas-order-actual"><bdi dir="ltr">${fmt(o.actualQty)}&nbsp;&nbsp;m³</bdi> فعلي</span>`:''}</div>
   <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
-  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${isSharedOrder && isOrderClosed && (o.sentToA ? (qtyA + qtyB > 0) : qtyB > 0) ? `<div style="margin-top:4px;color:#176b35;font-size:11px;font-weight:900;line-height:1.45">${o.sentToA ? (qtyA > 0 ? (qtyB > 0 ? "تم اكمال تجهيزه من معمل A" : "تم تجهيزه من معمل A") : "تم تجهيزه من معمل B") : (qtyA > 0 ? "تم اكمال تجهيزه من معمل B" : "تم تجهيزه من معمل B")}</div>` : ""}${isSharedOrder && isOrderClosed ? `<div style="margin-top:5px;padding:3px 5px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:10px;font-weight:800;line-height:1.55;white-space:normal"><div>فرع <span style="color:#d71920;font-size:12px;font-weight:1000">A</span>: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع <span style="color:#16813a;font-size:12px;font-weight:1000">B</span>: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
+  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${isSharedOrder && isOrderClosed && (o.sourceBranch === "B" ? (qtyA + qtyB > 0) : qtyB > 0) ? `<div style="margin-top:4px;color:#176b35;font-size:11px;font-weight:900;line-height:1.45">${o.sourceBranch === "B" ? (qtyA > 0 ? (qtyB > 0 ? "تم اكمال تجهيزه من معمل A" : "تم تجهيزه من معمل A") : "تم تجهيزه من معمل B") : (qtyA > 0 ? "تم اكمال تجهيزه من معمل B" : "تم تجهيزه من معمل B")}</div>` : ""}${isSharedOrder && isOrderClosed ? `<div style="margin-top:5px;padding:3px 5px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:10px;font-weight:800;line-height:1.55;white-space:normal"><div>فرع <span style="color:#d71920;font-size:12px;font-weight:1000">A</span>: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع <span style="color:#16813a;font-size:12px;font-weight:1000">B</span>: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
 
  </div>
 <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
- ${ATLAS_BRANCH_ID === 'B' && ['plant','manager'].includes(currentRole) && !o.sentToA && o.sourceBranch !== 'A' ? '<button class="btn gold" title="إرسال الأمر إلى معمل A" aria-label="إرسال إلى معمل A" onclick="sendOrderToA(\''+esc(o.no)+'\')">↗️ إرسال إلى A</button>' : ''}
+ ${ATLAS_BRANCH_ID === 'B' && ['plant','manager'].includes(currentRole) && !o.sentToA ? '<button class="btn gold" title="إرسال الأمر إلى معمل A" aria-label="إرسال إلى معمل A" onclick="sendOrderToA(\''+esc(o.no)+'\')">↗️ إرسال إلى A</button>' : ''}
  ${ATLAS_BRANCH_ID === 'A' && ['manager','plant'].includes(currentRole) && !o.sentToB ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
  ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
  ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
@@ -2531,23 +2488,6 @@ async function openLoad(no) {
 
         (async () => {
             try {
-                if (ATLAS_BRANCH_ID === 'B' && o.sourceBranch === 'A' && o.sourceOrderId) {
-                    const existingLoads=(data.loads||[]).filter(x=>String(x.orderId)===String(o.id)||String(x.orderNo)===String(o.no));
-                    const lastLoadNo=existingLoads.reduce((max,item)=>{const n=parseInt(item.no,10);return Number.isFinite(n)?Math.max(max,n):max;},0);
-                    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
-                    if(sessionError)throw sessionError;
-                    const token=sessionData?.session?.access_token;
-                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر إرسال الحمولة إلى A');
-                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_load',load:{source_order_id:o.sourceOrderId,load_no:String(lastLoadNo+1),qty:Number(v.qty),driver:v.driver||null,vehicle:v.vehicle||null,time:v.time||null,status:'تم التجهيز'}})});
-                    const transferResult=await transfer.json();
-                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل A');
-                    toast('تم تسجيل الحمولة ومزامنتها مع معمل A');
-                    closeModal();
-                    if(typeof window.sadaCloudSyncNow==='function') await window.sadaCloudSyncNow();
-                    else render();
-                    return;
-                }
-
                 const {data: orderRow, error: orderError} =
                     await supabaseClient
                     .from('concrete_orders')
@@ -2619,27 +2559,16 @@ async function openLoad(no) {
                     const transferResult=await transfer.json();
                     if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
-                else if (ATLAS_BRANCH_ID === 'B' && o.sourceBranch === 'A' && o.sourceOrderId) {
-                    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
-                    if(sessionError)throw sessionError;
-                    const token=sessionData?.session?.access_token;
-                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع A');
-                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_load',load:{...savedLoad,source_order_id:o.sourceOrderId}})});
-                    const transferResult=await transfer.json();
-                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل A');
-                }
-
-
-                else if (ATLAS_BRANCH_ID === 'B' && o.sentToA && !o.sourceBranch) {
-                    const sourceLoadId = 'B:' + String(savedLoad.id);
+                else if (o.sentToB && !o.sourceBranch) {
+                    const sourceLoadId = 'A:' + String(savedLoad.id);
                     savedLoad.source_load_id = sourceLoadId;
                     const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
                     if(sessionError)throw sessionError;
                     const token=sessionData?.session?.access_token;
-                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع A');
-                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_origin_load_to_a',order_no:String(o.no),load:savedLoad})});
+                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع B');
+                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_origin_load_to_b',order_no:String(o.no),load:savedLoad})});
                     const transferResult=await transfer.json();
-                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل A');
+                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
 
                 v.driver = v.driver || '';
