@@ -26,6 +26,10 @@ jobs:
 
       - name: Copy shared application files into B
         run: |
+          # Start from the newest main commit before generating B, avoiding stale-SHA rebase conflicts.
+          git fetch origin main
+          git reset --hard origin/main
+
           rsync -av --delete \
             --exclude='.git/' \
             --exclude='.github/' \
@@ -121,5 +125,4 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Sync shared ATLAS application updates to B"
-          git pull --rebase origin main
           git push
