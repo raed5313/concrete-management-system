@@ -1333,7 +1333,43 @@ data.mixes = mixesResult.data || [];
     }
   }
 
+  async function syncSharedBranchData(){
+    if(window.atlasSharedSyncRunningA)return;
+    window.atlasSharedSyncRunningA=true;
+    try{
+      const [ordersResult,loadsResult]=await Promise.all([
+        supabaseClient.from('concrete_orders').select('*').order('created_at'),
+        supabaseClient.from('loads').select('*').order('created_at')
+      ]);
+      if(ordersResult.error)throw ordersResult.error;
+      if(loadsResult.error)throw loadsResult.error;
+      data.orders=(ordersResult.data||[]).map(x=>({
+        id:x.id,no:x.order_no,customer:x.customer,phone:x.phone,site:x.site,pour:x.pour,grade:x.grade,
+        pump:x.pump||'',admixture_type:x.admixture_type||'',sentToB:!!x.sent_to_branch_b_at,
+        sentToA:!!x.sent_to_branch_a_at,sourceBranch:x.source_branch||'',sourceOrderId:x.source_order_id||'',
+        qty:x.qty,price:x.price,date:x.date,note:x.note,actualQty:x.actual_qty,lockNote:x.lock_note,status:x.status
+      }));
+      data.loads=(loadsResult.data||[]).map(x=>({
+        id:x.id,no:x.load_no,receiptNo:x.receipt_no,sourceLoadId:x.source_load_id||'',orderId:x.orderId,
+        orderNo:x.orderNo,driver:x.driver,vehicle:x.vehicle,qty:x.qty,pump:x.pump,
+        admixture_type:x.admixture_type||'',time:x.time||null,status:x.status,date:x.created_at
+      }));
+      render();
+    }catch(err){console.warn('Atlas shared sync A:',err);}
+    finally{window.atlasSharedSyncRunningA=false;}
+  }
   await syncCloudData();
+  await syncSharedBranchData();
+  if(window.atlasSharedSyncTimer)clearInterval(window.atlasSharedSyncTimer);
+  window.atlasSharedSyncTimer=setInterval(()=>{
+    if(document.visibilityState==='visible'&&navigator.onLine)syncSharedBranchData();
+  },5000);
+  if(!window.atlasSharedSyncEventsBound){
+    window.atlasSharedSyncEventsBound=true;
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&navigator.onLine)syncSharedBranchData();});
+    window.addEventListener('online',()=>syncSharedBranchData());
+    window.addEventListener('focus',()=>syncSharedBranchData());
+  }
   if(currentRole==='manager'){
     const today=new Date().toISOString().slice(0,10);
     let lastBackupDay='';try{lastBackupDay=localStorage.getItem('atlas-last-cloud-backup-day-' + ATLAS_BRANCH_ID)||'';}catch(e){}
