@@ -2810,7 +2810,7 @@ try{
  data.loads=data.loads.filter(x=>x!==load);
  logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+load.no);
  render();toast('تم حذف الحمولة من المعملين ومزامنة الحذف');
-}catch(err){console.error(err);toast('تعذر حذف الحمولة: '+(err.message||'تحقق من الاتصال والصلاحيات'));}
+}catch(err){console.error('ATLAS delete_load failed',err);let detail=err?.message||'خطأ غير معروف';try{const ctx=err?.context;if(ctx){const body=typeof ctx.clone==='function'?await ctx.clone().text():'';if(body){try{const parsed=JSON.parse(body);detail=parsed.error||parsed.message||body;}catch{detail=body;}}if(ctx.status)detail='HTTP '+ctx.status+' — '+detail;}}catch(readErr){console.warn('Could not read delete error response',readErr);}toast('تعذر حذف الحمولة: '+detail);}
 }
 
 async function openSimple(t){
