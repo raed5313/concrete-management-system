@@ -1,4 +1,4 @@
-const CACHE_NAME = "atlas-b-shell-52b86403";
+const CACHE_NAME = "atlas-b-shell-2d4dab4f";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
@@ -9,7 +9,7 @@ const APP_SHELL = [
 self.addEventListener("install", event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await Promise.allSettled(APP_SHELL.map(path => cache.add(path)));
+    await Promise.allSettled(APP_SHELL.map(path => cache.add(new Request(path, { cache: "reload" }))));
     await self.skipWaiting();
   })());
 });
