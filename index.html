@@ -1886,7 +1886,7 @@ let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
 const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
 const qtyB = ls.filter(isBBranchLoad).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
-const isSharedOrder = !!(o.sentToB || (o.sourceBranch === 'A' && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
+const isSharedOrder = !!(o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
 const unitPrice = Number(o.price)||0;
 const valueA = qtyA*unitPrice;
 const valueB = qtyB*unitPrice;
@@ -1912,7 +1912,7 @@ return `
 <tr class="${stateClass} order-card ${isSharedOrder ? "shared-order-card" : ""}">
 <td colspan="11" class="atlas-order-cell">
  <div class="atlas-order-layout">
-  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${isSharedOrder ? '<span style="color:#e00020;font-size:27px;font-weight:1000;line-height:1">A</span>/' : ""}${esc(o.no)}</strong>${(o.sourceBranch === "A" && o.sourceOrderId) ? '<span style="display:inline-block;color:#e00020;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع A</span>' : ""}</div>
+  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${isSharedOrder ? (o.sourceBranch === 'B' ? '<span style="color:#16813a;font-size:27px;font-weight:1000;line-height:1">B</span>/' : '<span style="color:#e00020;font-size:27px;font-weight:1000;line-height:1">A</span>/') : ""}${esc(String(o.no).replace(/^B-/,""))}</strong>${o.sourceBranch === "A" && o.sourceOrderId ? '<span style="display:inline-block;color:#e00020;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع A</span>' : o.sourceBranch === "B" && o.sourceOrderId ? '<span style="display:inline-block;color:#16813a;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع B</span>' : ""}</div>
   <div class="atlas-order-field atlas-order-date"><small>التاريخ</small><strong>${esc(dateOnly(o.date))}</strong></div>
   <div class="atlas-order-field atlas-order-customer"><small>اسم الزبون</small><strong>${esc(o.customer)}</strong><span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-weight:900"><span aria-hidden="true">📲📞</span><b dir="ltr">${esc(formatOrderPhone(o.phone)||"—")}</b></span></div>
   <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
@@ -2381,6 +2381,14 @@ try{
  o.status='قيد العمل';delete o.actualQty;
  toast('تعذر حفظ قفل الأمر في قاعدة البيانات');console.error(err);return;
 }
+if(o.sourceBranch==='B' && o.sourceOrderId){
+ try{
+  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();if(sessionError)throw sessionError;
+  const token=sessionData?.session?.access_token;if(!token)throw new Error('انتهت جلسة الدخول');
+  const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'send_reverse_status',source_order_id:o.sourceOrderId,status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote})});
+  const result=await transfer.json();if(!transfer.ok||!result.success)throw new Error(result.error||'تعذرت مزامنة حالة الأمر مع B');
+ }catch(syncErr){console.error('Reverse order status sync:',syncErr);toast('تم قفل الأمر في A لكن تعذرت مزامنة القفل إلى B');}
+}
 logAction(currentUserName,'قفل أمر وتسجيل كمية',`الأمر: ${no} - الكمية الفعلية المجهزة: ${delivered}`);
 await save();closeModal();toast('تم قفل الأمر على إجمالي الكمية المجهزة فعلياً');
 });
@@ -2489,6 +2497,24 @@ async function openLoad(no) {
                     .single();
 
                 if (saveError) throw saveError;
+
+                if (o.sourceBranch === 'B' && o.sourceOrderId) {
+                    const sourceLoadId = 'A:' + String(savedLoad.id);
+                    const {error:tagError} = await supabaseClient.from('loads').update({source_load_id:sourceLoadId}).eq('id',savedLoad.id);
+                    if (tagError) throw tagError;
+                    savedLoad.source_load_id = sourceLoadId;
+                    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+                    if(sessionError)throw sessionError;
+                    const token=sessionData?.session?.access_token;
+                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع B');
+                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
+                      method:'POST',
+                      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                      body:JSON.stringify({action:'send_reverse_load',source_order_id:o.sourceOrderId,load:savedLoad})
+                    });
+                    const transferResult=await transfer.json();
+                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
+                }
 
                 v.driver = v.driver || '';
                 v.orderNo = o.no;
@@ -3409,7 +3435,7 @@ function reportBranchBadge(branch){
   return '<span style="display:inline-block;margin:0 3px;padding:1px 5px;border-radius:5px;font-size:12px;font-weight:1000;line-height:1.4;color:'+(isA?'#d71920':'#176b35')+';background:'+(isA?'#fff0f0':'#e7f5eb')+';border:1px solid '+(isA?'#d71920':'#26934b')+'">'+(isA?'A':'B')+'</span>';
 }
 function reportOrderBranch(o){
-  return (ATLAS_BRANCH_ID==='A'||(o.sourceBranch==='A'&&o.sourceOrderId))?'A':'B';
+  return o.sourceBranch==='B'?'B':(o.sourceBranch==='A'||ATLAS_BRANCH_ID==='A')?'A':'B';
 }
 function reportLoadBranch(l){
   const id=String(l.sourceLoadId||'');
