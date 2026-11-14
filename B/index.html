@@ -3122,6 +3122,55 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
   font-variant-numeric:tabular-nums!important;
 }
 </style>
+
+<style id="atlas-mobile-keyboard-reliability">
+/* إصلاح فتح لوحة المفاتيح والكتابة في النماذج على الهواتف */
+.modal{
+  z-index:100000!important;
+  align-items:flex-start!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+  touch-action:pan-y!important;
+}
+.modal .panel{
+  position:relative!important;
+  z-index:100001!important;
+  max-height:calc(100dvh - 24px)!important;
+  max-height:calc(100vh - 24px)!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  padding-bottom:max(18px,env(safe-area-inset-bottom))!important;
+}
+.modal input,.modal textarea,.modal select,
+.field input,.field textarea,.field select,
+input:not([type="checkbox"]):not([type="radio"]),textarea,select{
+  position:relative!important;
+  z-index:100002!important;
+  pointer-events:auto!important;
+  -webkit-user-select:text!important;
+  user-select:text!important;
+  -webkit-touch-callout:default!important;
+  font-size:16px!important;
+  touch-action:auto!important;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.modal input:focus,.modal textarea:focus,.modal select:focus,
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:2px solid #42d8e8!important;
+  outline-offset:1px!important;
+  scroll-margin:100px!important;
+}
+.modal label{touch-action:manipulation!important}
+@media(max-width:800px){
+  .modal{padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important;}
+  .modal .panel{width:100%!important;margin:auto 0!important;}
+  .modal .formgrid,.modal .details{grid-template-columns:minmax(0,1fr)!important;}
+}
+</style>
+
 </body></html>`);
 w.document.close();
 }
