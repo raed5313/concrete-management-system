@@ -3638,8 +3638,14 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 </style>
 
 <style>
+/* إبراز اسم الزبون بالأزرق وبحجم أكبر قليلاً في بطاقة أمر التجهيز */
+#orders #ordersBody tr.order-card .atlas-order-customer strong{
+  color:#0878c9!important;
+  font-size:19px!important;
+  font-weight:900!important;
+}
+
 /* تثبيت اللون الأحمر للحقول المطلوبة في بطاقة أمر التجهيز - آخر أولوية CSS */
-#orders #ordersBody tr.order-card .atlas-order-customer strong,
 #orders #ordersBody tr.order-card .atlas-order-grade strong,
 #orders #ordersBody tr.order-card .atlas-order-qty .atlas-order-actual{
   color:#e00000!important;
