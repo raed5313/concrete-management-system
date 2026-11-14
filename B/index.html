@@ -2263,12 +2263,8 @@ try{
 const driverChoice=$('driverChoice'),customDriverName=$('customDriverName');
 if(driverChoice&&customDriverName){driverChoice.addEventListener('change',()=>{const custom=driverChoice.value==='__custom__';customDriverName.style.display=custom?'block':'none';customDriverName.required=custom;if(!custom)customDriverName.value='';});}
 $('modal').classList.remove('hidden');
-// التركيز الفوري على أول حقل بعد إظهار النافذة ضمن نفس ضغطة المستخدم
-const firstEditable = $('form').querySelector('input:not([type="hidden"]):not([disabled]),textarea:not([disabled]),select:not([disabled])');
-if (firstEditable) {
-  try { firstEditable.focus({preventScroll:true}); }
-  catch (_) { firstEditable.focus(); }
-}
+// لا نفرض التركيز برمجياً عند فتح النافذة؛ على iOS هذا قد يمنع ظهور لوحة المفاتيح.
+ // يترك الحقل ليأخذ التركيز من لمسة المستخدم مباشرة.
 }
 
 function closeModal(){$('modal').classList.add('hidden')}
@@ -3133,7 +3129,7 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
   align-items:flex-start!important;
   -webkit-overflow-scrolling:touch!important;
   overscroll-behavior:contain!important;
-  touch-action:pan-y!important;
+  touch-action:auto!important;
 }
 .modal .panel{
   position:relative!important;
@@ -3143,7 +3139,7 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
   overflow-x:hidden!important;
   overflow-y:auto!important;
   -webkit-overflow-scrolling:touch!important;
-  touch-action:pan-y!important;
+  touch-action:auto!important;
   padding-bottom:max(18px,env(safe-area-inset-bottom))!important;
 }
 .modal input,.modal textarea,.modal select,
@@ -3157,8 +3153,8 @@ input:not([type="checkbox"]):not([type="radio"]),textarea,select{
   -webkit-touch-callout:default!important;
   font-size:16px!important;
   touch-action:auto!important;
-  -webkit-appearance:none;
-  appearance:none;
+  -webkit-appearance:auto;
+  appearance:auto;
 }
 .modal input:focus,.modal textarea:focus,.modal select:focus,
 .field input:focus,.field textarea:focus,.field select:focus{
