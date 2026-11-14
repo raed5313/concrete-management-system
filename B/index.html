@@ -2574,11 +2574,6 @@ async function openLoad(no) {
     ], v => {
         // إذا كُتب اسم خارجي نعتمده، وإلا نعتمد الاسم المختار من القائمة.
         v.driver = (v.custom_driver || '').trim() || (v.driver === '__custom__' ? '' : (v.driver || '').trim());
-        if (o.status === 'مكتمل ومجهز') {
-            toast('هذا الأمر مقفول ولا يمكن إضافة حمولات جديدة');
-            return;
-        }
-
         if (!v.qty || Number(v.qty) <= 0) {
             toast('أدخل كمية صحيحة');
             return;
@@ -2586,18 +2581,21 @@ async function openLoad(no) {
 
         (async () => {
             try {
+                // نعتمد الحالة الحالية من قاعدة البيانات باستخدام معرّف الأمر الفريد،
+                // ولا نعتمد على حالة بطاقة قديمة أو رقم قد يتكرر بين المعملين.
                 const {data: orderRow, error: orderError} =
                     await supabaseClient
                     .from('concrete_orders')
-                    .select('id,order_no,status')
-                    .eq('order_no', String(o.no))
-                    .single();
+                    .select('id,order_no,status,branch_id,source_branch')
+                    .eq('id', String(o.id))
+                    .maybeSingle();
 
                 if (orderError || !orderRow) {
                     throw orderError || new Error('أمر التجهيز غير موجود');
                 }
-                if (orderRow.status === 'مكتمل ومجهز') {
-                    throw new Error('هذا الأمر مقفول في قاعدة البيانات ولا يمكن إضافة حمولة جديدة');
+                const currentStatus = String(orderRow.status || '').trim();
+                if (currentStatus === 'مكتمل ومجهز') {
+                    throw new Error('هذا الأمر مقفول ولا يمكن إضافة حمولة جديدة');
                 }
 
                 // جلب حمولات هذا الأمر فقط
