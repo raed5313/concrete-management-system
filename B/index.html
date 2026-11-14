@@ -1252,12 +1252,12 @@ async function initSystem(){
       const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
         walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = cloudResults;
 
-      if(ordersResult.error) throw ordersResult.error;
-      if(loadsResult.error) throw loadsResult.error;
-      if(customersResult.error) throw customersResult.error;
-      if(driversResult.error) throw driversResult.error;
-      if(vehiclesResult.error) throw vehiclesResult.error;
-if(mixesResult.error) throw mixesResult.error;
+      if(ordersResult.error) throw new Error('أوامر التجهيز: ' + (ordersResult.error.message || ordersResult.error.code || 'تعذر الاستعلام'));
+      if(loadsResult.error) throw new Error('الحمولات: ' + (loadsResult.error.message || loadsResult.error.code || 'تعذر الاستعلام'));
+      if(customersResult.error) throw new Error('العملاء: ' + (customersResult.error.message || customersResult.error.code || 'تعذر الاستعلام'));
+      if(driversResult.error) throw new Error('السائقون: ' + (driversResult.error.message || driversResult.error.code || 'تعذر الاستعلام'));
+      if(vehiclesResult.error) throw new Error('الآليات: ' + (vehiclesResult.error.message || vehiclesResult.error.code || 'تعذر الاستعلام'));
+if(mixesResult.error) throw new Error('الخلطات: ' + (mixesResult.error.message || mixesResult.error.code || 'تعذر الاستعلام'));
 
       const freshOrders = (ordersResult.data || []).map(x => ({
         id:x.id,
@@ -1324,8 +1324,8 @@ if(mixesResult.error) throw mixesResult.error;
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
       data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
 data.mixes = mixesResult.data || [];
-      if(walletAccountsResult.error) throw walletAccountsResult.error;
-      if(walletTransactionsResult.error) throw walletTransactionsResult.error;
+      if(walletAccountsResult.error) throw new Error('الحسابات: ' + (walletAccountsResult.error.message || walletAccountsResult.error.code || 'تعذر الاستعلام'));
+      if(walletTransactionsResult.error) throw new Error('حركات الحسابات: ' + (walletTransactionsResult.error.message || walletTransactionsResult.error.code || 'تعذر الاستعلام'));
       data.walletAccounts = walletAccountsResult.data || [];
       data.walletTransactions = walletTransactionsResult.data || [];
       const {data: companyRow, error: companyError} = companyResult;
