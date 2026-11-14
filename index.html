@@ -1353,6 +1353,16 @@ data.mixes = mixesResult.data || [];
   }
   window.sadaCloudSyncNow = syncCloudData;
 
+  // مزامنة فورية عبر Supabase Realtime عند إضافة أو تحديث أمر/حمولة في أي من المعملين.
+  if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') {
+    supabaseClient.removeChannel(window.atlasRealtimeChannel);
+  }
+  let atlasRealtime = supabaseClient.channel('atlas-live-a');
+  atlasRealtime = atlasRealtime.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{ if(document.visibilityState==='visible') syncCloudData(); });
+  atlasRealtime = atlasRealtime.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{ if(document.visibilityState==='visible') syncCloudData(); });
+  window.atlasRealtimeChannel = atlasRealtime.subscribe();
+
+
   if (window.atlasLoadsRealtimeChannel) supabaseClient.removeChannel(window.atlasLoadsRealtimeChannel);
   window.atlasLoadsRealtimeChannel = supabaseClient.channel('atlas-live-loads-A')
     .on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();})
