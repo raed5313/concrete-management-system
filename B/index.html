@@ -1897,7 +1897,7 @@ let canManageOrder = isManager || isPlant;
 let canPrintOnly = isAccountant;
 
 return `
-<tr class="${stateClass} order-card">
+<tr class="${stateClass} order-card ${isSharedOrder ? "shared-order-card" : ""}">
 <td colspan="11" class="atlas-order-cell">
  <div class="atlas-order-layout">
   <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${isSharedOrder ? '<span style="color:#e00020;font-size:27px;font-weight:1000;line-height:1">A</span>/' : ""}${esc(o.no)}</strong>${(o.sourceBranch === "A" && o.sourceOrderId) ? '<span style="display:inline-block;color:#e00020;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع A</span>' : ""}</div>
@@ -2983,6 +2983,18 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 }
 </style>
 
+
+<style>
+/* لون مستقل لبطاقات الأوامر المحولة أو المشتركة بين الفرعين فقط */
+#orders #ordersBody tr.order-card.shared-order-card,
+#orders #ordersBody tr.order-card.shared-order-card>td.atlas-order-cell,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-layout,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-actions{
+  background:#dff1ff!important;
+  border-color:#a9d5f2!important;
+}
+</style>
 </body></html>`);
 w.document.close();
 }
