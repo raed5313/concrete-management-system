@@ -1367,8 +1367,8 @@ data.mixes = mixesResult.data || [];
   // افتح الواجهة فوراً ولا تنتظر نقل البيانات بين الفرعين.
   void syncCloudData();
   void syncSharedLoadsToOtherBranch();
-  if(window.atlasSharedSyncTimerB)clearInterval(window.atlasSharedSyncTimerB);
-  window.atlasSharedSyncTimerB=setInterval(()=>{
+  if(window.atlasSharedSyncTimerA)clearInterval(window.atlasSharedSyncTimerA);
+  window.atlasSharedSyncTimerA=setInterval(()=>{
     if(document.visibilityState==='visible'&&navigator.onLine){syncSharedLoadsToOtherBranch();syncCloudData();}
   },15000);
   if(!window.atlasSharedSyncEventsBoundA){
@@ -1946,7 +1946,7 @@ const hay=[o.no,o.customer,o.site,o.pour,o.grade,o.status,o.phone].join(' ').toL
 return (!from||(orderDate&&orderDate>=from))&&(!to||(orderDate&&orderDate<=to))&&(!status||String(o.status||'')===status)&&(!q||hay.includes(q));
 }).slice().reverse(),
 o=>{
-let ls = data.loads.filter(l => String(l.orderNo) === String(o.no));
+let ls = data.loads.filter(l => (l.orderId && o.id) ? String(l.orderId) === String(o.id) : String(l.orderNo) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
 const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
 const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
@@ -2612,12 +2612,22 @@ async function openLoad(no) {
                     const transferResult=await transfer.json();
                     if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
-                else if (ATLAS_BRANCH_ID === 'B' && o.sourceBranch === 'B' && o.sourceOrderId) {
-                    // هذا أمر أصله معمل B؛ أي حمولة تسجل هنا يجب أن تبقى موسومة B.
-                    const sourceLoadId = 'B:' + String(savedLoad.id);
+                else if (o.sourceBranch === 'B' && o.sourceOrderId) {
+                    const sourceLoadId = 'A:' + String(savedLoad.id);
                     const {error:tagError} = await supabaseClient.from('loads').update({source_load_id:sourceLoadId}).eq('id',savedLoad.id);
                     if (tagError) throw tagError;
                     savedLoad.source_load_id = sourceLoadId;
+                    const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
+                    if(sessionError)throw sessionError;
+                    const token=sessionData?.session?.access_token;
+                    if(!token)throw new Error('انتهت جلسة الدخول؛ تعذر مزامنة الحمولة مع B');
+                    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
+                      method:'POST',
+                      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                      body:JSON.stringify({action:'send_reverse_load',source_order_id:o.sourceOrderId,load:savedLoad})
+                    });
+                    const transferResult=await transfer.json();
+                    if(!transfer.ok||!transferResult.success)throw new Error(transferResult.error||'تعذرت مزامنة الحمولة مع معمل B');
                 }
                 else if (o.sentToB && !o.sourceBranch) {
                     const sourceLoadId = 'A:' + String(savedLoad.id);
@@ -2800,7 +2810,7 @@ try{
  data.loads=data.loads.filter(x=>x!==load);
  logAction(currentUserName,'حذف حمولة','رقم الحمولة: '+load.no);
  render();toast('تم حذف الحمولة من المعملين ومزامنة الحذف');
-}catch(err){console.error('ATLAS delete_load failed',err);let detail=err?.message||'خطأ غير معروف';try{const ctx=err?.context;if(ctx){const body=typeof ctx.clone==='function'?await ctx.clone().text():'';if(body){try{const parsed=JSON.parse(body);detail=parsed.error||parsed.message||body;}catch{detail=body;}}if(ctx.status)detail='HTTP '+ctx.status+' — '+detail;}}catch(readErr){console.warn('Could not read delete error response',readErr);}toast('تعذر حذف الحمولة: '+detail);}
+}catch(err){console.error(err);toast('تعذر حذف الحمولة: '+(err.message||'تحقق من الاتصال والصلاحيات'));}
 }
 
 async function openSimple(t){
