@@ -1431,6 +1431,7 @@ data.mixes = mixesResult.data || [];
   if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') supabaseClient.removeChannel(window.atlasRealtimeChannel);
   let atlasRealtimeA = supabaseClient.channel('atlas-live-a');
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
   window.atlasRealtimeChannel = atlasRealtimeA.subscribe((status)=>{if(status==='SUBSCRIBED'){console.info('ATLAS A realtime connected');}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){console.warn('ATLAS A realtime disconnected:',status);}});
 
 
