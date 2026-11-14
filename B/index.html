@@ -894,6 +894,7 @@ input,button,select,textarea{
 'use strict';
 
 const ATLAS_BRANCH_ID = location.pathname.split('/').includes('B') ? 'B' : 'A';
+const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith('A:') : ATLAS_BRANCH_ID === 'B';
 const KEY = (ATLAS_BRANCH_ID === 'B') ? 'sada-concrete-v8-B' : 'sada-concrete-v8';
 if (ATLAS_BRANCH_ID === 'B') {
   document.title = 'أطلس للكونكريت | ATLAS B - الفرع الثاني';
@@ -1982,7 +1983,6 @@ return (!from||(orderDate&&orderDate>=from))&&(!to||(orderDate&&orderDate<=to))&
 o=>{
 let ls = data.loads.filter(l => (l.orderId && o.id) ? String(l.orderId) === String(o.id) : String(l.orderNo) === String(o.no));
 let totalLoadQty = ls.reduce((sum, l) => sum + (Number(l.qty) || 0), 0);
-const isBBranchLoad = l => l.sourceLoadId ? !String(l.sourceLoadId).startsWith("A:") : ATLAS_BRANCH_ID === 'B';
 const qtyA = ls.filter(l => !isBBranchLoad(l)).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
 const qtyB = ls.filter(isBBranchLoad).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
 const isSharedOrder = !!(o.sentToA || o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId) || ls.some(l=>!!l.sourceLoadId));
