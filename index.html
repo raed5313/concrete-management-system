@@ -3014,6 +3014,22 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 #orders #ordersBody tr.order-card{background:inherit}
 </style>
 </style>
+
+<style id="atlas-volume-unit-order">
+/* تثبيت ترتيب وحدة الحجم بعد الرقم في لوحة أوامر التجهيز */
+#orders #ordersBody .atlas-order-qty strong,
+#orders #ordersBody .atlas-order-qty .atlas-order-actual,
+#orders #ordersBody .atlas-load-total strong,
+#orders #ordersBody td{
+  unicode-bidi:isolate;
+}
+#orders #ordersBody .atlas-order-qty strong,
+#orders #ordersBody .atlas-order-qty .atlas-order-actual,
+#orders #ordersBody .atlas-load-total strong{
+  direction:ltr!important;
+  text-align:right;
+}
+</style>
 </body></html>`);
 w.document.close();
 }
