@@ -485,6 +485,22 @@ input,button,select,textarea{
   font-family:'Cairo',Tahoma,Arial,sans-serif!important;
 }
 </style>
+<style id="atlas-mobile-keyboard-fast">
+/* تحسين استجابة حقول الإدخال على الهواتف */
+.modal .panel{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.modal .formgrid{touch-action:pan-y}
+.modal .field input,.modal .field select,.modal .field textarea{
+  font-size:16px!important;
+  min-height:44px;
+  touch-action:manipulation;
+  -webkit-user-select:text;
+  user-select:text;
+}
+.modal .field input:focus,.modal .field select:focus,.modal .field textarea:focus{
+  outline:2px solid #42d8e8;
+  outline-offset:1px;
+}
+</style>
 </head>
 <body>
 
@@ -2235,6 +2251,12 @@ try{
 const driverChoice=$('driverChoice'),customDriverName=$('customDriverName');
 if(driverChoice&&customDriverName){driverChoice.addEventListener('change',()=>{const custom=driverChoice.value==='__custom__';customDriverName.style.display=custom?'block':'none';customDriverName.required=custom;if(!custom)customDriverName.value='';});}
 $('modal').classList.remove('hidden');
+// التركيز الفوري على أول حقل بعد إظهار النافذة ضمن نفس ضغطة المستخدم
+const firstEditable = $('form').querySelector('input:not([type="hidden"]):not([disabled]),textarea:not([disabled]),select:not([disabled])');
+if (firstEditable) {
+  try { firstEditable.focus({preventScroll:true}); }
+  catch (_) { firstEditable.focus(); }
+}
 }
 
 function closeModal(){$('modal').classList.add('hidden')}
@@ -2373,21 +2395,27 @@ async function openLoad(no) {
     const o = data.orders.find(x => String(x.no) === String(no));
     if (!o) return;
 
-    // تحديث قوائم السائقين والآليات مباشرة من قاعدة البيانات المشتركة عند فتح نافذة الحمولة
-    try {
-        const [driversResult, vehiclesResult] = await Promise.all([
-            supabaseClient.from('drivers').select('id,name,phone,note').order('created_at'),
-            supabaseClient.from('vehicles').select('id,name,capacity,kind').order('created_at')
-        ]);
+    // لا نؤخر فتح النافذة بانتظار الشبكة؛ القوائم الحالية تظهر فوراً،
+    // ويجري تحديثها بالخلفية حتى تبقى لوحة المفاتيح سريعة الاستجابة.
+    Promise.all([
+        supabaseClient.from('drivers').select('id,name,phone,note').order('created_at'),
+        supabaseClient.from('vehicles').select('id,name,capacity,kind').order('created_at')
+    ]).then(([driversResult, vehiclesResult]) => {
         if (driversResult.error) throw driversResult.error;
         if (vehiclesResult.error) throw vehiclesResult.error;
         data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
         data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
-    } catch (err) {
-        console.error('تعذر تحديث قوائم السائقين والآليات:', err);
-        toast('تعذر تحميل السائقين والآليات من قاعدة البيانات: ' + (err.message || 'تحقق من الاتصال والصلاحيات'));
-        return;
-    }
+        const form = $('form');
+        const driverInput = form?.querySelector('[name="driver"]');
+        const driverList = driverInput?.list;
+        if (driverList) driverList.innerHTML = data.drivers.map(x => '<option value="'+esc(x.name)+'"></option>').join('');
+        const vehicleSelect = form?.querySelector('[name="vehicle"]');
+        if (vehicleSelect) {
+            const selected = vehicleSelect.value;
+            vehicleSelect.innerHTML = '<option value="">— اختر —</option>' + data.vehicles.map(x => '<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>').join('');
+            vehicleSelect.value = selected;
+        }
+    }).catch(err => console.warn('تحديث قوائم السائقين والآليات بالخلفية:', err));
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
         {name:'driver', label:'اختيار السائق من القائمة', required:false, type:'driverCombo', options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
