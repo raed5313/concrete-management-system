@@ -1947,15 +1947,16 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
  ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
 </div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
-</div>
-  <div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
-   ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
-   ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
-   ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
-   <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
-   ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
-   ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
-  </div></div>
+
+<div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
+ ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\')">↗️ إرسال إلى B</button>' : ''}
+ ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
+ ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
+ <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
+ ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
+ ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
+</div></div></div>
+
 
 </td></tr>`;
 },8
@@ -3172,7 +3173,12 @@ input:not([type="checkbox"]):not([type="radio"]),textarea,select{
 }
 </style>
 
-\n<style id="atlas-actions-below-loads">\n/* وضع إجراءات أمر التجهيز أسفل بطاقة الحمولات */\n#orders #ordersBody .atlas-order-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important;width:100%!important;box-sizing:border-box!important;margin:7px 0 2px!important;padding:7px 9px!important;background:#f3f7fa!important;border:1px solid #cbd8e2!important;border-radius:8px!important}\n#orders #ordersBody .atlas-order-actions>small{font-weight:900!important;color:#263746!important}\n#orders #ordersBody .atlas-order-actions .actions{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:5px!important}\n</style>\n</body></html>`);
+\n<style id="atlas-actions-below-loads">
+/* الإجراءات داخل بطاقة الأمر وتحت قائمة الحمولات مباشرة */
+#orders #ordersBody .atlas-order-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important;width:100%!important;box-sizing:border-box!important;margin:8px 0 0!important;padding:7px 9px!important;background:rgba(255,255,255,.78)!important;border:1px solid rgba(110,125,140,.35)!important;border-radius:7px!important}
+#orders #ordersBody .atlas-order-actions>small{font-weight:900!important;color:#263746!important}
+#orders #ordersBody .atlas-order-actions .actions{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:5px!important}
+</style>\n</body></html>`);
 w.document.close();
 }
 
