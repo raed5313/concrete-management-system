@@ -1666,6 +1666,8 @@ async function sendOrderToA(orderNo){
   const response=await fetch(SUPABASE_URL+"/functions/v1/atlas-branch-transfer",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action:"send_order",order_no:String(orderNo)})});
   const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||"تعذر إرسال الأمر");
   toast("تم إرسال الأمر "+orderNo+" إلى A مع "+(result.imported_loads??0)+" حمولة");
+  const localOrder=(data.orders||[]).find(x=>String(x.no)===String(orderNo));if(localOrder)localOrder.sentToA=true;
+  render();
   if(typeof window.sadaCloudSyncNow==="function")window.sadaCloudSyncNow();
  }catch(err){console.error("ATLAS reverse transfer:",err);toast("فشل الإرسال: "+(err?.message||"تحقق من الاتصال"));}
 }
