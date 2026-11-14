@@ -2219,12 +2219,20 @@ f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</te
 </div>`).join('')+
 '<div class="full"><button class="btn primary" type="submit">حفظ البيانات</button></div>';
 
-$('form').onsubmit=e=>{
+$('form').onsubmit=async e=>{
 e.preventDefault();
+const form=e.currentTarget;
+const submitButton=form.querySelector('button[type="submit"]');
+if(submitButton&&submitButton.disabled)return;
+if(submitButton){submitButton.disabled=true;submitButton.dataset.originalText=submitButton.textContent;submitButton.textContent='جارٍ الحفظ…';}
 try{
- const result=cb(Object.fromEntries(new FormData(e.currentTarget)));
- if(result&&typeof result.then==='function')result.catch(err=>{console.error(err);toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'))});
-}catch(err){console.error(err);toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'))}
+ await cb(Object.fromEntries(new FormData(form)));
+}catch(err){
+ console.error(err);
+ toast('تعذر إكمال العملية: '+(err.message||'يرجى مراجعة البيانات'));
+}finally{
+ if(submitButton){submitButton.disabled=false;submitButton.textContent=submitButton.dataset.originalText||'حفظ البيانات';}
+}
 };
 const driverChoice=$('driverChoice'),customDriverName=$('customDriverName');
 if(driverChoice&&customDriverName){driverChoice.addEventListener('change',()=>{const custom=driverChoice.value==='__custom__';customDriverName.style.display=custom?'block':'none';customDriverName.required=custom;if(!custom)customDriverName.value='';});}
