@@ -1622,7 +1622,7 @@ if(data.audit.length > 100) data.audit.pop();
 }
 
 async function sendOrderToB(orderNo){
- if(ATLAS_BRANCH_ID!=="A"||currentRole!=="manager")return;
+ if(ATLAS_BRANCH_ID!=="A"||!["manager","plant"].includes(currentRole))return;
  if(!confirm("إرسال الأمر "+orderNo+" مع جميع حمولاته إلى معمل B؟"))return;
  try{
   const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
