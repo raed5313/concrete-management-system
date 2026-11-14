@@ -2405,7 +2405,7 @@ function openOrder(){
 
         const lastNo = (existing || []).reduce((max, row) => {
           const value = String(row.order_no || '');
-          if (!/^\\d+$/.test(value)) return max;
+          if (!/^\d+$/.test(value)) return max;
           const number = parseInt(value,10);
           return Number.isFinite(number) ? Math.max(max,number) : max;
         }, 0);
