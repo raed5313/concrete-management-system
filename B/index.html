@@ -1206,10 +1206,12 @@ async function initSystem(){
     sadaSyncRunning = true;
     try {
       // اجلب بيانات النظام في دفعة متوازية واحدة لتقليل زمن انتظار فتح النظام.
-      const [ordersResult, loadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
+      const [ordersResult, loadsResult, atlasOrdersResult, atlasLoadsResult, customersResult, driversResult, vehiclesResult, mixesResult,
         walletAccountsResult, walletTransactionsResult, companyResult, operationalResult, auditResult] = await Promise.all([
         supabaseClient.from('concrete_orders').select('*').order('created_at'),
         supabaseClient.from('loads').select('*').order('created_at'),
+        supabaseClient.from('atlas_branch_orders').select('*').order('sent_at'),
+        supabaseClient.from('atlas_branch_loads').select('*').order('created_at'),
         supabaseClient.from('customers').select('*').order('created_at'),
         supabaseClient.from('drivers').select('*').order('created_at'),
         supabaseClient.from('vehicles').select('*').order('created_at'),
@@ -1223,6 +1225,8 @@ async function initSystem(){
 
       if(ordersResult.error) throw ordersResult.error;
       if(loadsResult.error) throw loadsResult.error;
+      if(atlasOrdersResult.error) throw atlasOrdersResult.error;
+      if(atlasLoadsResult.error) throw atlasLoadsResult.error;
       if(customersResult.error) throw customersResult.error;
       if(driversResult.error) throw driversResult.error;
       if(vehiclesResult.error) throw vehiclesResult.error;
@@ -1249,7 +1253,12 @@ if(mixesResult.error) throw mixesResult.error;
         actualQty:x.actual_qty,
         lockNote:x.lock_note,
         status:x.status
-      }));
+      })).concat((atlasOrdersResult.data || []).map(x => ({
+        id:String(x.source_order_id),no:x.source_order_no,customer:x.customer,phone:x.phone,
+        site:x.site,pour:x.pour,grade:x.grade,pump:x.pump||'',admixture_type:x.admixture_type||'',
+        sentToA:false,sentToB:true,sourceBranch:'A',sourceOrderId:String(x.source_order_id),
+        qty:x.qty,price:x.price,date:x.date,note:x.note,actualQty:x.actual_qty,lockNote:x.lock_note,status:x.status
+      })));
 
       // تذكّر آخر أمر تم استلامه على هذا الجهاز حتى لا تضيع نافذة التنبيه بعد إغلاق الموقع أو إعادة تحميله.
       // عند أول تشغيل فقط نضع خط أساس، ثم نعرض أحدث أمر وصل أثناء غياب المعمل.
@@ -1273,22 +1282,24 @@ if(mixesResult.error) throw mixesResult.error;
       window.sadaKnownOrderIds = new Set(freshOrders.filter(o=>o.id).map(o=>String(o.id)));
       data.orders = freshOrders;
 
-      data.loads = (loadsResult.data || []).map(x => ({
-        id:x.id,
-        no:x.load_no,
-        receiptNo:x.receipt_no,
-        sourceLoadId:x.source_load_id||'',
-        orderId:x.orderId,
-        orderNo:x.orderNo,
-        driver:x.driver,
-        vehicle:x.vehicle,
-        qty:x.qty,
-        pump:x.pump,
-        admixture_type:x.admixture_type||'',
-        time:x.time || null,
-        status:x.status,
-        date:x.created_at
+      const localLoads = (loadsResult.data || []).map(x => ({
+        id:x.id,no:x.load_no,receiptNo:x.receipt_no,sourceLoadId:x.source_load_id||'',
+        orderId:x.orderId,orderNo:x.orderNo,driver:x.driver,vehicle:x.vehicle,qty:x.qty,pump:x.pump,
+        admixture_type:x.admixture_type||'',time:x.time||null,status:x.status,date:x.created_at
       }));
+      const knownSharedLoadIds = new Set(localLoads.map(x=>String(x.sourceLoadId||'')).filter(Boolean));
+      const incomingSharedLoads = (atlasLoadsResult.data || [])
+        .filter(x=>!x.source_load_id || !knownSharedLoadIds.has(String(x.source_load_id)))
+        .map(x => {
+          const parent=(atlasOrdersResult.data || []).find(o=>String(o.source_order_id)===String(x.source_order_id));
+          return {
+            id:x.source_load_id,no:x.load_no,receiptNo:parent?.source_order_no||'',
+            sourceLoadId:x.source_load_id||'',orderId:String(x.source_order_id),
+            orderNo:parent?.source_order_no||'',driver:x.driver,vehicle:x.vehicle,qty:x.qty,pump:x.pump,
+            admixture_type:'',time:x.load_time||null,status:x.status,date:x.created_at
+          };
+        });
+      data.loads = [...localLoads,...incomingSharedLoads];
       data.customers = (customersResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',address:x.address||''}));
       data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
       data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
@@ -1343,12 +1354,12 @@ data.mixes = mixesResult.data || [];
   }
 
   await syncCloudData();
-  if(window.atlasSharedSyncTimerA)clearInterval(window.atlasSharedSyncTimerA);
-  window.atlasSharedSyncTimerA=setInterval(()=>{
+  if(window.atlasSharedSyncTimerB)clearInterval(window.atlasSharedSyncTimerB);
+  window.atlasSharedSyncTimerB=setInterval(()=>{
     if(document.visibilityState==='visible'&&navigator.onLine)syncCloudData();
   },5000);
-  if(!window.atlasSharedSyncEventsBoundA){
-    window.atlasSharedSyncEventsBoundA=true;
+  if(!window.atlasSharedSyncEventsBoundB){
+    window.atlasSharedSyncEventsBoundB=true;
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&navigator.onLine)syncCloudData();});
     window.addEventListener('online',()=>syncCloudData());
     window.addEventListener('focus',()=>{if(navigator.onLine)syncCloudData();});
@@ -1377,6 +1388,8 @@ data.mixes = mixesResult.data || [];
   let atlasRealtimeA = supabaseClient.channel('atlas-live-a');
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible')syncCloudData();});
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_orders'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_loads'},()=>{if(document.visibilityState==='visible')syncCloudData();});
   window.atlasRealtimeChannel = atlasRealtimeA.subscribe();
 
 
