@@ -1369,7 +1369,7 @@ data.mixes = mixesResult.data || [];
   void syncSharedLoadsToOtherBranch();
   if(window.atlasSharedSyncTimerB)clearInterval(window.atlasSharedSyncTimerB);
   window.atlasSharedSyncTimerB=setInterval(()=>{
-    if(document.visibilityState==='visible'&&navigator.onLine)syncSharedLoadsToOtherBranch();
+    if(document.visibilityState==='visible'&&navigator.onLine){syncSharedLoadsToOtherBranch();syncCloudData();}
   },15000);
   if(!window.atlasSharedSyncEventsBoundA){
     window.atlasSharedSyncEventsBoundA=true;
