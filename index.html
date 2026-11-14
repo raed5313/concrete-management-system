@@ -1335,7 +1335,7 @@ data.mixes = mixesResult.data || [];
 
   async function syncSharedLoadsToOtherBranch(){
     const now=Date.now();
-    if(window.atlasSharedLoadTransferAt&&now-window.atlasSharedLoadTransferAt<15000)return;
+    if(window.atlasSharedLoadTransferAt&&now-window.atlasSharedLoadTransferAt<5000)return;
     window.atlasSharedLoadTransferAt=now;
     try{
       const {data:transferData,error:transferError}=await supabaseClient.functions.invoke('atlas-branch-transfer',{body:{action:'sync_shared_loads'}});
@@ -1361,12 +1361,12 @@ data.mixes = mixesResult.data || [];
   if(window.atlasSharedSyncTimerA)clearInterval(window.atlasSharedSyncTimerA);
   window.atlasSharedSyncTimerA=setInterval(()=>{
     if(document.visibilityState==='visible'&&navigator.onLine){syncSharedLoadsToOtherBranch();syncCloudData();}
-  },15000);
+  },5000);
   if(!window.atlasSharedSyncEventsBoundA){
     window.atlasSharedSyncEventsBoundA=true;
-    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&navigator.onLine)syncCloudData();});
-    window.addEventListener('online',()=>syncCloudData());
-    window.addEventListener('focus',()=>{if(navigator.onLine)syncCloudData();});
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&navigator.onLine){syncSharedLoadsToOtherBranch();syncCloudData();}});
+    window.addEventListener('online',()=>{syncSharedLoadsToOtherBranch();syncCloudData();});
+    window.addEventListener('focus',()=>{if(navigator.onLine){syncSharedLoadsToOtherBranch();syncCloudData();}});
   }
   if(currentRole==='manager'){
     const today=new Date().toISOString().slice(0,10);
@@ -1390,8 +1390,8 @@ data.mixes = mixesResult.data || [];
   // مزامنة فورية للطلبات والحمولات المشتركة بين الفرعين.
   if (window.atlasRealtimeChannel && typeof supabaseClient.removeChannel === 'function') supabaseClient.removeChannel(window.atlasRealtimeChannel);
   let atlasRealtimeA = supabaseClient.channel('atlas-live-a');
-  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible')syncCloudData();});
-  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible')syncCloudData();});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
   window.atlasRealtimeChannel = atlasRealtimeA.subscribe();
 
 
