@@ -1078,11 +1078,11 @@ async function handleLogin(e) {
   e.preventDefault();
 
   const msg = $('loginError');
-  const btn = document.querySelector('#loginForm button[type="submit"]');
+  const btn = document.querySelector('#loginForm button[type="submit"], #loginForm button[type="button"]');
 
   try {
     msg.textContent = 'جارٍ الاتصال والتحقق...';
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
     const u = $('loginUser').value.trim();
     const p = $('loginPass').value;
@@ -1109,7 +1109,7 @@ if (error) throw error;
   } catch (err) {
     msg.textContent = 'خطأ: ' + (err.message || 'تعذر تسجيل الدخول');
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 } 
 
