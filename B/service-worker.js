@@ -1,4 +1,4 @@
-const CACHE_NAME = "atlas-b-shell-b4309cd4";
+const CACHE_NAME = "atlas-b-shell-6ca750f7";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
