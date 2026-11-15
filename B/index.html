@@ -518,17 +518,18 @@ input,button,select,textarea{
 </style>
 
 <style id="atlas-load-entry-card">
-#modal .atlas-load-entry-panel{width:min(620px,100%);background:linear-gradient(145deg,#18242d,#101820)!important;border:2px solid #35cfe0!important;border-radius:18px!important;box-shadow:0 18px 55px #000b!important;padding:18px!important}
+#modal .atlas-load-entry-panel{width:min(520px,100%);max-height:90vh;background:linear-gradient(145deg,#18242d,#101820)!important;border:2px solid #35cfe0!important;border-radius:16px!important;box-shadow:0 18px 55px #000b!important;padding:14px!important}
 #modal .atlas-load-entry-panel #modalTitle{font-size:25px!important;color:#f4f7f8!important;font-weight:900!important}
-#modal .atlas-load-entry-panel .formgrid{grid-template-columns:minmax(0,1fr)!important;gap:15px!important}
+#modal .atlas-load-entry-panel .formgrid{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
 #modal .atlas-load-entry-panel .field{width:100%;gap:7px!important}
-#modal .atlas-load-entry-panel .field label{font-size:17px!important;color:#f2f4f5!important;font-weight:800!important}
-#modal .atlas-load-entry-panel .field input:not([type=checkbox]),#modal .atlas-load-entry-panel .field select{width:100%;min-height:58px!important;background:#17232c!important;border:1px solid #81909a!important;border-radius:12px!important;padding:12px 15px!important;font-size:19px!important;color:#fff!important}
+#modal .atlas-load-entry-panel .field label{font-size:15px!important;color:#f2f4f5!important;font-weight:800!important}
+#modal .atlas-load-entry-panel .field input:not([type=checkbox]),#modal .atlas-load-entry-panel .field select{width:100%;min-height:46px!important;background:#17232c!important;border:1px solid #81909a!important;border-radius:10px!important;padding:9px 12px!important;font-size:17px!important;color:#fff!important}
+#modal .atlas-load-entry-panel .atlas-load-customer-field input{background:#202d35!important;border-color:#35cfe0!important;color:#fff!important;font-weight:800!important}
 #modal .atlas-load-entry-panel .atlas-load-time-toggle{display:flex!important;flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;padding:8px 2px 20px!important;border-bottom:1px solid #45545d!important}
 #modal .atlas-load-entry-panel .atlas-load-time-toggle label{font-size:19px!important}
 #modal .atlas-load-entry-panel .atlas-load-time-toggle input{width:24px!important;height:24px!important;accent-color:#35cfe0}
 #modal .atlas-load-entry-panel .field:has([name=driver]) input{border-color:#35cfe0!important}
-#modal .atlas-load-entry-panel button[type=submit]{width:100%;min-height:56px!important;border-radius:12px!important;font-size:19px!important;font-weight:900!important;background:#168b91!important;color:white!important}
+#modal .atlas-load-entry-panel button[type=submit]{width:100%;min-height:48px!important;border-radius:10px!important;font-size:17px!important;font-weight:900!important;background:#168b91!important;color:white!important}
 @media(max-width:600px){#modal .atlas-load-entry-panel{padding:14px!important}#modal .atlas-load-entry-panel #modalTitle{font-size:22px!important}}
 </style>
 </head>
@@ -2350,8 +2351,9 @@ $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''} ${f.className||''}">
 <label>${f.label}</label>
 ${f.type==='driverCombo'?`<input name="${f.name}" type="text" list="atlasDriverOptions" autocomplete="off" placeholder="اختر سائقاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}"><datalist id="atlasDriverOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
-`<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?'— اختر —':esc(v)}</option>`).join('')}</select>`:
-f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
+`<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:
+f.type==='readonly'?`<input name="${f.name}" type="text" value="${esc(f.value??'')}" readonly aria-readonly="true">`:
+ f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
 f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</textarea>`:
 `<input name="${f.name}" type="${f.type||'text'}" ${f.required?'required':''} ${f.step?`step="${f.step}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} placeholder="${esc(f.placeholder||'')}" value="${esc(f.value??'')}">`}
 </div>`).join('')+
@@ -2585,9 +2587,10 @@ async function openLoad(no) {
     }).catch(err => console.warn('تحديث قوائم السائقين والآليات بالخلفية:', err));
 
     openForm('تسجيل حمولة شاحنة', [
+        {name:'customer_display', label:'اسم الزبون', type:'readonly', value:o.customer||'—', full:true, className:'atlas-load-customer-field'},
         {name:'show_departure_time', label:'إظهار وقت المغادرة في الطباعة', type:'checkbox', full:true, className:'atlas-load-time-toggle'},
         {name:'driver', label:'اسم السائق', required:false, type:'driverCombo', full:true, options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
-        {name:'vehicle', label:'الآلية (الخلاطة)', required:false, full:true, options:['',...(data.vehicles||[]).map(x=>x.name)]},
+        {name:'vehicle', label:'الآلية / الخلاطة (اختياري)', required:false, full:true, placeholder:'— اختر آلية مسجلة (اختياري) —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المسحوبة (م³)', type:'number', required:true, full:true, placeholder:'أدخل الكمية'},
         {name:'time', label:'وقت المغادرة', type:'time', required:false, full:true, className:'atlas-load-time-field'}
     ], v => {
