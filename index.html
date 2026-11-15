@@ -2368,7 +2368,7 @@ $('modal').classList.remove('hidden');
  // يترك الحقل ليأخذ التركيز من لمسة المستخدم مباشرة.
 }
 
-function closeModal(){$('modal').classList.add('hidden')}
+function closeModal(){$('modal').classList.add('hidden');document.querySelector('#modal .panel')?.classList.remove('atlas-load-entry-panel')}
 
 function openOrder(){
   if(currentRole !== 'manager'){
