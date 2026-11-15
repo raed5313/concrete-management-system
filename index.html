@@ -2558,8 +2558,8 @@ async function openLoad(no) {
     }
 
     openForm('تسجيل حمولة لأمر التجهيز ' + o.no + ' — الزبون: ' + (o.customer||'—'), [
-        {name:'driver', label:'اسم السائق', required:false, placeholder:'اختر السائق من القائمة', options:['',...(data.drivers||[]).map(x=>x.name)]},
-        {name:'vehicle', label:'رقم الآلية', required:false, placeholder:'اختر الآلية من القائمة', options:['',...(data.vehicles||[]).map(x=>x.name)]},
+        {name:'driver', label:'اسم السائق', type:'suggestCombo', required:false, placeholder:'اختر اسماً أو اكتب اسم سائق جديداً', options:(data.drivers||[]).map(x=>x.name)},
+        {name:'vehicle', label:'رقم الآلية', type:'suggestCombo', required:false, placeholder:'اختر آلية أو اكتب رقم آلية جديداً', options:(data.vehicles||[]).map(x=>x.name)},
         {name:'qty', label:'الكمية (m³)', type:'number', required:true},
         {name:'time', label:'الوقت', type:'time', required:false}
     ], v => {
