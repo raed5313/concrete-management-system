@@ -3863,7 +3863,19 @@ toast('تم مسح وإعادة ضبط النظام بنجاح');
   } catch (err) {
     console.error('Session restore:', err);
     const msg = $('loginError');
-    if (msg) msg.textContent = 'تعذر تهيئة جلسة الدخول؛ تحقق من الاتصال ثم أعد المحاولة.';
+    const detail = String(err && err.message || '');
+    // إذا كانت الجلسة المحلية القديمة تالفة أو انتهت صلاحيتها، نمسحها من هذا الجهاز فقط
+    // حتى يستطيع المستخدم تسجيل الدخول من جديد. لا يتم حذف الحساب أو إلغاء جلسات الأجهزة الأخرى.
+    if (/invalid refresh token|refresh token.*not found|session_not_found|jwt expired|invalid token/i.test(detail)) {
+      try { await supabaseClient.auth.signOut({ scope: 'local' }); } catch (clearError) {
+        console.warn('Local expired session cleanup:', clearError);
+      }
+      if (msg) msg.textContent = 'انتهت الجلسة المحفوظة على هذا الجهاز. أدخل بياناتك واضغط تسجيل الدخول.';
+    } else {
+      if (msg) msg.textContent = detail
+        ? 'تعذر استعادة الجلسة: ' + detail
+        : 'تعذر استعادة الجلسة. تحقق من الاتصال ثم أعد المحاولة.';
+    }
   }
 })();
 </script>
