@@ -2326,7 +2326,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
-${f.type==='suggestCombo'?('<input name="'+f.name+'" type="text" list="atlasSuggest_'+f.name+'" autocomplete="off" placeholder="'+esc(f.placeholder||'اختر من القائمة أو اكتب نصاً جديداً')+'" value="'+esc(f.value??'')+'" '+(f.required?'required':'')+'><datalist id="atlasSuggest_'+f.name+'">'+(f.options||[]).filter(v=>v!=='').map(v=>'<option value="'+esc(v)+'"></option>').join('')+'</datalist>'):f.type==='registeredCombo'?`<select name="${f.name}" ${f.required?'required':''}>${(f.options||[]).map(v=>`<option value="${esc(v)}">${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
+${f.type==='suggestCombo'?'<div class="atlas-suggest-wrap" style="position:relative"><input class="atlas-suggest-input" name="'+f.name+'" type="text" autocomplete="off" placeholder="'+esc(f.placeholder||'اختر من القائمة أو اكتب نصاً جديداً')+'" value="'+esc(f.value??'')+'" '+(f.required?'required':'')+'><div class="atlas-suggest-menu" hidden style="position:absolute;top:100%;right:0;left:0;z-index:9999;max-height:190px;overflow:auto;background:#101d29;border:1px solid #38bdf8;border-radius:8px;box-shadow:0 8px 22px #0009"></div></div>':f.type==='registeredCombo'?`<select name="${f.name}" ${f.required?'required':''}>${(f.options||[]).map(v=>`<option value="${esc(v)}">${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:
 f.type==='readonly'?`<input name="${f.name}" type="text" value="${esc(f.value??'')}" readonly aria-readonly="true">`:
  f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
@@ -2335,6 +2335,27 @@ f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</te
 </div>`).join('')+
 '<div class="full"><button class="btn primary" type="submit">حفظ البيانات</button></div>';
 
+$('form').querySelectorAll('.atlas-suggest-input').forEach(input=>{
+ const menu=input.parentElement.querySelector('.atlas-suggest-menu');
+ const options=${(()=>{const f=fields.find(x=>x.name===input.name);return (f?.options||[]).filter(Boolean)})();
+ const draw=()=>{
+   const q=input.value.trim().toLocaleLowerCase();
+   const matches=options.filter(v=>String(v).toLocaleLowerCase().includes(q));
+   menu.innerHTML=matches.map(v=>'<button type="button" data-value="'+esc(v)+'" style="display:block;width:100%;padding:10px 12px;text-align:right;color:#fff;background:transparent;border:0;border-bottom:1px solid #263746;font:inherit">'+esc(v)+'</button>').join('');
+   menu.hidden=matches.length===0;
+ };
+ input.addEventListener('focus',draw);
+ input.addEventListener('input',draw);
+ input.addEventListener('blur',()=>setTimeout(()=>{menu.hidden=true;},160));
+ menu.addEventListener('mousedown',e=>e.preventDefault());
+ menu.addEventListener('click',e=>{
+   const option=e.target.closest('button[data-value]');
+   if(!option)return;
+   input.value=option.getAttribute('data-value')||'';
+   menu.hidden=true;
+   input.dispatchEvent(new Event('change',{bubbles:true}));
+ });
+});
 $('form').onsubmit=async e=>{
 e.preventDefault();
 const form=e.currentTarget;
