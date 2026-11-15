@@ -2570,10 +2570,9 @@ async function openLoad(no) {
 
     openForm('تسجيل حمولة لأمر التجهيز ' + o.no, [
         {name:'customer', label:'اسم الزبون', type:'readonly', value:o.customer||'—', required:false, full:true},
-        {name:'driver', label:'اسم السائق', required:false, placeholder:'اختر السائق من القائمة', options:['',...(data.drivers||[]).map(x=>x.name)]},
+        {name:'vehicle', label:'رقم الآلية', required:false, placeholder:'اختر الآلية من القائمة', options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية (m³)', type:'number', required:true},
-        {name:'time', label:'الوقت', type:'time', required:false},
-        {name:'vehicle', label:'رقم الآلية', required:false, placeholder:'اختر الآلية من القائمة', options:['',...(data.vehicles||[]).map(x=>x.name)]}
+        {name:'time', label:'الوقت', type:'time', required:false}
     ], v => {
         v.time = String(v.time||'').trim();
         v.driver = String(v.driver||'').trim();
