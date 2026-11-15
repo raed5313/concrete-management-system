@@ -83,7 +83,7 @@ th{color:var(--gold)}
 @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
 
 .order-open{background:#fff!important;color:#202020!important;}
-.order-locked{background:#f8dce5!important;color:#6b233b!important;}
+.order-locked{background:#fff0a6!important;color:#5b4300!important;border-color:#d6a500!important;}.order-locked td{background:#fff0a6!important;color:#5b4300!important;}.order-locked .atlas-order-cell,.order-locked .order-load-cell{background:#fff0a6!important;color:#5b4300!important;}
 .order-invoiced{background:#075b2e!important;color:#ffffff!important;border-color:#03451f!important;}
 .order-invoiced td{color:#ffffff!important;font-weight:800!important;}
 .order-invoiced .goldtext{color:#ffe08a!important;}
@@ -2474,7 +2474,7 @@ async function closeOrder(no){
 if(currentRole!=='plant' && currentRole!=='manager'){toast('لا تملك صلاحية تعديل الأمر');return;}
 let o=data.orders.find(x=>String(x.no)===String(no));
 if(!o) return;
-if(o.status === 'مكتمل ومجهز'){toast('هذا الأمر مقفول بالفعل');return;}
+if(['مكتمل ومجهز','مقفل','مكتمل'].includes(String(o.status||'').trim())){toast('هذا الأمر مقفول بالفعل ولا يمكن إضافة حمولات');return;}
 const delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((sum,x)=>sum+(Number(x.qty)||0),0);
 if(delivered<=0){toast('لا يمكن قفل الأمر قبل تسجيل حمولة واحدة على الأقل');return;}
 openForm('تأكيد قفل الأمر رقم '+no,[
@@ -2542,6 +2542,10 @@ async function openLoad(no) {
 
     const o = data.orders.find(x => String(x.no) === String(no));
     if (!o) return;
+    if (['مكتمل ومجهز','مقفل','مكتمل'].includes(String(o.status||'').trim())) {
+        toast('هذا الأمر مقفول في المعملين ولا يمكن إضافة حمولة جديدة');
+        return;
+    }
 
     // لا نؤخر فتح النافذة بانتظار الشبكة؛ القوائم الحالية تظهر فوراً،
     // ويجري تحديثها بالخلفية حتى تبقى لوحة المفاتيح سريعة الاستجابة.
@@ -2593,8 +2597,8 @@ async function openLoad(no) {
                     throw orderError || new Error('أمر التجهيز غير موجود');
                 }
                 const currentStatus = String(orderRow.status || '').trim();
-                if (currentStatus === 'مكتمل ومجهز') {
-                    throw new Error('هذا الأمر مقفول ولا يمكن إضافة حمولة جديدة');
+                if (['مكتمل ومجهز','مقفل','مكتمل'].includes(currentStatus)) {
+                    throw new Error('هذا الأمر مقفول في المعملين ولا يمكن إضافة حمولة جديدة');
                 }
 
                 // جلب حمولات هذا الأمر فقط
