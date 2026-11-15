@@ -1701,9 +1701,8 @@ async function sendOrderToB(orderNo,orderId){
   if(sessionError)throw sessionError;
   const token=sessionData?.session?.access_token;
   if(!token)throw new Error("انتهت جلسة الدخول؛ سجّل الدخول مجدداً");
-  const {data:existing,error:checkError}=await supabaseClient.from("concrete_orders").select("sent_to_branch_b_at").eq("id",String(orderId)).eq("branch_id","A").maybeSingle();
-  if(checkError)throw checkError;
-  if(existing?.sent_to_branch_b_at){toast("هذا الأمر مُرسل إلى معمل B مسبقاً");return;}
+  // نتجنب maybeSingle قبل الإرسال حتى لا تمنع سجلات قديمة متعارضة عملية التحويل.
+  // الاستقبال يعتمد على معرّف الأمر الأصلي ويعالج إعادة المحاولة دون إنشاء نسخة مكررة.
   const response=await fetch(SUPABASE_URL+"/functions/v1/atlas-branch-transfer",{
    method:"POST",
    headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
