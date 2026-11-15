@@ -2558,8 +2558,8 @@ async function openLoad(no) {
     }
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
-        {name:'driver', label:'اسم السائق (اختياري)', required:false, type:'suggestCombo', placeholder:'اختر سائقاً أو اكتب اسماً جديداً', options:['',...(data.drivers||[]).map(x=>x.name)]},
-        {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false, type:'suggestCombo', placeholder:'اختر آلية أو اكتب رقمها الجديد', options:['',...(data.vehicles||[]).map(x=>x.name)]},
+        {name:'driver', label:'اسم السائق (اختياري)', required:false, placeholder:'— اختر من قائمة السائقين —', options:['',...(data.drivers||[]).map(x=>x.name)]},
+        {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false, placeholder:'— اختر من قائمة الآليات —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة m³', type:'number', required:true},
         {name:'time', label:'وقت تجهيز الحمولة (اختياري — اتركه فارغاً إن لم ترغب بإظهاره)', type:'time', required:false}
     ], v => {
