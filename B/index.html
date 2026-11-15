@@ -517,21 +517,7 @@ input,button,select,textarea{
 #orders #ordersBody .atlas-branch-total-b b{background:#16813a!important;color:#fff!important}
 </style>
 
-<style id="atlas-load-entry-card">
-#modal .atlas-load-entry-panel{width:min(405px,91vw);max-height:80vh;overflow-y:auto;background:linear-gradient(145deg,#18242d,#101820)!important;border:2px solid #35cfe0!important;border-radius:12px!important;box-shadow:0 14px 38px #000b!important;padding:8px!important}
-#modal .atlas-load-entry-panel #modalTitle{font-size:18px!important;color:#f4f7f8!important;font-weight:900!important}
-#modal .atlas-load-entry-panel .formgrid{grid-template-columns:minmax(0,1fr)!important;gap:5px!important}
-#modal .atlas-load-entry-panel .field{width:100%;gap:3px!important}
-#modal .atlas-load-entry-panel .field label{font-size:12px!important;color:#f2f4f5!important;font-weight:800!important}
-#modal .atlas-load-entry-panel .field input:not([type=checkbox]),#modal .atlas-load-entry-panel .field select{width:100%;min-height:34px!important;background:#17232c!important;border:1px solid #81909a!important;border-radius:8px!important;padding:5px 9px!important;font-size:14px!important;color:#fff!important}
-#modal .atlas-load-entry-panel .atlas-load-customer-field input{background:#202d35!important;border-color:#35cfe0!important;color:#fff!important;font-weight:800!important}
-#modal .atlas-load-entry-panel .atlas-load-time-toggle{display:flex!important;flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;padding:5px 2px 10px!important;border-bottom:1px solid #45545d!important}
-#modal .atlas-load-entry-panel .atlas-load-time-toggle label{font-size:14px!important}
-#modal .atlas-load-entry-panel .atlas-load-time-toggle input{width:19px!important;height:19px!important;accent-color:#35cfe0}
-#modal .atlas-load-entry-panel .field:has([name=driver]) input{border-color:#35cfe0!important}
-#modal .atlas-load-entry-panel button[type=submit]{width:100%;min-height:37px!important;border-radius:8px!important;font-size:14px!important;font-weight:900!important;background:#168b91!important;color:white!important}
-@media(max-width:600px){#modal .atlas-load-entry-panel{width:min(390px,92vw)!important;max-height:78vh!important;padding:7px!important}#modal .atlas-load-entry-panel #modalTitle{font-size:17px!important}}
-</style>
+
 </head>
 <body>
 
@@ -2349,7 +2335,7 @@ function printOperationalRecord(type,id){
 function openForm(title,fields,cb){
 $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
-<div class="field ${f.full?'full':''} ${f.className||''}">
+<div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
 ${f.type==='registeredCombo'?`<select name="${f.name}" ${f.required?'required':''}>${(f.options||[]).map(v=>`<option value="${esc(v)}">${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:
@@ -2582,15 +2568,14 @@ async function openLoad(no) {
         return;
     }
 
-    openForm('تسجيل حمولة شاحنة', [
-        {name:'customer_display', label:'اسم الزبون', type:'readonly', value:o.customer||'—', full:true, className:'atlas-load-customer-field'},
-        {name:'show_departure_time', label:'إظهار وقت المغادرة في الطباعة', type:'checkbox', full:true, className:'atlas-load-time-toggle'},
-        {name:'driver', label:'اسم السائق (اختياري)', required:false, full:true, placeholder:'— اختر سائقاً —', options:['',...(data.drivers||[]).map(x=>x.name)]},
-        {name:'vehicle', label:'الآلية / الخلاطة (اختياري)', required:false, full:true, placeholder:'— اختر الآلية —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
-        {name:'qty', label:'الكمية المسحوبة (م³)', type:'number', required:true, full:true, placeholder:'أدخل الكمية'},
-        {name:'time', label:'وقت المغادرة', type:'time', required:false, full:true, className:'atlas-load-time-field'}
+    openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
+        {name:'driver', label:'اختيار السائق من القائمة', required:false, type:'driverCombo', options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
+        {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false,options:['',...(data.vehicles||[]).map(x=>x.name)]},
+        {name:'qty', label:'الكمية المجهزة m³', type:'number', required:true},
+        {name:'time', label:'وقت تجهيز الحمولة (اختياري — اتركه فارغاً إن لم ترغب بإظهاره)', type:'time', required:false}
     ], v => {
-        v.time = v.show_departure_time === 'on' ? (v.time || new Date().toTimeString().slice(0,5)) : '';
+    ], v => {
+        v.time = String(v.time||'').trim();
         // لا نقبل إلا الأسماء الموجودة في القوائم المعتمدة المحمّلة من قاعدة البيانات.
         const registeredDriverNames = (data.drivers||[]).map(x=>String(x.name||'').trim()).filter(Boolean);
         const registeredVehicleNames = (data.vehicles||[]).map(x=>String(x.name||'').trim()).filter(Boolean);
@@ -2773,15 +2758,6 @@ async function openLoad(no) {
             }
         })();
     });
-    const loadPanel = document.querySelector('#modal .panel');
-    loadPanel?.classList.add('atlas-load-entry-panel');
-    const showTime = $('form')?.querySelector('[name="show_departure_time"]');
-    const timeField = $('form')?.querySelector('.atlas-load-time-field');
-    if(timeField) timeField.style.display = showTime?.checked ? 'grid' : 'none';
-    showTime?.addEventListener('change', () => {
-        if(timeField) timeField.style.display = showTime.checked ? 'grid' : 'none';
-    });
-
 }
 
 async function editOrderMix(no){
