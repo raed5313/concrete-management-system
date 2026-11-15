@@ -518,19 +518,19 @@ input,button,select,textarea{
 </style>
 
 <style id="atlas-load-entry-card">
-#modal .atlas-load-entry-panel{width:min(455px,94vw);max-height:86vh;overflow-y:auto;background:linear-gradient(145deg,#18242d,#101820)!important;border:2px solid #35cfe0!important;border-radius:14px!important;box-shadow:0 18px 55px #000b!important;padding:10px!important}
-#modal .atlas-load-entry-panel #modalTitle{font-size:21px!important;color:#f4f7f8!important;font-weight:900!important}
-#modal .atlas-load-entry-panel .formgrid{grid-template-columns:minmax(0,1fr)!important;gap:7px!important}
-#modal .atlas-load-entry-panel .field{width:100%;gap:4px!important}
-#modal .atlas-load-entry-panel .field label{font-size:13px!important;color:#f2f4f5!important;font-weight:800!important}
-#modal .atlas-load-entry-panel .field input:not([type=checkbox]),#modal .atlas-load-entry-panel .field select{width:100%;min-height:39px!important;background:#17232c!important;border:1px solid #81909a!important;border-radius:9px!important;padding:7px 10px!important;font-size:15px!important;color:#fff!important}
+#modal .atlas-load-entry-panel{width:min(405px,91vw);max-height:80vh;overflow-y:auto;background:linear-gradient(145deg,#18242d,#101820)!important;border:2px solid #35cfe0!important;border-radius:12px!important;box-shadow:0 14px 38px #000b!important;padding:8px!important}
+#modal .atlas-load-entry-panel #modalTitle{font-size:18px!important;color:#f4f7f8!important;font-weight:900!important}
+#modal .atlas-load-entry-panel .formgrid{grid-template-columns:minmax(0,1fr)!important;gap:5px!important}
+#modal .atlas-load-entry-panel .field{width:100%;gap:3px!important}
+#modal .atlas-load-entry-panel .field label{font-size:12px!important;color:#f2f4f5!important;font-weight:800!important}
+#modal .atlas-load-entry-panel .field input:not([type=checkbox]),#modal .atlas-load-entry-panel .field select{width:100%;min-height:34px!important;background:#17232c!important;border:1px solid #81909a!important;border-radius:8px!important;padding:5px 9px!important;font-size:14px!important;color:#fff!important}
 #modal .atlas-load-entry-panel .atlas-load-customer-field input{background:#202d35!important;border-color:#35cfe0!important;color:#fff!important;font-weight:800!important}
 #modal .atlas-load-entry-panel .atlas-load-time-toggle{display:flex!important;flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;padding:5px 2px 10px!important;border-bottom:1px solid #45545d!important}
 #modal .atlas-load-entry-panel .atlas-load-time-toggle label{font-size:14px!important}
 #modal .atlas-load-entry-panel .atlas-load-time-toggle input{width:19px!important;height:19px!important;accent-color:#35cfe0}
 #modal .atlas-load-entry-panel .field:has([name=driver]) input{border-color:#35cfe0!important}
-#modal .atlas-load-entry-panel button[type=submit]{width:100%;min-height:42px!important;border-radius:9px!important;font-size:15px!important;font-weight:900!important;background:#168b91!important;color:white!important}
-@media(max-width:600px){#modal .atlas-load-entry-panel{padding:14px!important}#modal .atlas-load-entry-panel #modalTitle{font-size:22px!important}}
+#modal .atlas-load-entry-panel button[type=submit]{width:100%;min-height:37px!important;border-radius:8px!important;font-size:14px!important;font-weight:900!important;background:#168b91!important;color:white!important}
+@media(max-width:600px){#modal .atlas-load-entry-panel{width:min(390px,92vw)!important;max-height:78vh!important;padding:7px!important}#modal .atlas-load-entry-panel #modalTitle{font-size:17px!important}}
 </style>
 </head>
 <body>
@@ -1457,6 +1457,7 @@ data.mixes = mixesResult.data || [];
   let atlasRealtimeA = supabaseClient.channel('atlas-live-b');
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'concrete_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
   atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
+  atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'vehicles'},()=>{if(document.visibilityState==='visible'){syncCloudData();}});
 atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_orders'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
 atlasRealtimeA = atlasRealtimeA.on('postgres_changes',{event:'*',schema:'public',table:'atlas_branch_loads'},()=>{if(document.visibilityState==='visible'){syncSharedLoadsToOtherBranch();syncCloudData();}});
   window.atlasRealtimeChannel = atlasRealtimeA.subscribe((status)=>{if(status==='SUBSCRIBED'){console.info('ATLAS A realtime connected');}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){console.warn('ATLAS A realtime disconnected:',status);}});
@@ -2566,25 +2567,20 @@ async function openLoad(no) {
 
     // لا نؤخر فتح النافذة بانتظار الشبكة؛ القوائم الحالية تظهر فوراً،
     // ويجري تحديثها بالخلفية حتى تبقى لوحة المفاتيح سريعة الاستجابة.
-    Promise.all([
-        supabaseClient.from('drivers').select('id,name,phone,note').order('created_at'),
-        supabaseClient.from('vehicles').select('id,name,capacity,kind').order('created_at')
-    ]).then(([driversResult, vehiclesResult]) => {
+    try {
+        const [driversResult, vehiclesResult] = await Promise.all([
+            supabaseClient.from('drivers').select('id,name,phone,note').order('created_at'),
+            supabaseClient.from('vehicles').select('id,name,capacity,kind').order('created_at')
+        ]);
         if (driversResult.error) throw driversResult.error;
         if (vehiclesResult.error) throw vehiclesResult.error;
         data.drivers = (driversResult.data || []).map(x => ({id:x.id,name:x.name,phone:x.phone||'',note:x.note||''}));
         data.vehicles = (vehiclesResult.data || []).map(x => ({id:x.id,name:x.name,capacity:x.capacity||0,kind:x.kind||''}));
-        const form = $('form');
-        const driverInput = form?.querySelector('[name="driver"]');
-        const driverList = driverInput?.list;
-        if (driverList) driverList.innerHTML = data.drivers.map(x => '<option value="'+esc(x.name)+'"></option>').join('');
-        const vehicleSelect = form?.querySelector('[name="vehicle"]');
-        if (vehicleSelect) {
-            const selected = vehicleSelect.value;
-            vehicleSelect.innerHTML = '<option value="">— اختر —</option>' + data.vehicles.map(x => '<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>').join('');
-            vehicleSelect.value = selected;
-        }
-    }).catch(err => console.warn('تحديث قوائم السائقين والآليات بالخلفية:', err));
+    } catch (err) {
+        console.error('تعذر تحديث قوائم السائقين والآليات:', err);
+        toast('تعذر تحميل قائمة الآليات المسجلة؛ تحقق من الاتصال ثم أعد فتح البطاقة');
+        return;
+    }
 
     openForm('تسجيل حمولة شاحنة', [
         {name:'customer_display', label:'اسم الزبون', type:'readonly', value:o.customer||'—', full:true, className:'atlas-load-customer-field'},
