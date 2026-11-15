@@ -1,4 +1,4 @@
-const CACHE_NAME = "atlas-shell-login-retry-20261115-0742";
+const CACHE_NAME = "atlas-shell-login-button-fix-20261115-0910";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
