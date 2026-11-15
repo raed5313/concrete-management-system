@@ -2558,6 +2558,7 @@ async function openLoad(no) {
     }
 
     openForm('إضافة حمولة لأمر التجهيز ' + o.no, [
+        {name:'customer', label:'اسم الزبون', type:'readonly', value:o.customer||'—', required:false},
         {name:'driver', label:'اسم السائق (اختياري)', required:false, placeholder:'— اختر من قائمة السائقين —', options:['',...(data.drivers||[]).map(x=>x.name)]},
         {name:'vehicle', label:'رقم الآلية / الخلاطة (اختياري)', required:false, placeholder:'— اختر من قائمة الآليات —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المجهزة m³', type:'number', required:true},
