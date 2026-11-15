@@ -2585,16 +2585,21 @@ async function openLoad(no) {
     openForm('تسجيل حمولة شاحنة', [
         {name:'customer_display', label:'اسم الزبون', type:'readonly', value:o.customer||'—', full:true, className:'atlas-load-customer-field'},
         {name:'show_departure_time', label:'إظهار وقت المغادرة في الطباعة', type:'checkbox', full:true, className:'atlas-load-time-toggle'},
-        {name:'driver', label:'اسم السائق', required:false, type:'driverCombo', full:true, options:['',...(data.drivers||[]).map(x=>x.name),'__custom__']},
+        {name:'driver', label:'اسم السائق (اختياري)', required:false, full:true, placeholder:'— اختر من السائقين المسجلين —', options:['',...(data.drivers||[]).map(x=>x.name)]},
         {name:'vehicle', label:'الآلية / الخلاطة (اختياري)', required:false, full:true, placeholder:'— اختر من الآليات المسجلة —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المسحوبة (م³)', type:'number', required:true, full:true, placeholder:'أدخل الكمية'},
         {name:'time', label:'وقت المغادرة', type:'time', required:false, full:true, className:'atlas-load-time-field'}
     ], v => {
         v.time = v.show_departure_time === 'on' ? (v.time || new Date().toTimeString().slice(0,5)) : '';
-        // إذا كُتب اسم خارجي نعتمده، وإلا نعتمد الاسم المختار من القائمة.
-        v.driver = (v.custom_driver || '').trim() || (v.driver === '__custom__' ? '' : (v.driver || '').trim());
-        const registeredVehicleNames = (data.vehicles||[]).map(x=>String(x.name||'').trim());
+        // لا نقبل إلا الأسماء الموجودة في القوائم المعتمدة المحمّلة من قاعدة البيانات.
+        const registeredDriverNames = (data.drivers||[]).map(x=>String(x.name||'').trim()).filter(Boolean);
+        const registeredVehicleNames = (data.vehicles||[]).map(x=>String(x.name||'').trim()).filter(Boolean);
+        v.driver = String(v.driver||'').trim();
         v.vehicle = String(v.vehicle||'').trim();
+        if (v.driver && !registeredDriverNames.includes(v.driver)) {
+            toast('اختر السائق من قائمة السائقين المسجلين في النظام');
+            return;
+        }
         if (v.vehicle && !registeredVehicleNames.includes(v.vehicle)) {
             toast('اختر الآلية من قائمة الآليات المسجلة في النظام');
             return;
