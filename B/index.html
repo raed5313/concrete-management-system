@@ -2351,7 +2351,7 @@ $('modalTitle').textContent=title;
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''} ${f.className||''}">
 <label>${f.label}</label>
-${f.type==='driverCombo'?`<input name="${f.name}" type="text" list="atlasDriverOptions" autocomplete="off" placeholder="اختر سائقاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}"><datalist id="atlasDriverOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
+${f.type==='registeredCombo'?(() => { const listId='atlasList_'+f.name; return `<input name="${f.name}" type="text" list="${listId}" autocomplete="off" autocapitalize="off" placeholder="${esc(f.placeholder||'— اكتب أو اختر من القائمة —')}" value="${esc(f.value??'')}" aria-label="${esc(f.label)}"><datalist id="${listId}">${(f.options||[]).filter(v=>v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`; })():f.type==='customerCombo'?`<input name="${f.name}" type="text" list="atlasCustomerOptions" autocomplete="off" placeholder="اختر عميلاً أو اكتب اسماً جديداً" value="${esc(f.value??'')}" ${f.required?'required':''}><datalist id="atlasCustomerOptions">${f.options.filter(v=>v!=='__custom__'&&v!=='').map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>`:f.options?
 `<select name="${f.name}" ${f.required?'required':''}>${f.options.map((v,i)=>`<option value="${esc(v)}" ${String(v)===String(f.value??'')?'selected':''}>${v===''?(f.placeholder||'— اختر —'):esc(v)}</option>`).join('')}</select>`:
 f.type==='readonly'?`<input name="${f.name}" type="text" value="${esc(f.value??'')}" readonly aria-readonly="true">`:
  f.type==='checkbox'?`<input name="${f.name}" type="checkbox">`:
@@ -2585,8 +2585,8 @@ async function openLoad(no) {
     openForm('تسجيل حمولة شاحنة', [
         {name:'customer_display', label:'اسم الزبون', type:'readonly', value:o.customer||'—', full:true, className:'atlas-load-customer-field'},
         {name:'show_departure_time', label:'إظهار وقت المغادرة في الطباعة', type:'checkbox', full:true, className:'atlas-load-time-toggle'},
-        {name:'driver', label:'اسم السائق (اختياري)', required:false, full:true, placeholder:'— اختر من السائقين المسجلين —', options:['',...(data.drivers||[]).map(x=>x.name)]},
-        {name:'vehicle', label:'الآلية / الخلاطة (اختياري)', required:false, full:true, placeholder:'— اختر من الآليات المسجلة —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
+        {name:'driver', label:'اسم السائق (اختياري)', type:'registeredCombo', required:false, full:true, placeholder:'— اكتب اسم السائق أو اختر من القائمة —', options:['',...(data.drivers||[]).map(x=>x.name)]},
+        {name:'vehicle', label:'الآلية / الخلاطة (اختياري)', type:'registeredCombo', required:false, full:true, placeholder:'— اكتب اسم الآلية أو اختر من القائمة —', options:['',...(data.vehicles||[]).map(x=>x.name)]},
         {name:'qty', label:'الكمية المسحوبة (م³)', type:'number', required:true, full:true, placeholder:'أدخل الكمية'},
         {name:'time', label:'وقت المغادرة', type:'time', required:false, full:true, className:'atlas-load-time-field'}
     ], v => {
