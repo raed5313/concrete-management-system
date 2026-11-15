@@ -2322,7 +2322,12 @@ function printOperationalRecord(type,id){
 }
 
 function openForm(title,fields,cb){
-$('modalTitle').textContent=title;
+if(title.startsWith('تسجيل حمولة لأمر التجهيز') && title.includes(' — الزبون: ')){
+ const parts=title.split(' — الزبون: ');
+ $('modalTitle').innerHTML=esc(parts[0])+' — الزبون: <span style="color:#facc15;font-weight:800">'+esc(parts.slice(1).join(' — الزبون: '))+'</span>';
+}else{
+ $('modalTitle').textContent=title;
+}
 $('form').innerHTML=fields.map(f=>`
 <div class="field ${f.full?'full':''}">
 <label>${f.label}</label>
