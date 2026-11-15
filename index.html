@@ -568,7 +568,7 @@ input,button,select,textarea{
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="field"><label>اسم المستخدم</label><input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم" autocomplete="username"></div>
         <div class="field"><label>كلمة المرور</label><input type="password" id="loginPass" required placeholder="أدخل كلمة المرور" autocomplete="current-password"></div>
-        <button type="button" onclick="handleLogin(event)">تسجيل الدخول <span>←</span></button>
+        <button type="submit">تسجيل الدخول <span>←</span></button>
         <div id="loginError" class="login-error"></div>
       </form>
       <div class="atlas-login-footer"><span>أطلس للكونكريت — ATLAS</span><span>نظام الإدارة الرئيسي</span></div>
@@ -889,7 +889,6 @@ input,button,select,textarea{
 <div id="toast" class="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
 
