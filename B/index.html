@@ -2348,7 +2348,7 @@ f.type==='textarea'?`<textarea name="${f.name}" rows="3">${esc(f.value??'')}</te
 
 $('form').querySelectorAll('.atlas-suggest-input').forEach(input=>{
  const menu=input.parentElement.querySelector('.atlas-suggest-menu');
- const options=${(()=>{const f=fields.find(x=>x.name===input.name);return (f?.options||[]).filter(Boolean)})();
+ const options=(fields.find(x=>x.name===input.name)?.options||[]).filter(Boolean);
  const draw=()=>{
    const q=input.value.trim().toLocaleLowerCase();
    const matches=options.filter(v=>String(v).toLocaleLowerCase().includes(q));
