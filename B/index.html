@@ -2574,7 +2574,6 @@ async function openLoad(no) {
         {name:'qty', label:'الكمية المجهزة m³', type:'number', required:true},
         {name:'time', label:'وقت تجهيز الحمولة (اختياري — اتركه فارغاً إن لم ترغب بإظهاره)', type:'time', required:false}
     ], v => {
-    ], v => {
         v.time = String(v.time||'').trim();
         // لا نقبل إلا الأسماء الموجودة في القوائم المعتمدة المحمّلة من قاعدة البيانات.
         const registeredDriverNames = (data.drivers||[]).map(x=>String(x.name||'').trim()).filter(Boolean);
