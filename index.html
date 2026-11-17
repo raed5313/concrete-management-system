@@ -2096,7 +2096,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-heading">الكمية الفعلية والحمولات</div><div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}')">➕</button>` : ''}${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''} </div>
+<div class="atlas-load-heading">الكمية الفعلية والحمولات</div><div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}','${esc(o.id)}')">➕</button>` : ''}${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''} </div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
@@ -2618,14 +2618,19 @@ if(peerSyncOK)toast('تم قفل أمر التجهيز في المعملين م�
 else toast('تم القفل محلياً، لكن تعذرت مزامنته إلى المعمل الآخر؛ أعد المحاولة بعد عودة الاتصال');
 });
 }
-async function openLoad(no) {
+async function openLoad(no, orderId) {
     if (currentRole !== 'plant' && currentRole !== 'operator') {
         toast('إضافة الحمولة متاحة لمشغّل المعمل فقط');
         return;
     }
 
-    const o = data.orders.find(x => String(x.no) === String(no));
-    if (!o) return;
+    const o = orderId
+        ? data.orders.find(x => String(x.id) === String(orderId))
+        : (() => { const matches = data.orders.filter(x => String(x.no) === String(no)); return matches.length === 1 ? matches[0] : null; })();
+    if (!o) {
+        toast('تعذر تحديد أمر التجهيز بدقة؛ حدّث الصفحة ثم أعد المحاولة');
+        return;
+    }
     if (['مكتمل ومجهز','مقفل','مكتمل'].includes(String(o.status||'').trim())) {
         toast('هذا الأمر مقفول في المعملين ولا يمكن إضافة حمولة جديدة');
         return;
