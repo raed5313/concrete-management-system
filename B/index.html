@@ -518,6 +518,69 @@ input,button,select,textarea{
 </style>
 
 
+<style id="atlas-3d-surface">
+/* ATLAS 3D surfaces — visual-only styling */
+@media screen {
+  .brand,.panel,.stat,.login-card,.detail,.loadbox,.order-card,
+  .order-loadbox,.sada-alert-card,.atlas-login-card,.atlas-login-panel,
+  .report-kpi,.report-filters,.report-table-wrap,.summary>div,
+  .user-info,.alert-box,.modal .panel {
+    background-image:linear-gradient(145deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.018) 34%,rgba(0,0,0,.13) 100%);
+    border-top-color:rgba(255,255,255,.28);
+    box-shadow:
+      0 2px 3px rgba(0,0,0,.42),
+      0 8px 18px rgba(0,0,0,.28),
+      0 16px 30px rgba(0,0,0,.16),
+      inset 0 1px 0 rgba(255,255,255,.13),
+      inset 0 -2px 0 rgba(0,0,0,.16);
+    transform:perspective(1100px) translateZ(0);
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+  }
+  .panel,.stat,.brand,.login-card,.detail,.loadbox,.order-card,
+  .order-loadbox,.sada-alert-card,.atlas-login-card,.report-kpi,
+  .report-filters,.report-table-wrap,.summary>div {
+    position:relative;
+  }
+  .modal .panel,.sada-alert-card,.atlas-login-card {
+    box-shadow:
+      0 5px 10px rgba(0,0,0,.35),
+      0 18px 42px rgba(0,0,0,.42),
+      0 30px 65px rgba(0,0,0,.24),
+      inset 0 1px 0 rgba(255,255,255,.2);
+  }
+  #orders #ordersBody tr.order-card {
+    border-top:1px solid rgba(255,255,255,.48)!important;
+    box-shadow:0 3px 5px rgba(0,0,0,.28),0 9px 18px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.45)!important;
+  }
+  #orders #ordersBody tr.order-load-row {
+    filter:drop-shadow(0 5px 7px rgba(0,0,0,.2));
+  }
+  #orders #ordersBody .order-loadbox {
+    box-shadow:0 3px 5px rgba(0,0,0,.22),0 8px 15px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.48)!important;
+  }
+  .modal {
+    perspective:1400px;
+  }
+  .toast {
+    box-shadow:0 5px 10px rgba(0,0,0,.4),0 15px 35px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.18);
+  }
+}
+@media screen and (hover:hover) {
+  .brand,.panel,.stat,.login-card,.detail,.loadbox,.order-card,
+  .order-loadbox,.sada-alert-card,.atlas-login-card,.report-kpi,
+  .summary>div {
+    transition:box-shadow .22s ease,transform .22s ease;
+  }
+  .brand:hover,.panel:hover,.stat:hover,.login-card:hover,
+  .detail:hover,.loadbox:hover,.order-card:hover,.order-loadbox:hover,
+  .sada-alert-card:hover,.atlas-login-card:hover,.report-kpi:hover,
+  .summary>div:hover {
+    transform:perspective(1100px) translateY(-2px) rotateX(.35deg);
+    box-shadow:0 4px 7px rgba(0,0,0,.34),0 13px 25px rgba(0,0,0,.27),0 22px 38px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.18);
+  }
+}
+</style>
 </head>
 <body>
 
