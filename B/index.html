@@ -2107,7 +2107,7 @@ return `
 </tr>
 <tr class="order-load-row"><td colspan="11" class="order-load-cell">
 <div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-heading">الكمية الفعلية والحمولات</div><div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-add-load-total" title="إضافة حمولة" aria-label="إضافة حمولة" onclick="openLoad('${esc(o.no)}','${esc(o.id)}')">➕</button>` : ''}${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''} </div>
+<div class="atlas-load-heading"><span class="atlas-load-check">✓</span><strong>الكمية الفعلية</strong></div>
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
@@ -2118,7 +2118,8 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
  ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
 </div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
-
+<div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''}</div>
+${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-register-load" title="تسجيل حمولة" aria-label="تسجيل حمولة" onclick="openLoad('${esc(o.no)}','${esc(o.id)}')">♧ تسجيل حمولة</button>` : ''}
 </div>
 
 
@@ -3536,6 +3537,67 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
 }
 </style>
 
+
+<style id="atlas-load-card-photo-layout">
+/* تنسيق قائمة الحمولات مطابق للصورة المرجعية فقط */
+#orders #ordersBody .atlas-load-list{
+ background:#202329!important;color:#f4f5f6!important;border:1px solid #59616a!important;
+ border-radius:8px!important;padding:5px!important
+}
+#orders #ordersBody .atlas-load-list .atlas-load-heading{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ position:relative!important;min-height:34px!important;margin:0 0 7px!important;
+ padding:4px 36px!important;background:#f1f3f5!important;border:1px solid #aeb8c1!important;
+ border-radius:6px!important;color:#515b65!important;text-align:center!important
+}
+#orders #ordersBody .atlas-load-list .atlas-load-heading strong{
+ color:#515b65!important;font-size:14px!important;font-weight:900!important
+}
+#orders #ordersBody .atlas-load-list .atlas-load-check{
+ position:absolute!important;right:0!important;top:0!important;bottom:0!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:32px!important;background:#27845a!important;color:#fff!important;
+ border-radius:5px 0 0 5px!important;font-size:19px!important;font-weight:1000!important
+}
+#orders #ordersBody .atlas-load-list .atlas-load-rows{display:flex!important;flex-direction:column!important;width:100%!important}
+#orders #ordersBody .atlas-load-list .atlas-load-row{
+ display:flex!important;flex-direction:row!important;direction:rtl!important;align-items:center!important;
+ gap:6px!important;min-height:35px!important;width:100%!important;padding:2px 5px!important;
+ border-top:1px solid #68727c!important;background:#202329!important
+}
+#orders #ordersBody .atlas-load-list .atlas-load-seq{flex:0 0 18px!important;text-align:right!important;color:#d8e1e8!important;font-size:12px!important;font-weight:900!important}
+#orders #ordersBody .atlas-load-list .atlas-load-driver{flex:0 1 145px!important;min-width:58px!important;color:#f3f4f6!important;font-size:12px!important;font-weight:800!important;text-align:right!important;overflow-wrap:anywhere!important}
+#orders #ordersBody .atlas-load-list .atlas-load-vehicle{flex:0 0 auto!important;min-width:36px!important;padding:3px 6px!important;border-radius:8px!important;background:#e5e7eb!important;color:#3d4650!important;font-size:11px!important;font-weight:900!important}
+#orders #ordersBody .atlas-load-list .atlas-load-spacer{flex:1 1 auto!important}
+#orders #ordersBody .atlas-load-list .atlas-load-row>.atlas-load-qty,
+#orders #ordersBody .atlas-load-list .atlas-load-row>.atlas-load-qty bdi{flex:0 0 auto!important;min-width:52px!important;text-align:left!important;color:#ffe66d!important;-webkit-text-fill-color:#ffe66d!important;font-size:15px!important;font-weight:1000!important}
+#orders #ordersBody .atlas-load-list .atlas-load-print,
+#orders #ordersBody .atlas-load-list .atlas-load-edit,
+#orders #ordersBody .atlas-load-list .atlas-load-delete{flex:0 0 24px!important;width:24px!important;height:25px!important;padding:0!important;border:0!important;background:transparent!important;font-size:17px!important;font-weight:900!important;cursor:pointer!important}
+#orders #ordersBody .atlas-load-list .atlas-load-print{color:#42d8e8!important}
+#orders #ordersBody .atlas-load-list .atlas-load-edit{color:#f5c65a!important}
+#orders #ordersBody .atlas-load-list .atlas-load-delete{color:#ff6675!important}
+#orders #ordersBody .atlas-load-list .muted{color:#d5dbe0!important;text-align:center!important}
+#orders #ordersBody .atlas-load-list .atlas-load-total{
+ display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+ flex-wrap:wrap!important;min-height:30px!important;padding:5px 2px!important;border-top:1px solid #68727c!important
+}
+#orders #ordersBody .atlas-load-list .atlas-load-total>strong,
+#orders #ordersBody .atlas-load-list .atlas-load-total>strong bdi{
+ color:#fff200!important;-webkit-text-fill-color:#fff200!important;font-size:18px!important;font-weight:1000!important
+}
+#orders #ordersBody .atlas-load-list .atlas-shared-branch-totals{display:inline-flex!important;align-items:center!important;gap:5px!important}
+#orders #ordersBody .atlas-load-list .atlas-register-load{
+ display:block!important;width:100%!important;min-height:32px!important;margin:3px 0 0!important;
+ padding:4px 8px!important;border:1px solid #42d8e8!important;border-radius:6px!important;
+ background:#202329!important;color:#42d8e8!important;font-size:14px!important;font-weight:900!important
+}
+@media(max-width:520px){
+ #orders #ordersBody .atlas-load-list .atlas-load-driver{font-size:11px!important;min-width:48px!important}
+ #orders #ordersBody .atlas-load-list .atlas-load-row{gap:4px!important;padding:2px 3px!important}
+ #orders #ordersBody .atlas-load-list .atlas-load-row>.atlas-load-qty{font-size:14px!important;min-width:46px!important}
+}
+</style>
 </body></html>`);
 w.document.close();
 }
