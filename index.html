@@ -2087,7 +2087,7 @@ return `
  ${ATLAS_BRANCH_ID === 'B' && currentRole === 'manager' && !o.sentToA ? '<button class="btn gold" title="إرسال الأمر إلى معمل A" aria-label="إرسال إلى معمل A" onclick="sendOrderToA(\''+esc(o.no)+'\',\''+esc(o.id)+'\')">↗️ إرسال إلى A</button>' : ''}
  ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' && !o.sentToB ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\',\''+esc(o.id)+'\')">↗️ إرسال إلى B</button>' : ''}
  ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
- ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}')">🔒</button>` : ''}
+ ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}','${esc(o.id)}')">🔒</button>` : ''}
  <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
  ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
  ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
@@ -2555,12 +2555,13 @@ await save();render();toast('تم تحديث حالة الأمر في قاعدة
 }catch(err){console.error(err);toast('تعذر تحديث حالة الأمر: '+(err.message||''));}
 }
 
-async function closeOrder(no){
+async function closeOrder(no, orderId){
 if(currentRole!=='plant' && currentRole!=='manager'){toast('لا تملك صلاحية تعديل الأمر');return;}
-let o=data.orders.find(x=>String(x.no)===String(no));
-if(!o) return;
+const sameNoOrders=data.orders.filter(x=>String(x.no)===String(no));
+let o=orderId ? data.orders.find(x=>String(x.id)===String(orderId)) : (sameNoOrders.length===1 ? sameNoOrders[0] : null);
+if(!o){toast('تعذر تحديد أمر التجهيز بدقة؛ حدّث الصفحة ثم أعد المحاولة');return;}
 if(['مكتمل ومجهز','مقفل','مكتمل'].includes(String(o.status||'').trim())){toast('هذا الأمر مقفول بالفعل ولا يمكن إضافة حمولات');return;}
-const delivered=data.loads.filter(x=>String(x.orderNo)===String(no)).reduce((sum,x)=>sum+(Number(x.qty)||0),0);
+const delivered=data.loads.filter(x=>x.orderId ? String(x.orderId)===String(o.id) : (sameNoOrders.length===1 && String(x.orderNo)===String(no))).reduce((sum,x)=>sum+(Number(x.qty)||0),0);
 if(delivered<=0){toast('لا يمكن قفل الأمر قبل تسجيل حمولة واحدة على الأقل');return;}
 openForm('تأكيد قفل الأمر رقم '+no,[
 {name:'deliveredDisplay',label:'إجمالي الكمية المجهزة فعلياً (m³) — ستعتمد عند القفل',value:delivered.toFixed(2),required:true},
@@ -2572,7 +2573,7 @@ o.status='مكتمل ومجهز';
 try{
  const {error:closeError}=await supabaseClient.from('concrete_orders')
  .update({status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote})
- .eq('order_no',String(no));
+ .eq('id',String(o.id));
  if(closeError)throw closeError;
 }catch(err){
  o.status='قيد العمل';delete o.actualQty;
@@ -2587,7 +2588,7 @@ try{
  let action=null,payload={};
  if(ATLAS_BRANCH_ID==='A' && o.sentToB){
    action='send_shared_status';
-   payload={order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
+   payload={order_id:String(o.id),order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
  }else if(ATLAS_BRANCH_ID==='A' && o.sourceBranch==='B' && o.sourceOrderId){
    action='send_reverse_status';
    payload={source_order_id:o.sourceOrderId,status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
@@ -2598,7 +2599,7 @@ try{
  }else if(ATLAS_BRANCH_ID==='B' && o.sentToA && !o.sourceBranch){
    // أمر منشؤه B وتم تحويله إلى A.
    action='send_origin_status';
-   payload={order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
+   payload={order_id:String(o.id),order_no:String(no),status:'مكتمل ومجهز',actual_qty:delivered,lock_note:o.lockNote};
  }
  if(action){
    const transfer=await fetch(SUPABASE_URL+'/functions/v1/atlas-branch-transfer',{
