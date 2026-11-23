@@ -3863,12 +3863,12 @@ function isSharedReportOrder(o){
   return !!(o && (o.sentToA || o.sentToB || o.sourceBranch || o.sourceOrderId));
 }
 function reportOrderBadge(o){
-  return isSharedReportOrder(o) ? reportOrderBadge(o) : '';
+  return isSharedReportOrder(o) ? reportBranchBadge(reportOrderBranch(o)) : '';
 }
 function reportLoadBadge(l){
   const order=(data.orders||[]).find(o=>l.orderId && String(o.id)===String(l.orderId))
     || (data.orders||[]).find(o=>String(o.no)===String(l.orderNo));
-  return isSharedReportOrder(order) ? reportLoadBadge(l) : '';
+  return isSharedReportOrder(order) ? reportBranchBadge(reportLoadBranch(l)) : '';
 }
 
 function getFilteredReportOrders(){
