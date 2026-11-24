@@ -588,6 +588,25 @@ input,button,select,textarea{
   }
 }
 </style>
+<style id="atlas-arabic-sidebar-text-fix">
+/* إصلاح ظهور النص العربي في القوائم ومنع قصّ الكلمات */
+html[lang="ar"] body,html[lang="ar"] #mainApp,html[lang="ar"] #mainApp button,
+html[lang="ar"] #mainApp h1,html[lang="ar"] #mainApp h2,html[lang="ar"] #mainApp h3,
+html[lang="ar"] #mainApp label,html[lang="ar"] #mainApp small,html[lang="ar"] #mainApp span{
+ font-family:Tahoma,Arial,sans-serif!important;font-kerning:normal!important;
+ font-variant-ligatures:common-ligatures!important;letter-spacing:normal!important;word-spacing:normal!important;
+}
+#mainApp .side{display:flex!important;flex-direction:column!important;min-width:0!important}
+#mainApp .side .nav{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ align-items:stretch!important;width:100%!important;min-width:0!important;max-height:none!important;
+ overflow-y:auto!important;overflow-x:hidden!important;white-space:normal!important;gap:7px!important}
+#mainApp .side .nav button{display:block!important;flex:0 0 auto!important;width:100%!important;
+ min-width:0!important;max-width:100%!important;height:auto!important;min-height:42px!important;
+ padding:10px 12px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+ direction:rtl!important;unicode-bidi:plaintext!important;text-align:right!important;line-height:1.6!important;
+ overflow-wrap:normal!important;word-break:normal!important}
+#mainApp .side .side-logout-footer{flex:0 0 auto!important;width:100%!important;margin-top:auto!important}
+</style>
 </head>
 <body>
 
