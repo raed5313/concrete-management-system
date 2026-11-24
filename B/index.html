@@ -141,7 +141,7 @@ th{color:var(--gold)}
 .report-table .report-load-row{background:#f1f2f4;color:#333;font-size:13px}
 .report-table .report-load-row td{padding:7px}
 .report-empty{text-align:center;padding:24px!important;color:#737b84}
-.driver-stats-marquee{margin:8px 0 12px;max-height:220px;overflow-y:auto;overflow-x:hidden;white-space:normal;border:1px solid #354d59;border-radius:9px;background:linear-gradient(135deg,#101b24,#1d303b);color:#e8f7fa;padding:5px 10px;scrollbar-width:thin;overscroll-behavior:contain}
+.driver-stats-marquee{display:none!important}.driver-stats-table-scroll{max-height:360px;overflow-y:auto;overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;border:1px solid #354d59;border-radius:9px}.driver-stats-table-scroll .report-table thead th{position:sticky;top:0;z-index:2}.driver-stats-marquee{margin:8px 0 12px;max-height:220px;overflow-y:auto;overflow-x:hidden;white-space:normal;border:1px solid #354d59;border-radius:9px;background:linear-gradient(135deg,#101b24,#1d303b);color:#e8f7fa;padding:5px 10px;scrollbar-width:thin;overscroll-behavior:contain}
 .driver-stats-marquee-track{display:flex;flex-direction:column;gap:0;min-width:0;animation:none}
 .driver-stats-marquee-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 3px;border-bottom:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:500}
 .driver-stats-marquee-item:last-child{border-bottom:0}
@@ -919,7 +919,7 @@ input,button,select,textarea{
 <div class="panel" style="margin:14px 0;padding:12px">
 <div class="head"><h3>إحصائيات وتقلبات السائقين خلال الفترة</h3><div class="actions"><span class="badge" id="driverStatsLoads">0 نقلة</span><span class="badge" id="driverStatsDrivers">0 سائق</span><span class="badge" id="driverStatsQty">0.00 م³</span></div></div>
 <div id="driverStatsTicker" class="driver-stats-marquee" aria-label="قائمة أسماء السائقين المتحركة"><div class="driver-stats-marquee-track"></div></div>
-<div class="report-table-wrap"><table class="report-table"><thead><tr><th>#</th><th>اسم السائق</th><th>عدد النقلات (الحمولات)</th><th>إجمالي الكمية المنقولة</th><th>عدد الطلبات</th><th>نسبة المشاركة</th><th>تصفية</th></tr></thead><tbody id="driverStatsBody"><tr><td colspan="7" class="report-empty">جاري تحميل الإحصائيات...</td></tr></tbody></table></div>
+<div class="report-table-wrap driver-stats-table-scroll"><table class="report-table"><thead><tr><th>#</th><th>اسم السائق</th><th>عدد النقلات (الحمولات)</th><th>إجمالي الكمية المنقولة</th><th>عدد الطلبات</th><th>نسبة المشاركة</th><th>تصفية</th></tr></thead><tbody id="driverStatsBody"><tr><td colspan="7" class="report-empty">جاري تحميل الإحصائيات...</td></tr></tbody></table></div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px"><span id="driverReportFilterLabel" style="font-size:12px;color:var(--muted)">عرض جميع السائقين</span><button class="btn" type="button" onclick="clearReportDriverFilter()">إلغاء تصفية السائق</button></div>
 <input type="hidden" id="reportDriverFilter" value="">
 </div>
