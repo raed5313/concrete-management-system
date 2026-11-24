@@ -141,14 +141,13 @@ th{color:var(--gold)}
 .report-table .report-load-row{background:#f1f2f4;color:#333;font-size:13px}
 .report-table .report-load-row td{padding:7px}
 .report-empty{text-align:center;padding:24px!important;color:#737b84}
-.driver-stats-marquee{margin:8px 0 12px;overflow:hidden;white-space:nowrap;border:1px solid #354d59;border-radius:9px;background:linear-gradient(90deg,#101b24,#1d303b);color:#e8f7fa;padding:9px 0}
-.driver-stats-marquee-track{display:inline-flex;align-items:center;gap:28px;min-width:max-content;animation:atlasDriverNames 28s linear infinite}
-.driver-stats-marquee:hover .driver-stats-marquee-track{animation-play-state:paused}
-.driver-stats-marquee-item{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600}
+.driver-stats-marquee{margin:8px 0 12px;max-height:220px;overflow-y:auto;overflow-x:hidden;white-space:normal;border:1px solid #354d59;border-radius:9px;background:linear-gradient(135deg,#101b24,#1d303b);color:#e8f7fa;padding:5px 10px;scrollbar-width:thin;overscroll-behavior:contain}
+.driver-stats-marquee-track{display:flex;flex-direction:column;gap:0;min-width:0;animation:none}
+.driver-stats-marquee-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 3px;border-bottom:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:500}
+.driver-stats-marquee-item:last-child{border-bottom:0}
 .driver-stats-marquee-item b{color:#f4ca58;font-weight:500}
-.driver-stats-marquee-item em{font-style:normal;color:#61d8e8;font-size:12px}
-@keyframes atlasDriverNames{from{transform:translateX(0)}to{transform:translateX(50%)}}
-@media(prefers-reduced-motion:reduce){.driver-stats-marquee-track{animation:none;white-space:normal;flex-wrap:wrap}}
+.driver-stats-marquee-item em{font-style:normal;color:#61d8e8;font-size:12px;white-space:nowrap}
+@media(max-width:700px){.driver-stats-marquee{max-height:190px}.driver-stats-marquee-item{font-size:12px}}
 @media(max-width:700px){.report-filters{grid-template-columns:1fr 1fr}.report-filters .report-customer-filter{grid-column:1/-1}.report-search{grid-column:1/-1}.report-kpis{grid-template-columns:1fr}.report-shell{padding:8px}}
 
 /* تحسين عرض الأمر والحمولات */
@@ -3885,6 +3884,21 @@ function reportLoadBadge(l){
     || (data.orders||[]).find(o=>String(o.no)===String(l.orderNo));
   return isSharedReportOrder(order) ? reportBranchBadge(reportLoadBranch(l)) : '';
 }
+function reportLoadDateTime(value){
+  const raw=String(value||'').trim();
+  if(!raw)return '—';
+  // Keep date-only values unchanged to avoid timezone shifting.
+  const dateOnlyMatch=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(dateOnlyMatch)return dateOnlyMatch[3]+'-'+dateOnlyMatch[2]+'-'+dateOnlyMatch[1];
+  const d=new Date(raw);
+  if(!Number.isNaN(d.getTime())){
+    const pad=n=>String(n).padStart(2,'0');
+    return pad(d.getDate())+'-'+pad(d.getMonth()+1)+'-'+d.getFullYear()+' الساعة '+pad(d.getHours())+':'+pad(d.getMinutes());
+  }
+  const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  if(m)return m[3]+'-'+m[2]+'-'+m[1]+' الساعة '+m[4]+':'+m[5];
+  return raw.replace(/[TZ]|\.\d+|\+00:00/g,' ').replace(/\s+/g,' ').trim();
+}
 
 function reportLoadsForOrder(order){
   const sameNo=(data.orders||[]).filter(o=>String(o.no)===String(order.no));
@@ -3924,8 +3938,8 @@ function renderDriverStats(orders){
   if(ticker){
     const track=ticker.querySelector('.driver-stats-marquee-track');
     if(track){
-      const names=stats.rows.map(x=>'<span class="driver-stats-marquee-item"><b>'+esc(x.name)+'</b><em>'+fmt(x.loads)+' نقلة · '+fmt(x.qty.toFixed(2))+' م³</em></span>').join('');
-      track.innerHTML=names?(names+names):'<span class="driver-stats-marquee-item">لا توجد أسماء سائقين ضمن الفترة المحددة</span>';
+      const names=stats.rows.map((x,i)=>'<span class="driver-stats-marquee-item"><b>'+fmt(i+1)+'. '+esc(x.name)+'</b><em>'+fmt(x.loads)+' نقلة · '+fmt(x.qty.toFixed(2))+' م³</em></span>').join('');
+      track.innerHTML=names||'<span class="driver-stats-marquee-item">لا توجد أسماء سائقين ضمن الفترة المحددة</span>';
       ticker.style.display=stats.rows.length?'block':'none';
     }
   }
@@ -3980,7 +3994,7 @@ function printFilteredOrdersReport(){
     const total=loads.reduce((sum,l)=>sum+(Number(l.qty)||0),0);
     const orderRow='<tr class="order-row"><td class="order-no">'+reportOrderBadge(o)+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="customer">'+esc(o.customer||'—')+'<small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' m³</td><td class="qty">'+fmt(total)+' m³</td></tr>';
     const loadRows=loads.length?loads.map((l,i)=>{
-      const loadDate=l.time||l.date||'—';
+      const loadDate=reportLoadDateTime(l.time||l.date);
       return '<tr class="load-row"><td>حمولة: '+reportLoadBadge(l)+esc(l.no||i+1)+'</td><td></td><td class="driver">← '+esc(l.driver||'—')+(l.vehicle?' | '+esc(l.vehicle):'')+'</td><td>نقلة في '+esc(loadDate)+'</td><td>—</td><td class="qty">'+fmt(l.qty)+' m³</td></tr>';
     }).join(''):'<tr class="load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
     return orderRow+loadRows;
