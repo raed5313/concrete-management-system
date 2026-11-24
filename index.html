@@ -3941,13 +3941,36 @@ function renderDetailedReports(){
 }
 
 function printFilteredOrdersReport(){
-  const orders=getFilteredReportOrders();
+  const baseOrders=getFilteredReportOrders();
+  const selectedDriver=String($('reportDriverFilter')?.value||'').trim();
+  const orders=selectedDriver?baseOrders.filter(o=>reportLoadsForOrder(o).some(l=>String(l.driver||'').trim()===selectedDriver)):baseOrders;
+  const from=$('reportFrom')?.value||'',to=$('reportTo')?.value||'';
+  const period=(from||'بداية السجلات')+' — '+(to||'آخر السجلات');
   const rows=orders.map(o=>{
-    const loads=data.loads.filter(l=>String(l.orderNo)===String(o.no));
-    const total=loads.reduce((s,l)=>s+(Number(l.qty)||0),0);
-    return '<tr><td>'+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td>'+esc(o.customer||'—')+'<br>'+esc(o.site||'—')+'</td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' m³</td><td>'+fmt(total)+' m³</td></tr>'+loads.map((l,i)=>'<tr><td colspan="2">حمولة '+reportLoadBadge(l)+esc(l.no||i+1)+'</td><td>'+esc(l.driver||'—')+' / '+esc(l.vehicle||'—')+'</td><td>'+esc(l.time||dateOnly(l.date))+'</td><td colspan="2">'+fmt(l.qty)+' m³</td></tr>').join('');
+    const loads=reportLoadsForOrder(o);
+    const total=loads.reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+    const orderRow='<tr class="order-row"><td class="order-no">'+reportOrderBadge(o)+esc(o.no)+'</td><td>'+esc(dateOnly(o.date))+'</td><td class="customer">'+esc(o.customer||'—')+'<small>'+esc(o.site||'—')+'</small></td><td>'+esc(o.grade||'—')+' / '+esc(o.pour||'—')+'</td><td>'+fmt(o.qty)+' m³</td><td class="qty">'+fmt(total)+' m³</td></tr>';
+    const loadRows=loads.length?loads.map((l,i)=>{
+      const loadDate=l.time||l.date||'—';
+      return '<tr class="load-row"><td>حمولة: '+esc(l.no||i+1)+'</td><td></td><td class="driver">← '+esc(l.driver||'—')+(l.vehicle?' | '+esc(l.vehicle):'')+'</td><td>نقلة في '+esc(loadDate)+'</td><td>—</td><td class="qty">'+fmt(l.qty)+' m³</td></tr>';
+    }).join(''):'<tr class="load-row"><td colspan="6">لا توجد حمولات مسجلة لهذا الأمر</td></tr>';
+    return orderRow+loadRows;
   }).join('');
-  printDocA4('تقرير أوامر التجهيز', '<div class="r"><div class="head"><h2>شركة أطلس للكونكريت للكونكريت الجاهز</h2><div class="en">ATLAS CONCRETE</div></div><div class="title">تقرير أوامر التجهيز والحمولات</div><table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>الزبون / الموقع</th><th>المواصفة / الصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+rows+'</tbody></table></div>');
+  const stats=reportDriverStats(baseOrders);
+  const statsRows=stats.rows.map((x,i)=>{
+    const pct=stats.totalQty>0?x.qty/stats.totalQty*100:0;
+    return '<tr><td>'+fmt(i+1)+'</td><td>'+esc(x.name)+'</td><td>'+fmt(x.loads)+'</td><td>'+fmt(x.qty.toFixed(2))+' m³</td><td>'+fmt(x.orders.size)+'</td><td>'+pct.toFixed(1)+'%</td></tr>';
+  }).join('');
+  const w=window.open('','_blank','width=1200,height=900');
+  if(!w){toast('اسمح بالنوافذ المنبثقة للطباعة');return;}
+  const brand=atlasDocumentBrand();
+  w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تفاصيل أوامر التجهيز والحمولات المنفذة — ATLAS</title><style>'+
+  '@page{size:A4 landscape;margin:8mm}*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.atlas-doc-brand{text-align:center;margin:0 auto 3mm}.atlas-doc-brand-line{display:flex;align-items:center;justify-content:center;gap:3mm}.atlas-doc-brand-line img{max-width:62mm;max-height:19mm;object-fit:contain}.atlas-doc-brand-line .atlas-system-symbol{display:inline-flex;align-items:center;justify-content:center;width:8mm;height:8mm;border:1px solid #b28a29;border-radius:2mm;background:#f5d77d;color:#17130a;font-size:16pt;font-weight:900}.atlas-doc-tagline{font-size:7px;font-weight:bold;color:#8a681c}.report-title{text-align:right;font-weight:bold;font-size:13px;margin:3mm 0 2mm}.period{text-align:left;font-size:9px;margin:0 0 2mm}.data{width:100%;border-collapse:collapse;table-layout:fixed}.data th,.data td{border:1px solid #777;padding:5px 4px;text-align:center;vertical-align:middle;overflow-wrap:anywhere}.data th{font-weight:bold;background:#eee;font-size:9px}.data td{font-size:9px}.data th:nth-child(1){width:10%}.data th:nth-child(2){width:10%}.data th:nth-child(3){width:31%}.data th:nth-child(4){width:21%}.data th:nth-child(5){width:12%}.data th:nth-child(6){width:16%}.order-row{break-after:avoid;page-break-after:avoid}.order-row td{background:#f1f1f1;font-weight:bold}.order-row .customer{text-align:right}.customer small{display:block;font-size:8px;font-weight:normal;margin-top:2px}.load-row td{font-weight:normal;background:#fff}.load-row .driver{text-align:right}.load-row td:first-child{white-space:nowrap}.qty{font-weight:bold;white-space:nowrap}.branch-badge{display:inline-block;margin-left:3px}.stats{margin-top:7mm;break-inside:avoid}.stats h3{font-size:11px;margin:0 0 2mm}.stats table{width:100%;border-collapse:collapse}.stats th,.stats td{border:1px solid #777;padding:5px;text-align:center;font-size:9px}.stats th{background:#eee}.empty{text-align:center;padding:10px!important}.footer{margin-top:4mm;text-align:center;font-size:8px;color:#555}@media print{thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}}'+
+  '</style></head><body>'+brand+'<div class="report-title">تفاصيل أوامر التجهيز والحمولات المنفذة</div><div class="period">الفترة: '+esc(period)+(selectedDriver?' | السائق: '+esc(selectedDriver):'')+'</div>'+
+  '<table class="data"><thead><tr><th>رقم الأمر</th><th>التاريخ</th><th>اسم الزبون والموقع / تفاصيل الحمولات</th><th>المواصفة والصب</th><th>المطلوب</th><th>المجهز</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">لا توجد أوامر مطابقة للفترة المحددة</td></tr>')+'</tbody></table>'+
+  '<section class="stats"><h3>إحصائيات وتقلبات السائقين خلال الفترة</h3><table><thead><tr><th>#</th><th>اسم السائق</th><th>عدد النقلات</th><th>إجمالي الكمية المنقولة</th><th>عدد الطلبات</th><th>نسبة المشاركة</th></tr></thead><tbody>'+(statsRows||'<tr><td colspan="6">لا توجد حمولات مرتبطة بسائقين</td></tr>')+'</tbody></table></section>'+
+  '<div class="footer">ATLAS — أطلس للكونكريت الجاهز</div><script>window.onload=function(){setTimeout(function(){window.print();},350)};<\\/script></body></html>');
+  w.document.close();
 }
 
 function printVehicleCostReport(){
