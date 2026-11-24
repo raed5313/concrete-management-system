@@ -3914,7 +3914,7 @@ function renderDriverStats(orders){
   const body=$('driverStatsBody');if(!body)return;
   body.innerHTML=stats.rows.length?stats.rows.map((x,i)=>{
     const pct=stats.totalQty>0?(x.qty/stats.totalQty*100):0;
-    return '<tr><td>'+fmt(i+1)+'</td><td><b>'+esc(x.name)+'</b></td><td><span class="badge">'+fmt(x.loads)+' نقلة</span></td><td class="report-actual">'+fmt(x.qty.toFixed(2))+' م³</td><td>'+fmt(x.orders.size)+' طلبية</td><td><div style="display:flex;align-items:center;gap:7px;min-width:90px"><span>'+pct.toFixed(1)+'%</span><span style="height:8px;flex:1;background:var(--line);border-radius:10px;overflow:hidden"><i style="display:block;height:100%;width:'+pct.toFixed(1)+'%;background:var(--cyan);border-radius:10px"></i></span></div></td><td><button class="btn small" type="button" onclick="filterReportsByDriver(\''+esc(x.name).replace(/'/g,"&#39;")+'\')">تصفية</button></td></tr>';
+    return '<tr><td>'+fmt(i+1)+'</td><td><b>'+esc(x.name)+'</b></td><td><span class="badge">'+fmt(x.loads)+' نقلة</span></td><td class="report-actual">'+fmt(x.qty.toFixed(2))+' م³</td><td>'+fmt(x.orders.size)+' طلبية</td><td><div style="display:flex;align-items:center;gap:7px;min-width:90px"><span>'+pct.toFixed(1)+'%</span><span style="height:8px;flex:1;background:var(--line);border-radius:10px;overflow:hidden"><i style="display:block;height:100%;width:'+pct.toFixed(1)+'%;background:var(--cyan);border-radius:10px"></i></span></div></td><td><button class="btn small" type="button" onclick="filterReportsByDriver(this.dataset.driver)" data-driver="'+esc(x.name)+'">تصفية</button></td></tr>';
   }).join(''):'<tr><td colspan="7" class="report-empty">لا توجد حمولات مرتبطة بسائقين في الفترة المحددة</td></tr>';
 }
 function getFilteredReportOrders(){
