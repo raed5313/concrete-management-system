@@ -28,6 +28,7 @@ button{cursor:pointer}
 .login-card button{width:100%;background:#147d77;color:white;border:none;border-radius:8px;padding:12px;font-weight:bold;margin-top:10px}
 .login-error{color:#ff8791;font-size:12px;text-align:center;margin-top:10px}
 
+ .side-logout-footer{flex:0 0 auto;margin-top:auto;padding-top:9px;background:#0d151c;position:sticky;bottom:0;z-index:8}.side-logout-footer button{display:block;width:100%;padding:10px 12px;border:1px solid #8b3543;border-radius:9px;background:linear-gradient(135deg,#351a22,#54212b);color:#ffd9de;font-size:13px;font-weight:700;text-align:center;cursor:pointer}.side-logout-footer button:active{transform:translateY(1px);filter:brightness(1.15)}
 /* التطبيق الرئيسي */
 .app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
 .side{background:#0d151c;padding:14px;border-left:1px solid var(--line)}
@@ -662,6 +663,7 @@ input,button,select,textarea{
 </div>
 
 <nav class="nav" id="nav"></nav>
+<div class="side-logout-footer"><button type="button" onclick="logout()">↪ تسجيل الخروج</button></div>
 </aside>
 
 <main class="main">
