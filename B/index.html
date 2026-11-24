@@ -1023,8 +1023,7 @@ input,button,select,textarea{
 </div>
 <div id="toast" class="toast"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>if (!window.supabase) { document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"><\\/script>'); }</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;var fallback=document.createElement('script');fallback.src='https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js';fallback.onerror=function(){var e=document.getElementById('loginError');if(e)e.textContent='تعذر تحميل خدمة تسجيل الدخول. تحقق من الاتصال ثم أعد تحميل الصفحة.';};document.head.appendChild(fallback);"></script>
 <script>
 'use strict';
 
