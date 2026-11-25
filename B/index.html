@@ -444,6 +444,31 @@ body.plant-role .side .nav{gap:2px!important}
 @media(max-width:800px){.atlas-brand-mark .atlas-full-logo{width:min(100%,125px)!important}.atlas-system-symbol{width:29px;height:29px;font-size:20px}}
 
 #atlasBranchMarker{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;z-index:10001;background:#3a2c0b;color:#ffe08a;border:1px solid #d5a638;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:900;letter-spacing:.3px;box-shadow:0 3px 12px #0008;pointer-events:none}
+
+
+/* ATLAS: improve number legibility on grey display cards without bolding */
+.app .stat strong,
+.app .detail strong,
+.app .report-kpi strong,
+.app .atlas-payroll-field span,
+.app .panel .number,
+.app .panel .amount,
+.app .panel .total,
+.app .panel [class*="value"],
+.app .panel [class*="amount"],
+.app .panel [class*="total"]{
+  color:#101b2a!important;
+  font-weight:500!important;
+  font-size:16px!important;
+  font-variant-numeric:tabular-nums lining-nums!important;
+  text-shadow:0 0 .01px currentColor!important;
+}
+.app .atlas-payroll-field.atlas-payroll-net span{
+  color:#075b43!important;
+  font-weight:500!important;
+  font-size:17px!important;
+}
+
 </style>
 <style id="ATLAS-LOGO-CACHE-FIX">
 /* تثبيت عرض شعار أطلس الذهبي في الواجهة وشاشة الدخول والطباعة */
