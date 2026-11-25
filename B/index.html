@@ -887,6 +887,8 @@ input,button,select,textarea{
 <div class="actions"><button class="btn primary" onclick="openWalletTransaction()">＋ حركة مالية</button><button class="btn gold" onclick="openWalletAccount()">＋ إضافة حساب</button></div>
 </div>
 <div id="walletAccounts" class="details"></div>
+<div class="head" style="margin-top:18px"><h3>تفاصيل الصرف والدفعات</h3><span class="muted">دفعات الموردين والمصروفات والغرامات والمكافآت</span></div>
+<div class="tablewrap"><table style="min-width:560px"><thead><tr><th>نوع الحركة</th><th>الاسم</th><th>الوقت</th><th>المبلغ</th><th>التاريخ</th></tr></thead><tbody id="walletDetailTransactions"></tbody></table></div>
 <div class="head" style="margin-top:18px"><h3>سجل الحركات المالية</h3></div>
 <div class="tablewrap"><table><thead><tr><th>رقم الحركة</th><th>التاريخ</th><th>النوع</th><th>من حساب</th><th>إلى حساب</th><th>المبلغ</th><th>البيان</th><th>الحالة</th></tr></thead><tbody id="walletTransactions"></tbody></table></div>
 <p class="muted" style="margin-top:12px">الحساب المصرفي وMastercard ظاهران كحسابات داخلية تجريبية لحين إتمام الربط مع مزود دفع مرخّص. لا تُدخل أرقام بطاقات أو كلمات مرور أو رموز تحقق هنا.</p>
@@ -1999,6 +2001,23 @@ function renderWallet(){
  const names=Object.fromEntries(accounts.map(a=>[a.id,a.name]));
  const types={income:'إيراد',expense:'مصروف',deposit:'إيداع',withdrawal:'سحب',transfer:'تحويل',adjustment:'تسوية'};
  $('walletTransactions').innerHTML=txs.length?txs.map(t=>'<tr><td>'+esc(t.transaction_no)+'</td><td>'+esc(new Date(t.created_at).toLocaleString('ar-IQ'))+'</td><td>'+esc(types[t.transaction_type]||t.transaction_type)+'</td><td>'+esc(names[t.from_account_id]||'—')+'</td><td>'+esc(names[t.to_account_id]||'—')+'</td><td>'+fmt(t.amount)+' د.ع</td><td>'+esc(t.description)+'</td><td>'+esc(t.status==='posted'?'مرحّلة':t.status)+'</td></tr>').join(''):'<tr><td colspan="8">لا توجد حركات مالية مسجلة بعد</td></tr>';
+ renderWalletDetails();
+}
+function renderWalletDetails(){
+ const body=$('walletDetailTransactions');if(!body)return;
+ const entries=[];
+ const add=(kind,name,amount,date,createdAt,detail)=>{
+  const value=Number(amount||0);if(!Number.isFinite(value)||value<=0)return;
+  const stamp=createdAt||'';
+  const time=stamp?new Date(stamp).toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'}):'—';
+  entries.push({kind,name:name||'—',time,amount:value,date:date||(stamp?String(stamp).slice(0,10):'—'),detail:detail||'',sort:stamp?new Date(stamp).getTime():0});
+ };
+ (data.supplier_payments||[]).forEach(x=>add('دفعة مورد',x.supplier,x.amount,x.date,x.created_at,x.method||''));
+ (data.expenses||[]).forEach(x=>add('مصروف',x.title||x.notes,x.amount,x.date,x.created_at,x.notes||''));
+ (data.fines||[]).forEach(x=>add('غرامة موظف',x.employee,x.amount,x.date,x.created_at,x.reason||''));
+ (data.bonuses||[]).forEach(x=>add('مكافأة موظف',x.employee,x.amount,x.date,x.created_at,x.reason||''));
+ entries.sort((a,b)=>b.sort-a.sort);
+ body.innerHTML=entries.length?entries.map(x=>'<tr><td><strong>'+esc(x.kind)+'</strong>'+(x.detail?'<small style="display:block;color:#71818b">'+esc(x.detail)+'</small>':'')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.time)+'</td><td><strong>'+fmt(x.amount)+' د.ع</strong></td><td>'+esc(x.date)+'</td></tr>').join(''):'<tr><td colspan="5">لا توجد دفعات أو مصروفات أو غرامات أو مكافآت مسجلة بعد</td></tr>';
 }
 function openWalletAccount(){
  if(!['manager','accountant'].includes(currentRole))return;
@@ -3169,6 +3188,7 @@ openForm('تسجيل مصروف تشغيلي',[
 {name:'notes',label:'ملاحظات',type:'textarea'}
 ],async v=>{
 v.id = Date.now();
+v.created_at = new Date().toISOString();
 data.expenses.push(v);
 logAction(currentUserName, 'تسجيل مصروف', `${v.title}: ${v.amount}`);
 if(!await save()){data.expenses.pop();data.audit.shift();render();return;}
