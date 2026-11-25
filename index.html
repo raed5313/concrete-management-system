@@ -539,6 +539,23 @@ body.plant-role .side .nav{gap:2px!important}
 }
 .app #ordersBody .atlas-order-actions .actions button[onclick*="editOrderMix"]::before{content:none!important;display:none!important}
 
+
+/* Restore labeled action buttons in each load card, matching order cards */
+.app #ordersBody .atlas-load-row>.atlas-load-print,
+.app #ordersBody .atlas-load-row>.atlas-load-edit,
+.app #ordersBody .atlas-load-row>.atlas-load-delete{
+ flex:0 0 auto!important;width:auto!important;min-width:66px!important;
+ height:31px!important;padding:4px 8px!important;margin:0 2px!important;
+ border:1px solid currentColor!important;border-radius:7px!important;
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ gap:4px!important;background:rgba(10,18,26,.72)!important;
+ font-size:12px!important;font-weight:600!important;line-height:1.2!important;
+ white-space:nowrap!important;cursor:pointer!important;
+}
+.app #ordersBody .atlas-load-row>.atlas-load-print{color:#42d8e8!important}
+.app #ordersBody .atlas-load-row>.atlas-load-edit{color:#f5c65a!important}
+.app #ordersBody .atlas-load-row>.atlas-load-delete{color:#ff6675!important}
+
 </style>
 <style id="ATLAS-LOGO-CACHE-FIX">
 /* تثبيت عرض شعار أطلس الذهبي في الواجهة وشاشة الدخول والطباعة */
@@ -2325,8 +2342,8 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <span class="atlas-load-vehicle" style="position:relative;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;white-space:nowrap"><strong>${(()=>{const m=String(l.vehicle||'').match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'—';})()}</strong>${isSharedOrder ? (isBBranchLoad(l) ? '<small style="color:#176b35;background:#e7f5eb;border:1px solid #26934b;border-radius:4px;padding:1px 4px;font-size:12px;font-weight:1000;line-height:1">B</small>' : '<small style="color:#d71920;background:#fff0f0;border:1px solid #d71920;border-radius:4px;padding:1px 4px;font-size:12px;font-weight:1000;line-height:1">A</small>') : ''}</span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty"><bdi dir="ltr">${(Number(l.qty)||0).toFixed(3)}</bdi></strong>
- <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️</button>
- ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">×</button>` : ''}
+ <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨️ طباعة</button>
+ ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')">✎ تعديل</button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')">× حذف</button>` : ''}
 </div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
 <div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''}</div>
 ${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-register-load" title="تسجيل حمولة" aria-label="تسجيل حمولة" onclick="openLoad('${esc(o.no)}','${esc(o.id)}')">🚚 تسجيل حمولة</button>` : ''}
