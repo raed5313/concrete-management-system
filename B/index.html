@@ -2196,7 +2196,7 @@ return `
  ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}','${esc(o.id)}')">🔒</button>` : ''}
  <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
  ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
- ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
+ ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.id)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></div></div>
 </td>
 </tr>
@@ -3030,20 +3030,32 @@ await save();closeModal();toast('تم تعديل الأمر وحفظه مركز�
 );
 }
 
-async function delOrder(no){
-if(currentRole!=='manager' && !(currentRole==='accountant' && ['drivers','vehicles'].includes(k))){toast('الحذف متاح للمدير فقط في هذا القسم');return;}
+async function delOrder(orderId){
+if(currentRole!=='manager'){toast('حذف أوامر التجهيز متاح للمدير فقط');return;}
 if(!confirm('حذف الأمر وحمولاته؟'))return;
-const order=data.orders.find(x=>String(x.no)===String(no));if(!order)return;
+const order=data.orders.find(x=>String(x.id)===String(orderId));
+if(!order){toast('لم يتم العثور على أمر التجهيز');return;}
 try{
-if(order.id){
-const {error:le}=await supabaseClient.from('loads').delete().eq('orderId',order.id);if(le)throw le;
-const {error:oe}=await supabaseClient.from('concrete_orders').delete().eq('id',order.id);if(oe)throw oe;
+  if(!order.id) throw new Error('معرّف الأمر غير موجود؛ لم يتم تنفيذ الحذف');
+  const {data:deletedLoads,error:le}=await supabaseClient.from('loads').delete().eq('orderId',order.id).select('id');
+  if(le)throw le;
+  const {data:deletedOrders,error:oe}=await supabaseClient.from('concrete_orders').delete().eq('id',order.id).select('id');
+  if(oe)throw oe;
+  if(!Array.isArray(deletedOrders)||deletedOrders.length!==1){
+    const {data:stillThere,error:checkError}=await supabaseClient.from('concrete_orders').select('id').eq('id',order.id).maybeSingle();
+    if(checkError)throw checkError;
+    if(stillThere) throw new Error('رفضت قاعدة البيانات حذف الأمر. تحقق من صلاحية المدير والفرع المرتبط بالحساب');
+    if(!deletedOrders||deletedOrders.length===0) throw new Error('لم تؤكد قاعدة البيانات حذف الأمر؛ أعد تحميل الصفحة للتحقق');
+  }
+  data.orders=data.orders.filter(x=>String(x.id)!==String(order.id));
+  data.loads=data.loads.filter(x=>String(x.orderId)!==String(order.id));
+  logAction(currentUserName,'حذف أمر تجهيز','رقم الأمر: '+order.no);
+  render();
+  toast('تم حذف الأمر وحمولاته نهائياً');
+}catch(err){
+  console.error('Delete order failed:',err);
+  toast('لم يتم حذف الأمر: '+(err.message||'تحقق من الاتصال والصلاحيات'));
 }
-data.orders=data.orders.filter(x=>String(x.no)!==String(no));
-data.loads=data.loads.filter(x=>String(x.orderNo)!==String(no));
-logAction(currentUserName,'حذف أمر تجهيز','رقم الأمر: '+no);
-await save();toast('تم حذف الأمر وحمولاته من قاعدة البيانات');
-}catch(err){console.error(err);toast('تعذر حذف الأمر: '+(err.message||''));}
 }
 async function editLoad(id){
  if(!['manager','plant','operator'].includes(currentRole)){toast('تعديل الحمولة متاح للمدير ومشغل المعمل فقط');return;}
