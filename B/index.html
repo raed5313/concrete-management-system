@@ -4800,6 +4800,32 @@ body{background:#ffffff!important}
 @media(max-width:850px){.app .atlas-payroll-card{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.app .atlas-payroll-card{grid-template-columns:1fr 1fr}.app .atlas-payroll-field{padding:9px}}
 
+
+/* Payroll details remain in the original side-by-side reading order */
+.app .atlas-payroll-card{
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(115px,1fr))!important;
+  grid-auto-flow:row!important;
+  align-items:stretch!important;
+  gap:0!important;
+}
+.app .atlas-payroll-field{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  min-width:0!important;
+  text-align:right!important;
+  white-space:normal!important;
+}
+.app .atlas-payroll-actions{grid-column:1/-1!important}
+@media(max-width:1050px){
+  .app .atlas-payroll-card{grid-template-columns:repeat(4,minmax(110px,1fr))!important}
+}
+@media(max-width:650px){
+  .app .atlas-payroll-card{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
 </style>
 </body>
 </html>
