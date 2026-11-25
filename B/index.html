@@ -2364,8 +2364,9 @@ ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
  <span class="atlas-load-seq">${index+1}</span>
  
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
- <span class="atlas-load-vehicle" style="position:relative;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:0;white-space:nowrap"><strong>${(()=>{const raw=String(l.vehicle||'').trim();const side=raw.match(/M\\s*[-#:]?\\s*\\d+\\s*[-/#|–]\\s*(\\d+)/i);if(side&&side[1])return 'M'+side[1];const single=raw.match(/M\\s*[-#:]?\\s*(\\d+)/i);return single?'M'+single[1]:'—';})()}</strong></span>
- ${isSharedOrder ? '<small class="atlas-load-source" style="flex:0 0 auto;font-size:12px;font-weight:1000;white-space:nowrap;color:' + (isBBranchLoad(l) ? "#16813a" : "#d71920") + '">' + (isBBranchLoad(l) ? "B" : "A") + '</small>' : ''}
+ <span class="atlas-load-vehicle" style="display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;flex:0 0 auto!important;min-width:52px;height:25px;box-sizing:border-box;padding:2px 6px;border-radius:6px;background:#e5ebf1;border:1px solid #aebdca;white-space:nowrap;direction:ltr">
+ ${isSharedOrder ? '<b style="font-size:11px;font-weight:1000;color:' + (isBBranchLoad(l) ? "#16813a" : "#d71920") + '">' + (isBBranchLoad(l) ? "B" : "A") + '</b>' : ''}
+ <strong style="font-size:12px;font-weight:900;color:#263746">${(()=>{const raw=String(l.vehicle||'').trim();const side=raw.match(/M\\s*[-#:]?\\s*\\d+\\s*[-/#|–]\\s*(\\d+)/i);if(side&&side[1])return 'M'+side[1];const single=raw.match(/M\\s*[-#:]?\\s*(\\d+)/i);return single?'M'+single[1]:'M—';})()}</strong></span>
  <span class="atlas-load-spacer"></span>
  <strong class="atlas-load-qty"><bdi dir="ltr">${(Number(l.qty)||0).toFixed(3)}</bdi></strong>
  <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨</button>
