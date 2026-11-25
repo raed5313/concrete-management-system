@@ -1421,17 +1421,26 @@ if(mixesResult.error) throw new Error('الخلطات: ' + (mixesResult.error.me
 
       // تذكّر آخر أمر تم استلامه على هذا الجهاز حتى لا تضيع نافذة التنبيه بعد إغلاق الموقع أو إعادة تحميله.
       // عند أول تشغيل فقط نضع خط أساس، ثم نعرض أحدث أمر وصل أثناء غياب المعمل.
-      if (currentRole === 'plant' && freshOrders.length) {
+      if (currentRole === 'plant') {
         const markerKey = 'atlas-plant-last-order-no-' + ATLAS_BRANCH_ID;
-        const latestNo = Math.max(...freshOrders.map(o => Number(o.no) || 0));
-        let lastNotifiedNo = 0;
-        try { lastNotifiedNo = Number(localStorage.getItem(markerKey) || 0); } catch(e) {}
-        if (lastNotifiedNo > 0 && latestNo > lastNotifiedNo) {
-          const pendingOrders = freshOrders.filter(o => (Number(o.no) || 0) > lastNotifiedNo);
-          const newestPending = pendingOrders[pendingOrders.length - 1];
-          if (newestPending) triggerPlantAlert(newestPending);
+        const latestNo = Math.max(0, ...freshOrders.map(o => Number(o.no) || 0));
+        let storedMarker = null;
+        try {
+          const savedMarker = localStorage.getItem(markerKey);
+          if (savedMarker !== null) storedMarker = Number(savedMarker) || 0;
+        } catch(e) {}
+        if (storedMarker === null) {
+          // أول تشغيل: اعتماد الموجود كخط أساس، حتى لا نعرض أوامر قديمة.
+          // نحفظ الصفر أيضاً إذا لم توجد أوامر، كي لا يضيع أول أمر يصل لاحقاً.
+          try { localStorage.setItem(markerKey, String(latestNo)); } catch(e) {}
+        } else {
+          if (latestNo > storedMarker) {
+            const pendingOrders = freshOrders.filter(o => (Number(o.no) || 0) > storedMarker);
+            const newestPending = pendingOrders[pendingOrders.length - 1];
+            if (newestPending) triggerPlantAlert(newestPending);
+          }
+          try { localStorage.setItem(markerKey, String(Math.max(storedMarker, latestNo))); } catch(e) {}
         }
-        try { localStorage.setItem(markerKey, String(Math.max(lastNotifiedNo, latestNo))); } catch(e) {}
       }
       const previouslyKnownOrderIds = window.sadaKnownOrderIds;
       if (currentRole === 'plant' && previouslyKnownOrderIds) {
