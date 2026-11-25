@@ -4655,6 +4655,42 @@ body{background:#ffffff!important}
 /* تكبير أسماء السائقين في بطاقة الحمولات بخط عادي */
 #orders #ordersBody .atlas-load-driver{font-size:13px!important;font-weight:400!important}
 @media(max-width:800px){#orders #ordersBody .atlas-load-driver{font-size:12px!important;font-weight:400!important}}
+
+/* ATLAS light workspace: keep the login identity and order/load card colors unchanged */
+.app{background:#f4f6f8!important;color:#202b36!important}
+.app .main{background:#f4f6f8!important;color:#202b36!important}
+.app .side{background:#fff!important;color:#202b36!important;border-color:#d8e0e7!important}
+.app .brand,.app .panel,.app .stat,.app .user-info,.app .detail,
+.app .report-shell,.app .report-filters,.app .report-kpi,
+.app .driver-stats-table-scroll,.app .tablewrap{
+  background:#fff!important;color:#202b36!important;border-color:#d8e0e7!important;
+}
+.app .report-kpi{box-shadow:0 2px 8px rgba(25,45,65,.08)!important}
+.app .report-kpi span{color:#64748b!important}
+.app .report-kpi strong{color:#167f91!important}
+.app .report-filters label,.app .report-filters input{color:#202b36!important}
+.app .report-filters input,.app .field input,.app .field select,.app .field textarea{
+  background:#fff!important;color:#202b36!important;border-color:#cbd5df!important;
+}
+.app .field label{color:#526171!important}
+.app .user-info{box-shadow:0 1px 4px rgba(20,40,60,.06)!important}
+.app .nav button{background:#eef7f8!important;color:#176b75!important;border-color:#b8dfe3!important}
+.app .nav button.active{background:#d9f0f2!important;color:#124f58!important}
+.app td,.app th{color:#273746;border-bottom-color:#e1e7ed}
+.app .tablewrap table{background:#fff}
+.app .tablewrap thead th{background:#edf2f6;color:#263746}
+.app .loadbox{background:#fff;color:#202b36;border:1px solid #d8e0e7}
+.app .detail{background:#fff!important}
+.app .report-table .report-main-row{background:#fff!important;color:#202b36!important}
+.app .report-table .report-main-row td{background:#fff!important;color:#202b36!important;border-color:#d9dde1!important}
+.app .driver-stats-marquee{background:#fff!important;color:#202b36!important;border-color:#d8e0e7!important}
+.app .driver-stats-marquee-item b{color:#9a6b12!important}
+.app .driver-stats-marquee-item em{color:#167f91!important}
+/* Preserve the established special colors for order cards and their load cards */
+.app #orders #ordersBody tr.order-card.order-open{background:#fff!important}
+.app #orders #ordersBody tr.order-card.order-locked{background:#fff0a6!important}
+.app #orders #ordersBody tr.order-card.order-invoiced{background:#075b2e!important}
+
 </style>
 </body>
 </html>
