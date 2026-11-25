@@ -1993,20 +1993,27 @@ function renderWallet(){
  renderWalletDetails();
 }
 function renderWalletDetails(){
- const body=$('walletDetailTransactions');if(!body)return;
- const entries=[];
- const add=(kind,name,amount,date,createdAt,detail)=>{
-  const value=Number(amount||0);if(!Number.isFinite(value)||value<=0)return;
-  const stamp=createdAt||'';
-  const time=stamp?new Date(stamp).toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'}):'—';
-  entries.push({kind,name:name||'—',time,amount:value,date:date||(stamp?String(stamp).slice(0,10):'—'),detail:detail||'',sort:stamp?new Date(stamp).getTime():0});
- };
- (data.supplier_payments||[]).forEach(x=>add('دفعة مورد',x.supplier,x.amount,x.date,x.created_at,x.method||''));
- (data.expenses||[]).forEach(x=>add('مصروف',x.title||x.notes,x.amount,x.date,x.created_at,x.notes||''));
- (data.fines||[]).forEach(x=>add('غرامة موظف',x.employee,x.amount,x.date,x.created_at,x.reason||''));
- (data.bonuses||[]).forEach(x=>add('مكافأة موظف',x.employee,x.amount,x.date,x.created_at,x.reason||''));
- entries.sort((a,b)=>b.sort-a.sort);
- body.innerHTML=entries.length?entries.map(x=>'<tr><td><strong>'+esc(x.kind)+'</strong>'+(x.detail?'<small style="display:block;color:#71818b">'+esc(x.detail)+'</small>':'')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.time)+'</td><td><strong>'+fmt(x.amount)+' د.ع</strong></td><td>'+esc(x.date)+'</td></tr>').join(''):'<tr><td colspan="5">لا توجد دفعات أو مصروفات أو غرامات أو مكافآت مسجلة بعد</td></tr>';
+  const body=$('walletDetailTransactions');if(!body)return;
+  const entries=[];
+  const add=(kind,name,amount,date,createdAt,detail)=>{
+   const value=Number(amount||0);if(!Number.isFinite(value)||value<=0)return;
+   const stamp=createdAt||'';
+   const parsed=stamp?new Date(stamp):null;
+   const time=parsed&&!Number.isNaN(parsed.getTime())?parsed.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'}):'—';
+   const shownDate=date||(parsed&&!Number.isNaN(parsed.getTime())?parsed.toISOString().slice(0,10):'—');
+   entries.push({kind,name:name||'—',time,amount:value,date:shownDate,detail:detail||'',sort:parsed&&!Number.isNaN(parsed.getTime())?parsed.getTime():0});
+  };
+  (data.supplier_payments||[]).forEach(x=>add('دفعة مورد',x.supplier,x.amount,x.date,x.created_at,x.method||x.notes||''));
+  (data.expenses||[]).forEach(x=>add('مصروف',x.title||x.notes,x.amount,x.date,x.created_at,x.notes||''));
+  (data.fines||[]).forEach(x=>add('غرامة موظف',x.employee,x.amount,x.date,x.created_at,x.reason||x.notes||''));
+  (data.bonuses||[]).forEach(x=>add('مكافأة موظف',x.employee,x.amount,x.date,x.created_at,x.reason||x.notes||''));
+  (data.advances||[]).forEach(x=>add('سلفة موظف',x.employee,x.amount,x.date,x.created_at,'المتبقي: '+fmt(x.remaining??(Number(x.amount||0)-Number(x.deducted||0)))+' د.ع'));
+  (data.payroll||[]).forEach(x=>add('راتب موظف',x.employee,x.paid,x.date,x.created_at,'شهر الراتب: '+(x.month||'—')));
+  (data.invoices||[]).forEach(x=>add('فاتورة مبيعات',x.customer,x.total,x.date,x.created_at,'رقم الفاتورة: '+(x.no||'—')+' — المدفوع: '+fmt(x.paid||0)+' — المتبقي: '+fmt(x.remaining??(Number(x.total||0)-Number(x.paid||0)-Number(x.discount||0)))));
+  (data.receipts||[]).forEach(x=>add('سند قبض',x.customer,x.amount,x.date,x.created_at,'رقم السند: '+(x.no||'—')+(x.method?' — '+x.method:'')+(x.notes?' — '+x.notes:'')));
+  (data.purchases||[]).forEach(x=>add('مشتريات',x.supplier||x.item,x.total||Number(x.quantity||0)*Number(x.unit_price||0),x.date,x.created_at,(x.supplier?'المادة: '+(x.item||'—')+' — ':'')+'الكمية: '+(x.quantity??'—')));
+  entries.sort((a,b)=>b.sort-a.sort);
+  body.innerHTML=entries.length?entries.map(x=>'<tr><td><strong>'+esc(x.kind)+'</strong>'+(x.detail?'<small style="display:block;color:#71818b">'+esc(x.detail)+'</small>':'')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.time)+'</td><td><strong>'+fmt(x.amount)+' د.ع</strong></td><td>'+esc(x.date)+'</td></tr>').join(''):'<tr><td colspan="5">لا توجد حركات مالية مسجلة بعد</td></tr>';
 }
 function openWalletAccount(){
  if(!['manager','accountant'].includes(currentRole))return;
@@ -3113,6 +3120,8 @@ openForm('إصدار فاتورة مبيعات',[
 {name:'discount',label:'الخصم',type:'number',value:0}
 ],async v=>{
 v.no = data.nextInvNo++;
+v.date = new Date().toISOString().slice(0,10);
+v.created_at = new Date().toISOString();
 v.remaining = Number(v.total) - Number(v.paid) - Number(v.discount||0);
 data.invoices.push(v);
 logAction(currentUserName, 'إصدار فاتورة', `رقم الفاتورة: ${v.no}`);
@@ -3139,6 +3148,7 @@ v.orderTotal=orderTotal;
 v.orderSite=order.site||'';
 v.orderQty=deliveredQty;
 v.no = data.nextRecNo++;
+v.created_at = new Date().toISOString();
 v.date = new Date().toISOString().slice(0,10);
 data.receipts.push(v);
 logAction(currentUserName, 'سند قبض', `مبلغ: ${v.amount} من العميل ${v.customer} للأمر ${v.orderNo}`);
