@@ -2351,6 +2351,7 @@ return `
 ${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
 <div class="atlas-load-row">
  <span class="atlas-load-seq">${index+1}</span>
+ ${isSharedOrder ? '<small class="atlas-load-source" style="flex:0 0 auto;font-size:11px;font-weight:900;white-space:nowrap;color:' + (isBBranchLoad(l) ? "#16813a" : "#d71920") + '">جهزت من ' + (isBBranchLoad(l) ? "B" : "A") + '</small>' : ''}
  <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
  <span class="atlas-load-vehicle" style="position:relative;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:0;white-space:nowrap"><strong>${(()=>{const raw=String(l.vehicle||'').trim();const side=raw.match(/M\\s*[-#:]?\\s*\\d+\\s*[-/#|–]\\s*(\\d+)/i);if(side&&side[1])return 'M'+side[1];const single=raw.match(/M\\s*[-#:]?\\s*(\\d+)/i);return single?'M'+single[1]:'—';})()}</strong></span>
  <span class="atlas-load-spacer"></span>
