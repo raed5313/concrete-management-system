@@ -4826,6 +4826,40 @@ body{background:#ffffff!important}
   .app .atlas-payroll-card{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+
+/* ATLAS neutral grey cards across the workspace; order and load cards stay as designed */
+.app .panel,
+.app .stat,
+.app .detail,
+.app .report-shell,
+.app .report-filters,
+.app .report-kpi,
+.app .driver-stats-table-scroll,
+.app .tablewrap,
+.app .user-info,
+.app .atlas-payroll-card,
+.app .atlas-payroll-actions{
+  background:#e7e9ed!important;
+  color:#26313d!important;
+  border-color:#cbd0d8!important;
+}
+.app .panel h1,.app .panel h2,.app .panel h3,
+.app .stat strong,.app .detail strong,
+.app .atlas-payroll-field span{color:#26313d!important}
+.app .stat span,.app .report-kpi span,
+.app .atlas-payroll-field strong{color:#5c6876!important}
+.app .atlas-payroll-field{border-color:#cbd0d8!important}
+.app .atlas-payroll-field.atlas-payroll-net{background:#dcebe5!important}
+.app .atlas-payroll-field.atlas-payroll-net span{color:#087b58!important}
+/* Explicitly preserve order/load presentation */
+.app #orders #ordersBody tr.order-card,
+.app #orders #ordersBody tr.order-card td,
+.app #orders .loadbox,
+.app #orders .load-card,
+.app .order-card,
+.app .loadbox,
+.app .load-card{background:initial}
+
 </style>
 </body>
 </html>
