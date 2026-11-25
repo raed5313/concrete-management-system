@@ -3493,7 +3493,9 @@ try{
 }
 
 function atlasDocumentBrand(){
- return '<div class="atlas-doc-brand"><div class="atlas-doc-brand-line"><img src="'+location.origin+location.pathname.replace(/[^/]*$/,'')+'assets/atlas-logo.svg?v=25" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز النظام B">B</span></div><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE · BRANCH B</div></div>';
+ const logoUrl=location.origin+location.pathname.replace(/[^/]*$/,'')+'assets/atlas-logo.svg?v=25';
+ const watermark='<style id="atlas-document-watermark-20261125">body{background-color:#fff!important;background-image:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),url("'+logoUrl+'")!important;background-position:center center,center center!important;background-repeat:no-repeat!important;background-size:100% 100%,72% auto!important;background-attachment:fixed!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@media print{body{background-image:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),url("'+logoUrl+'")!important;background-position:center center,center center!important;background-repeat:no-repeat!important;background-size:100% 100%,72% auto!important;background-attachment:fixed!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}</style>';
+ return watermark+'<div class="atlas-doc-brand"><div class="atlas-doc-brand-line"><img src="'+logoUrl+'" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز النظام B">B</span></div><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE · BRANCH B</div></div>';
 }
 
 function atlasManagerSignatureHTML(){
