@@ -2392,7 +2392,7 @@ const isSharedOrder=!!(o.sentToA||o.sentToB||(['A','B'].includes(o.sourceBranch)
 return `<tr>
 <td>${esc(l.no)}</td>
 <td>${esc(l.orderNo)}</td>
-<td>${isSharedOrder ? `<b style="${isBBranchLoad(l)?'color:#176b35':'color:#d71920'}">جهزت من ${isBBranchLoad(l)?'B':'A'}</b> ` : ''}${esc(o.customer||'—')}</td>
+<td>${isSharedOrder ? `<b style="${isBBranchLoad(l)?'color:#16813a!important':'color:#d71920!important'};-webkit-text-fill-color:${isBBranchLoad(l)?'#16813a':'#d71920'}">جهزت من ${isBBranchLoad(l)?'B':'A'}</b> ` : ''}${esc(o.customer||'—')}</td>
 <td>${esc(l.driver||'—')}</td>
 <td>${esc(l.vehicle||'—')}</td>
 <td><bdi dir="ltr">${(Number(l.qty)||0).toFixed(3)}</bdi></td>
