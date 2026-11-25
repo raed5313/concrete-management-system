@@ -3931,6 +3931,26 @@ font-size:0!important;line-height:1!important;overflow:visible!important}
 #orders #ordersBody .atlas-load-list .atlas-load-row>button.atlas-load-edit{color:#f5c65a!important}
 #orders #ordersBody .atlas-load-list .atlas-load-row>button.atlas-load-delete{color:#ff6675!important}
 </style>
+
+<style id="atlas-load-buttons-zero-gap-2026">
+#orders #ordersBody .atlas-load-row{
+  gap:0!important;column-gap:0!important;justify-content:flex-start!important;
+}
+#orders #ordersBody .atlas-load-row>button.atlas-load-print,
+#orders #ordersBody .atlas-load-row>button.atlas-load-edit,
+#orders #ordersBody .atlas-load-row>button.atlas-load-delete,
+#orders #ordersBody .atlas-load-row>button.atlas-load-print+button,
+#orders #ordersBody .atlas-load-row>button.atlas-load-edit+button{
+  margin:0!important;padding:0!important;gap:0!important;
+  width:18px!important;min-width:18px!important;max-width:18px!important;
+  flex:0 0 18px!important;height:20px!important;min-height:20px!important;
+  border:0!important;
+}
+#orders #ordersBody .atlas-load-row>button.atlas-load-print+button,
+#orders #ordersBody .atlas-load-row>button.atlas-load-edit+button{
+  margin-inline-start:0!important;margin-inline-end:0!important;
+}
+</style>
 </body></html>`);
 w.document.close();
 }
