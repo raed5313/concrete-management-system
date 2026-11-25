@@ -2342,10 +2342,15 @@ function renderOperationalTables(canManage){
   const body=$(type+'Body'); if(!body)return;
   const fields=type==='payroll'?[...operationalConfig[type].fields,['present_days','أيام الحضور'],['absent_days','أيام الغياب'],['base_salary','أجور الحضور'],['bonuses_total','المكافآت'],['advances_deducted','السلف المستقطعة'],['fines_total','الغرامات'],['net_due','صافي المستحق'],['remaining','المتبقي']]:operationalConfig[type].fields;
   body.innerHTML=tableRows(data[type]||[],r=>{
-   const cells=fields.map(([key])=>'<td>'+esc(r[key]??'—')+'</td>').join('');
    const actions=canManage
-    ? (type==='suppliers' ? '<button class="btn gold" onclick="printSupplierStatement(\''+esc(r.name)+'\')">كشف حساب</button> ' : '') + '<button class="btn" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
-    : '<button class="btn gold" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>';
+    ? (type==='suppliers' ? '<button class="btn gold" title="كشف حساب" aria-label="كشف حساب" onclick="printSupplierStatement(\''+esc(r.name)+'\')">كشف حساب</button> ' : '') + '<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">تعديل</button> <button class="btn danger" title="حذف" aria-label="حذف" onclick="deleteOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">حذف</button> <button class="btn gold" title="طباعة" aria-label="طباعة" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>'
+    : '<button class="btn gold" title="طباعة" aria-label="طباعة" onclick="printOperationalRecord(\''+type+'\',\''+esc(r.id)+'\')">طباعة</button>';
+   if(type==='payroll'){
+    const cardFields=[['التاريخ',r.date],['الموظف',r.employee],['الشهر',r.month],['أيام الحضور',r.present_days],['أيام الغياب',r.absent_days],['الراتب الأساسي',r.base_salary],['المكافآت',r.bonuses_total],['السلف المستقطعة',r.advances_deducted],['الغرامات',r.fines_total],['صافي المستحق',r.net_due],['المبلغ المستلم',r.paid],['المتبقي',r.remaining],['ملاحظات',r.notes]];
+    const card=cardFields.map(([label,value])=>'<div class="atlas-payroll-field '+(label==='صافي المستحق'?'atlas-payroll-net':'')+'"><strong>'+esc(label)+'</strong><span>'+esc(value??'—')+(String(label).includes('راتب')||['المكافآت','السلف المستقطعة','الغرامات','صافي المستحق','المبلغ المستلم','المتبقي'].includes(label)?' د.ع':'')+'</span></div>').join('');
+    return '<tr class="atlas-payroll-row"><td colspan="'+(fields.length+1)+'"><article class="atlas-payroll-card">'+card+'<div class="atlas-payroll-actions">'+actions+'</div></article></td></tr>';
+   }
+   const cells=fields.map(([key])=>'<td>'+esc(r[key]??'—')+'</td>').join('');
    return '<tr>'+cells+'<td><div class="actions">'+actions+'</div></td></tr>';
   },fields.length+1);
  });
@@ -4754,6 +4759,46 @@ body{background:#ffffff!important}
 .app .side .side-logout-footer button{
   box-shadow:0 0 10px rgba(222,72,104,.12)!important;
 }
+
+
+/* ATLAS compact icon-only action controls across all modules */
+.app button[onclick*="print" i],
+.app button[onclick*="edit" i],
+.app button[onclick*="delete" i],
+.app button[onclick*="del" i],
+.app button[onclick*="remove" i]{
+  width:32px!important;min-width:32px!important;height:30px!important;
+  min-height:30px!important;padding:0!important;margin:1px 2px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  font-size:0!important;line-height:1!important;vertical-align:middle!important;
+  border-radius:7px!important;gap:0!important;
+}
+.app button[onclick*="print" i]::before{content:"🖨";font-size:15px!important}
+.app button[onclick*="edit" i]::before{content:"✎";font-size:19px!important;font-weight:900}
+.app button[onclick*="delete" i]::before,
+.app button[onclick*="del" i]::before,
+.app button[onclick*="remove" i]::before{content:"✕";font-size:16px!important;font-weight:900}
+.app .atlas-payroll-card{
+  display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:0;
+  background:#fff;border:1px solid #d9e1e8;border-radius:12px;
+  overflow:hidden;box-shadow:0 2px 8px rgba(24,45,65,.06);margin:7px 0;
+}
+.app .atlas-payroll-field{
+  display:flex;flex-direction:column;gap:6px;padding:11px 13px;
+  border-bottom:1px solid #e7ecf1;border-left:1px solid #e7ecf1;
+  min-width:0;text-align:right;
+}
+.app .atlas-payroll-field strong{font-size:11px;color:#667789;font-weight:700}
+.app .atlas-payroll-field span{font-size:14px;color:#202b36;font-weight:800;overflow-wrap:anywhere}
+.app .atlas-payroll-field.atlas-payroll-net{background:#f0f7f5}
+.app .atlas-payroll-field.atlas-payroll-net span{color:#087b58;font-size:16px}
+.app .atlas-payroll-actions{
+  grid-column:1/-1;display:flex;align-items:center;justify-content:flex-start;
+  gap:7px;padding:9px 12px;background:#f7f9fb;border-top:1px solid #e3e9ef;
+}
+.app #payrollBody>tr>td{padding:4px!important;border-bottom:0!important}
+@media(max-width:850px){.app .atlas-payroll-card{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.app .atlas-payroll-card{grid-template-columns:1fr 1fr}.app .atlas-payroll-field{padding:9px}}
 
 </style>
 </body>
