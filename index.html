@@ -755,6 +755,19 @@ input,button,select,textarea{
  }
 }
 </style>
+
+<style id="atlas-load-card-status-colors">
+/* خلفية بطاقة الحمولات تتبع لون حالة أمر التجهيز، مع إبقاء صفوف الحمولات الداكنة كما هي */
+#orders #ordersBody tr.order-card.order-open + tr.order-load-row .order-loadbox.atlas-load-list{
+ background:#f8dce5!important;color:#61283b!important;border:1px solid #e7b8c7!important;
+}
+#orders #ordersBody tr.order-card.order-locked + tr.order-load-row .order-loadbox.atlas-load-list{
+ background:#fff2b8!important;color:#594600!important;border:1px solid #e6cf72!important;
+}
+#orders #ordersBody tr.order-card.order-invoiced + tr.order-load-row .order-loadbox.atlas-load-list{
+ background:#d9f2df!important;color:#174b2b!important;border:1px solid #a9d8b4!important;
+}
+</style>
 </head>
 <body>
 
