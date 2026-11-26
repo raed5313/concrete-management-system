@@ -4049,13 +4049,23 @@ font-size:0!important;line-height:1!important;overflow:visible!important}
 </style>
 
 <style id="atlas-load-list-total-separator">
-/* خط فاصل واضح بين قائمة النقلات والكمية المتراكمة */
-#orders #ordersBody .atlas-load-list > .atlas-load-total{
+/* فاصل ظاهر فعلياً أسفل قائمة النقلات وفوق الكمية المتراكمة */
+#orders #ordersBody .order-loadbox.atlas-load-list .atlas-load-rows{
+ display:flex!important;
+ flex-direction:column!important;
+ width:100%!important;
+ box-sizing:border-box!important;
+ padding-bottom:9px!important;
+ margin-bottom:8px!important;
+ border-bottom:2px solid #c5cbd2!important;
+ box-shadow:0 2px 0 rgba(0,0,0,.22)!important;
+}
+#orders #ordersBody .order-loadbox.atlas-load-list > .atlas-load-total{
  display:flex!important;
  box-sizing:border-box!important;
  width:100%!important;
- border-top:2px solid #aeb7c2!important;
- margin:9px 0 0!important;
+ border-top:2px solid #c5cbd2!important;
+ margin:0!important;
  padding:9px 5px 3px!important;
 }
 </style>
