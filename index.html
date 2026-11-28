@@ -5645,3 +5645,49 @@ body{background:#ffffff!important}
 }
 </style>
 </html>
+
+
+<style id="atlas-order-actual-amount-load-refinement-20261128">
+/* إبراز الكمية الفعلية قليلاً داخل بطاقة أمر التجهيز */
+#orders #ordersBody .atlas-order-qty .atlas-order-actual{
+  font-size:17px!important;
+  line-height:1.4!important;
+}
+/* تصغير المبلغ النهائي قليلاً */
+#orders #ordersBody .atlas-order-price .order-final-amount{
+  font-size:13px!important;
+  line-height:1.35!important;
+}
+/* تصغير بطاقة الحمولات بدرجة بسيطة إضافية */
+#orders #ordersBody .atlas-load-list{padding:3px!important}
+#orders #ordersBody .atlas-load-heading{
+  min-height:25px!important;padding:1px 4px!important;
+}
+#orders #ordersBody .atlas-load-heading strong{font-size:13px!important}
+#orders #ordersBody .atlas-load-row{
+  min-height:31px!important;padding:1px 5px!important;gap:5px!important;
+}
+#orders #ordersBody .atlas-load-seq{font-size:10px!important}
+#orders #ordersBody .atlas-load-driver{font-size:10px!important}
+#orders #ordersBody .atlas-load-vehicle{
+  padding:2px 5px!important;font-size:9px!important;min-width:33px!important;
+}
+#orders #ordersBody .atlas-load-row>strong.atlas-load-qty,
+#orders #ordersBody .atlas-load-row>strong.atlas-load-qty bdi{
+  font-size:12px!important;
+}
+#orders #ordersBody .atlas-load-total{padding:1px 0 3px!important}
+#orders #ordersBody .atlas-load-total strong{font-size:16px!important}
+#orders #ordersBody .atlas-load-list .atlas-register-load{
+  min-height:25px!important;padding:2px 6px!important;font-size:11px!important;
+}
+@media(max-width:520px){
+  #orders #ordersBody .atlas-order-qty .atlas-order-actual{font-size:16px!important}
+  #orders #ordersBody .atlas-order-price .order-final-amount{font-size:12px!important}
+  #orders #ordersBody .atlas-load-row{min-height:29px!important}
+  #orders #ordersBody .atlas-load-driver{font-size:9px!important}
+  #orders #ordersBody .atlas-load-row>strong.atlas-load-qty,
+  #orders #ordersBody .atlas-load-row>strong.atlas-load-qty bdi{font-size:11px!important}
+}
+</style>
+</html>
