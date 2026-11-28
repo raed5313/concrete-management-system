@@ -2908,26 +2908,23 @@ async function openLoad(no, orderId) {
         return;
     }
 
-    // الأوامر المتبادلة بين المعملين تتطلب حفظ خلطة خاصة بالمعمل الحالي قبل أول حمولة.
-    const isTransferredOrder = !!(o.sentToA || o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId));
-    if (isTransferredOrder) {
-        try {
-            const {data: savedMix, error: mixCheckError} = await supabaseClient
-                .from('concrete_order_mix_recipes')
-                .select('id')
-                .eq('branch_id', ATLAS_BRANCH_ID)
-                .eq('order_no', String(o.no))
-                .maybeSingle();
-            if (mixCheckError) throw mixCheckError;
-            if (!savedMix) {
-                toast('لا يمكن تسجيل الحمولة قبل تعديل الخلطة وحفظ مكوناتها لهذا الأمر');
-                return;
-            }
-        } catch (mixCheckError) {
-            console.error('ATLAS required mix check:', mixCheckError);
-            toast('تعذر التحقق من الخلطة؛ لا يمكن تسجيل الحمولة حالياً');
+    // جميع أوامر التجهيز، المشتركة وغير المشتركة، تتطلب حفظ خلطة خاصة بالمعمل الحالي قبل أول حمولة.
+    try {
+        const {data: savedMix, error: mixCheckError} = await supabaseClient
+            .from('concrete_order_mix_recipes')
+            .select('id')
+            .eq('branch_id', ATLAS_BRANCH_ID)
+            .eq('order_no', String(o.no))
+            .maybeSingle();
+        if (mixCheckError) throw mixCheckError;
+        if (!savedMix) {
+            toast('لا يمكن تسجيل الحمولة قبل تعديل الخلطة وحفظ مكوناتها لهذا الأمر');
             return;
         }
+    } catch (mixCheckError) {
+        console.error('ATLAS required mix check:', mixCheckError);
+        toast('تعذر التحقق من الخلطة؛ لا يمكن تسجيل الحمولة حالياً');
+        return;
     }
 
     // لا نؤخر فتح النافذة بانتظار الشبكة؛ القوائم الحالية تظهر فوراً،
