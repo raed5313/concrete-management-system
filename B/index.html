@@ -5525,3 +5525,31 @@ body{background:#ffffff!important}
  }
 }
 </style>
+
+
+<style id="atlas-shared-order-sky-background-20261128">
+/* خلفية سماوية لبطاقة أمر التجهيز المشترك فقط مع إبقاء بطاقة الحمولات الداكنة */
+#orders #ordersBody tr.order-card.shared-order-card,
+#orders #ordersBody tr.order-card.shared-order-card>td.atlas-order-cell,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-layout,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-admixture,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-actions{
+ background:#dff1ff!important;
+ color:#263746!important;
+ border-color:#a9d5f2!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field strong,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-admixture strong{
+ color:#263746!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-field small,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-admixture small,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-actions>small{
+ color:#52738b!important;
+}
+/* لا تغيّر لون بطاقة الحمولات السوداء داخل الأمر المشترك */
+#orders #ordersBody tr.order-card.shared-order-card .atlas-load-list{
+ background:#202329!important;color:#f4f5f6!important;
+}
+</style>
