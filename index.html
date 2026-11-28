@@ -888,6 +888,13 @@ input,button,select,textarea{
 <button type="button" class="btn" onclick="window.print()">▣ طباعة</button>
 <button type="button" class="btn" onclick="clearOrdersFilters()">مسح</button>
 </div>
+<div class="atlas-order-color-legend" aria-label="دلالة ألوان أوامر التجهيز">
+  <span class="atlas-legend-title">دلالة الألوان:</span>
+  <span class="atlas-legend-item"><i class="atlas-legend-swatch atlas-legend-pink"></i> قيد التجهيز / قيد العمل</span>
+  <span class="atlas-legend-item"><i class="atlas-legend-swatch atlas-legend-yellow"></i> مقفل 🔒</span>
+  <span class="atlas-legend-item"><i class="atlas-legend-swatch atlas-legend-green"></i> مرحّل الفاتورة</span>
+  <span class="atlas-legend-item"><i class="atlas-legend-swatch atlas-legend-blue"></i> أمر مشترك بين المعملين</span>
+</div>
 <div class="tablewrap">
 <table>
 <thead><tr><th>رقم</th><th>التاريخ</th><th>الحالة</th><th>العميل</th><th>رقم الهاتف</th><th>الموقع</th><th>الصب</th><th>m³ (تقديري / فعلي)</th><th>الإجراءات</th></tr></thead>
@@ -5834,5 +5841,27 @@ body{background:#ffffff!important}
 #orders #ordersBody tr.order-card.order-invoiced .atlas-order-field small,
 #orders #ordersBody tr.order-card.order-invoiced .atlas-order-actions>small{
   color:#103b19!important;
+}
+</style>
+
+
+<style id="atlas-order-color-legend-20261128">
+/* دلالة ألوان بطاقات أوامر التجهيز في نظام ATLAS */
+#orders .atlas-order-color-legend{
+ display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:8px 15px;
+ margin:10px 0 12px;padding:10px 12px;background:#f7f9fb;
+ border:1px solid #dce3e9;border-radius:9px;color:#17212b;
+ direction:rtl;font-size:12px;font-weight:700;line-height:1.5
+}
+#orders .atlas-legend-title{color:#111827;font-weight:900}
+#orders .atlas-legend-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+#orders .atlas-legend-swatch{display:inline-block;flex:0 0 15px;width:15px;height:15px;border-radius:4px;border:1px solid rgba(0,0,0,.18)}
+#orders .atlas-legend-pink{background:#f8dce5;border-color:#e7b8c7}
+#orders .atlas-legend-yellow{background:#fff2b8;border-color:#e6cf72}
+#orders .atlas-legend-green{background:#39e75f;border-color:#20bd46}
+#orders .atlas-legend-blue{background:#d9efff;border-color:#9bcdf0}
+@media(max-width:600px){
+ #orders .atlas-order-color-legend{gap:7px 11px;padding:9px;font-size:11px}
+ #orders .atlas-legend-swatch{flex-basis:13px;width:13px;height:13px}
 }
 </style>
