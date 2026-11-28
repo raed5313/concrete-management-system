@@ -3509,7 +3509,9 @@ try{
 function atlasDocumentBrand(){
  const logoUrl=location.origin+location.pathname.replace(/[^/]*$/,'')+'assets/atlas-logo.svg?v=25';
  const watermark='<style id="atlas-document-watermark-print-20261125">.atlas-print-watermark{display:block!important;position:fixed!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:72%!important;max-width:145mm!important;height:auto!important;max-height:78%!important;object-fit:contain!important;opacity:.075!important;z-index:0!important;pointer-events:none!important}.r{position:relative!important;isolation:isolate!important}.r>*:not(.atlas-print-watermark){position:relative;z-index:1}@media print{.atlas-print-watermark{position:fixed!important;opacity:.075!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}</style><img class="atlas-print-watermark" src="'+logoUrl+'" alt="" aria-hidden="true">';
- return watermark+'<div class="atlas-doc-brand"><div class="atlas-doc-brand-line"><img src="'+logoUrl+'" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز النظام B">B</span></div><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE · BRANCH B</div></div>';
+ const branchLetter = ATLAS_BRANCH_ID === 'B' ? 'B' : 'A';
+ const branchColor = branchLetter === 'B' ? '#16813a' : '#d71920';
+ return watermark+'<div class="atlas-doc-brand"><div class="atlas-doc-brand-line"><img src="'+logoUrl+'" alt="ATLAS أطلس للكونكريت"><span class="atlas-system-symbol" aria-label="رمز المعمل '+branchLetter+'" style="color:'+branchColor+'">'+branchLetter+'</span></div><div class="atlas-doc-tagline">شركة أطلس للكونكريت الجاهز · ATLAS CONCRETE · BRANCH B</div></div>';
 }
 function atlasManagerSignatureHTML(){
  return '<div class="atlas-manager-signature" style="display:flex;justify-content:flex-end;margin:24mm 8mm 0;page-break-inside:avoid;break-inside:avoid;text-align:center;font-family:Tahoma,Arial,sans-serif;font-size:12px;font-weight:700;color:#111"><div style="min-width:58mm">توقيع المدير<br><br><span style="display:block;border-bottom:1px solid #333;height:8mm"></span></div></div>';
@@ -3529,6 +3531,7 @@ body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0;padding:0;backgroun
  .atlas-doc-brand-line{display:flex;align-items:center;justify-content:center;gap:3mm}
  .atlas-doc-brand-line img{display:block;width:auto;max-width:72%;max-height:35mm;height:auto;object-fit:contain;margin:0}
  .atlas-doc-brand-line .atlas-system-symbol{display:inline-flex;align-items:center;justify-content:center;width:9mm;height:9mm;flex:0 0 9mm;border:1px solid #b28a29;border-radius:2mm;background:#f5d77d;color:#17130a;font-family:Arial,sans-serif;font-size:18pt;font-weight:900;line-height:1;box-shadow:none}
+ .atlas-doc-brand-line .atlas-system-symbol{width:auto!important;height:auto!important;min-width:0!important;flex:0 0 auto!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;background-image:none!important;font-size:11pt!important;font-weight:800!important;line-height:1!important;box-shadow:none!important}
  .atlas-doc-brand svg{display:block;width:min(100%,142mm);height:27mm;margin:auto;filter:drop-shadow(0 2px 2px #0008)}
  .atlas-doc-tagline{font-size:7px;font-weight:900;letter-spacing:.6px;color:#f0d17a;text-shadow:0 1px 2px #000} .atlas-signatures{display:flex;align-items:flex-start;justify-content:space-between;gap:18mm;width:100%;margin-top:22mm!important;padding-top:3mm;border-top:0!important;font-size:10px;font-weight:800;break-inside:avoid;flex-shrink:0}.atlas-signature{display:flex;flex-direction:column;align-items:center;gap:8mm;min-width:48mm;text-align:center}.atlas-signature span{display:inline-block;min-width:48mm;text-align:center;color:#333;letter-spacing:1px}
  .r>.head{display:none!important}
@@ -5354,6 +5357,13 @@ body{background:#ffffff!important}
  color:#202329!important;
  -webkit-text-fill-color:#202329!important;
  font-weight:500!important;
+}
+</style>
+<style id="atlas-register-load-button-smaller-20261128">
+#orders #ordersBody .atlas-load-container .atlas-load-list .atlas-register-load{
+ min-height:23px!important;height:23px!important;padding:1px 6px!important;
+ margin:3px 0 0!important;font-size:11px!important;line-height:1.15!important;
+ font-weight:700!important;border-radius:5px!important
 }
 </style>
 </body>
