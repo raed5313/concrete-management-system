@@ -2334,15 +2334,15 @@ let canPrintOnly = isAccountant;
 return `
 <tr class="${stateClass} order-card ${isSharedOrder ? "shared-order-card" : ""}">
 <td colspan="11" class="atlas-order-cell">
- ${layout}
+ 
  <div class="atlas-load-container">
-  ${loads}
+  
  </div>
  <div class="atlas-order-admixture">
   <small>نوع المضاف</small>
   <strong>${esc(o.admixture_type||'—')}</strong>
  </div>
- ${actions}
+ 
 </td>
 </tr>`;
 },8
