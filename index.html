@@ -2373,7 +2373,7 @@ ${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-register-loa
  ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
  ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}','${esc(o.id)}')">🔒</button>` : ''}
  <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
- ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
+ ${!canPrintOnly && canManageOrder ? '<button class="btn primary atlas-mix-edit-btn" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">☰</button>' : ''}
  ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.id)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
 </div></div>
 
@@ -5864,4 +5864,10 @@ body{background:#ffffff!important}
  #orders .atlas-order-color-legend{gap:7px 11px;padding:9px;font-size:11px}
  #orders .atlas-legend-swatch{flex-basis:13px;width:13px;height:13px}
 }
+</style>
+
+
+<style id="atlas-load-header-hide-mix-menu-20261128">
+#orders #ordersBody .atlas-load-container .atlas-load-list .atlas-load-heading{display:none!important}
+#orders #ordersBody .atlas-order-actions .atlas-mix-edit-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important;padding:0!important;margin:0 2px!important;border-radius:6px!important;font-size:19px!important;line-height:1!important;font-weight:900!important}
 </style>
