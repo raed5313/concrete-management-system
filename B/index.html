@@ -2919,6 +2919,28 @@ async function openLoad(no, orderId) {
         return;
     }
 
+    // الأوامر المتبادلة بين المعملين تتطلب حفظ خلطة خاصة بالمعمل الحالي قبل أول حمولة.
+    const isTransferredOrder = !!(o.sentToA || o.sentToB || (['A','B'].includes(o.sourceBranch) && o.sourceOrderId));
+    if (isTransferredOrder) {
+        try {
+            const {data: savedMix, error: mixCheckError} = await supabaseClient
+                .from('concrete_order_mix_recipes')
+                .select('id')
+                .eq('branch_id', ATLAS_BRANCH_ID)
+                .eq('order_no', String(o.no))
+                .maybeSingle();
+            if (mixCheckError) throw mixCheckError;
+            if (!savedMix) {
+                toast('لا يمكن تسجيل الحمولة قبل تعديل الخلطة وحفظ مكوناتها لهذا الأمر');
+                return;
+            }
+        } catch (mixCheckError) {
+            console.error('ATLAS required mix check:', mixCheckError);
+            toast('تعذر التحقق من الخلطة؛ لا يمكن تسجيل الحمولة حالياً');
+            return;
+        }
+    }
+
     // لا نؤخر فتح النافذة بانتظار الشبكة؛ القوائم الحالية تظهر فوراً،
     // ويجري تحديثها بالخلفية حتى تبقى لوحة المفاتيح سريعة الاستجابة.
     try {
@@ -5881,4 +5903,9 @@ body{background:#ffffff!important}
 <style id="atlas-load-header-hide-mix-menu-20261128">
 #orders #ordersBody .atlas-load-container .atlas-load-list .atlas-load-heading{display:none!important}
 #orders #ordersBody .atlas-order-actions .atlas-mix-edit-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important;padding:0!important;margin:0 2px!important;border-radius:6px!important;font-size:19px!important;line-height:1!important;font-weight:900!important}
+</style>
+
+
+<style id="atlas-shared-order-recipe-required-20261128">
+/* إظهار زر تسجيل الحمولة بشكل طبيعي؛ المنع الفعلي يتم قبل فتح نموذج التسجيل */
 </style>
