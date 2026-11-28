@@ -5545,44 +5545,30 @@ body{background:#ffffff!important}
 
 
 <style id="atlas-order-cards-slightly-compact-20261128">
-/* حجم خط بطاقة أمر التجهيز مطابق تقريباً للصورة المرجعية */
-#orders #ordersBody tr.order-card>td.atlas-order-cell{
-  font-size:16px!important;
+/* إعادة حجم بطاقة أمر التجهيز إلى الحجم السابق قبل المطابقة مع الصورة */
+#orders #ordersBody tr.order-card{
+  border-radius:8px!important;
 }
-#orders #ordersBody .atlas-order-field{
-  padding:7px 10px!important;
+#orders #ordersBody tr.order-card>td:not(.order-load-cell){
+  padding:4px 5px!important;
+  min-height:20px!important;
+  line-height:1.12!important;
+  font-size:8.5px!important;
 }
-#orders #ordersBody .atlas-order-field small,
-#orders #ordersBody .atlas-order-actions>small{
-  font-size:15px!important;
-  line-height:1.35!important;
+#orders #ordersBody tr.order-card>td:not(.order-load-cell):before{
+  font-size:8.2px!important;
 }
-#orders #ordersBody .atlas-order-field strong{
-  font-size:20px!important;
-  line-height:1.45!important;
+#orders #ordersBody .atlas-order-admixture{
+  min-height:68px!important;
+  padding:9px 12px!important;
+  gap:4px!important;
 }
-#orders #ordersBody .atlas-order-customer strong{
-  font-size:24px!important;
-  line-height:1.45!important;
-}
-#orders #ordersBody .atlas-order-customer span{
-  font-size:17px!important;
-}
-#orders #ordersBody .atlas-order-no strong{
-  font-size:22px!important;
-}
-#orders #ordersBody .atlas-order-admixture small{font-size:15px!important}
-#orders #ordersBody .atlas-order-admixture strong{font-size:19px!important}
+#orders #ordersBody .atlas-order-admixture small{font-size:11px!important}
+#orders #ordersBody .atlas-order-admixture strong{font-size:13px!important}
 #orders #ordersBody .atlas-order-actions{
+  min-height:64px!important;
   padding:8px 12px 10px!important;
-}
-@media(max-width:520px){
-  #orders #ordersBody .atlas-order-field small,
-  #orders #ordersBody .atlas-order-actions>small{font-size:13px!important}
-  #orders #ordersBody .atlas-order-field strong{font-size:17px!important}
-  #orders #ordersBody .atlas-order-customer strong{font-size:21px!important}
-  #orders #ordersBody .atlas-order-customer span{font-size:14px!important}
-  #orders #ordersBody .atlas-order-no strong{font-size:19px!important}
+  gap:5px!important;
 }
 </style>
 
