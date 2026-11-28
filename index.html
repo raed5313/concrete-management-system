@@ -5458,23 +5458,31 @@ body{background:#ffffff!important}
 
 
 <style id="atlas-load-list-total-separator-live-20261128">
-/* فاصل فعلي ظاهر بين صفوف الحمولات والكمية الفعلية */
+/* فاصل رفيع بين قائمة الحمولات والكمية الفعلية */
 #orders #ordersBody .atlas-load-container .atlas-load-list .atlas-load-rows{
-  display:flex!important;
-  flex-direction:column!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  border-bottom:3px solid #c5cbd2!important;
-  padding-bottom:10px!important;
-  margin-bottom:0!important;
+  display:flex!important;flex-direction:column!important;width:100%!important;
+  box-sizing:border-box!important;border-bottom:0!important;
+  padding-bottom:0!important;margin-bottom:0!important;
 }
 #orders #ordersBody .atlas-load-container .atlas-load-list .atlas-load-total{
-  display:flex!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  border-top:3px solid #c5cbd2!important;
-  margin-top:0!important;
-  padding:10px 6px 4px!important;
+  display:flex!important;width:100%!important;box-sizing:border-box!important;
+  border-top:1px solid #aeb7c2!important;
+  margin-top:5px!important;padding:7px 6px 4px!important;
+}
+/* زر تسجيل الحمولة يمتد بعرض بطاقة الحمولات مع توهج سماوي خفيف */
+#orders #ordersBody .atlas-load-container .atlas-load-list .atlas-register-load{
+  display:block!important;width:100%!important;max-width:none!important;
+  min-height:34px!important;box-sizing:border-box!important;
+  margin:4px 0 0!important;padding:5px 10px!important;
+  border:1px solid #42d8e8!important;border-radius:6px!important;
+  background:linear-gradient(180deg,#26343b 0%,#202329 100%)!important;
+  color:#55e4f2!important;
+  box-shadow:0 0 5px rgba(66,216,232,.28),inset 0 0 4px rgba(66,216,232,.12)!important;
+  text-shadow:0 0 4px rgba(66,216,232,.35)!important;
+  font-size:14px!important;font-weight:900!important;
+}
+#orders #ordersBody .atlas-load-container .atlas-load-list .atlas-register-load:active{
+  box-shadow:0 0 7px rgba(66,216,232,.42),inset 0 0 5px rgba(66,216,232,.2)!important;
 }
 </style>
 
