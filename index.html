@@ -2323,51 +2323,17 @@ let canPrintOnly = isAccountant;
 return `
 <tr class="${stateClass} order-card ${isSharedOrder ? "shared-order-card" : ""}">
 <td colspan="11" class="atlas-order-cell">
- <div class="atlas-order-layout">
-  <div class="atlas-order-field atlas-order-no"><small>رقم الأمر</small><strong>${isSharedOrder ? (o.sourceBranch === 'B' ? '<span style="color:#16813a;font-size:27px;font-weight:1000;line-height:1">B</span>/' : '<span style="color:#e00020;font-size:27px;font-weight:1000;line-height:1">A</span>/') : ""}${esc(String(o.no).replace(/^B-/,""))}</strong>${o.sourceBranch === "A" && o.sourceOrderId ? '<span style="display:inline-block;color:#e00020;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع A</span>' : o.sourceBranch === "B" && o.sourceOrderId ? '<span style="display:inline-block;color:#16813a;font-size:13px;font-weight:900;margin-top:4px">مرسل من فرع B</span>' : ""}</div>
-  <div class="atlas-order-field atlas-order-date"><small>التاريخ</small><strong>${esc(dateOnly(o.date))}</strong></div>
-  <div class="atlas-order-field atlas-order-customer"><small>اسم الزبون</small><strong>${esc(o.customer)}</strong><span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-weight:900"><span aria-hidden="true">📲📞</span><b dir="ltr">${esc(formatOrderPhone(o.phone)||"—")}</b></span></div>
-  <div class="atlas-order-field atlas-order-site"><small>العنوان</small><strong>${esc(o.site)}</strong></div>
-  <div class="atlas-order-field atlas-order-pour"><small>نوع الصب</small><strong>${esc(o.pour)}</strong></div>
-  <div class="atlas-order-field atlas-order-grade"><small>المقاومة / المواصفة</small><strong>${esc(o.grade||'—')}</strong></div>
-  <div class="atlas-order-field atlas-order-qty"><small>الكمية التقديرية</small><strong><bdi dir="ltr">${fmt(o.qty)}&nbsp;&nbsp;m³</bdi></strong>${o.actualQty?`<span class="atlas-order-actual"><bdi dir="ltr">${fmt(o.actualQty)}&nbsp;&nbsp;m³</bdi> فعلي</span>`:''}</div>
-  <div class="atlas-order-field atlas-order-price"><small>السعر الكلي / سعر المتر</small><strong>${fmt(o.price||0)} د.ع</strong>${isOrderClosed ? `<b class="order-final-amount">المبلغ النهائي: ${fmt((Number(o.actualQty)||totalLoadQty)*(Number(o.price)||0))} د.ع</b>` : ""}</div>
-  <div class="atlas-order-field atlas-order-status"><small>الحالة</small><strong>${statusBadge}</strong>${isSharedOrder && isOrderClosed && (o.sourceBranch === "B" ? (qtyA + qtyB > 0) : qtyB > 0) ? `<div style="margin-top:4px;color:#176b35;font-size:11px;font-weight:900;line-height:1.45">${o.sourceBranch === "B" ? (qtyA > 0 ? (qtyB > 0 ? "تم اكمال تجهيزه من معمل A" : "تم تجهيزه من معمل A") : "تم تجهيزه من معمل B") : (qtyA > 0 ? "تم اكمال تجهيزه من معمل B" : "تم تجهيزه من معمل B")}</div>` : ""}${isSharedOrder && isOrderClosed ? `<div style="margin-top:5px;padding:3px 5px;border-radius:6px;background:#f4f8f5;border:1px solid #c9ddcf;color:#284b35;font-size:10px;font-weight:800;line-height:1.55;white-space:normal"><div>فرع <span style="color:#d71920;font-size:12px;font-weight:1000">A</span>: ${fmt(qtyA)} م³ × ${fmt(unitPrice)} = ${fmt(valueA)} د.ع</div><div>فرع <span style="color:#16813a;font-size:12px;font-weight:1000">B</span>: ${fmt(qtyB)} م³ × ${fmt(unitPrice)} = ${fmt(valueB)} د.ع</div></div>` : ''}</div>
-
+ ${layout}
+ <div class="atlas-load-container">
+  ${loads}
  </div>
-<div class="atlas-order-actions"><small>الإجراءات</small><div class="actions">
- ${ATLAS_BRANCH_ID === 'B' && currentRole === 'manager' && !o.sentToA ? '<button class="btn gold" title="إرسال الأمر إلى معمل A" aria-label="إرسال إلى معمل A" onclick="sendOrderToA(\''+esc(o.no)+'\',\''+esc(o.id)+'\')">↗️ إرسال إلى A</button>' : ''}
- ${ATLAS_BRANCH_ID === 'A' && currentRole === 'manager' && !o.sentToB ? '<button class="btn gold" title="إرسال الأمر إلى معمل B" aria-label="إرسال إلى معمل B" onclick="sendOrderToB(\''+esc(o.no)+'\',\''+esc(o.id)+'\')">↗️ إرسال إلى B</button>' : ''}
- ${currentRole === 'plant' && isOrderClosed ? '<span title="الأمر مقفول" style="color:#f1cc71;font-weight:bold;padding:8px">🔒</span>' : ''}
- ${!isOrderClosed && !canPrintOnly ? `<button class="btn primary" title="قفل الأمر وتسجيل الكمية" aria-label="قفل الأمر" onclick="closeOrder('${esc(o.no)}','${esc(o.id)}')">🔒</button>` : ''}
- <button class="btn gold" title="طباعة وصل الأمر" aria-label="طباعة وصل الأمر" onclick="receiptOrder('${esc(o.no)}')">🖨️</button>
- ${!canPrintOnly && canManageOrder ? '<button class="btn primary" title="تعديل مكونات الخلطة للمتر المكعب" aria-label="تعديل الخلطة" onclick="editOrderMix(\''+esc(o.no)+'\')">🧪 تعديل الخلطة</button>' : ''}
- ${!canPrintOnly && currentRole !== 'plant' ? `<button class="btn" title="تعديل" aria-label="تعديل" onclick="editOrder('${esc(o.no)}')" ${!canManageOrder?'disabled':''}>✏️</button><button class="btn danger" title="حذف" aria-label="حذف" onclick="delOrder('${esc(o.id)}')" ${!canManageOrder?'disabled':''}>❌</button>` : ''}
-</div></div></div>
+ <div class="atlas-order-admixture">
+  <small>نوع المضاف</small>
+  <strong>${esc(o.admixture_type||'—')}</strong>
+ </div>
+ ${actions}
 </td>
-</tr>
-<tr class="order-load-row"><td colspan="11" class="order-load-cell">
-<div class="loadbox order-loadbox atlas-load-list" style="margin-top:6px">
-<div class="atlas-load-heading"><span class="atlas-load-check">✓</span><strong>الكمية الفعلية</strong></div>
-${ls.length?`<div class="atlas-load-rows">${ls.map((l,index)=>`
-<div class="atlas-load-row">
- <span class="atlas-load-seq">${index+1}</span>
- 
- <span class="atlas-load-driver">${esc(l.driver||'—')}</span>
- <span class="atlas-load-vehicle" style="display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;flex:0 0 auto!important;min-width:52px;height:26px!important;box-sizing:border-box;padding:3px 6px!important;border-radius:11px!important;background:#eef0f3!important;border:0!important;white-space:nowrap!important;direction:ltr!important">
- ${isSharedOrder ? '<b style="display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;box-sizing:border-box;border:1.5px solid ' + (isBBranchLoad(l) ? "#27864b" : "#d52d35") + ';border-radius:6px;background:' + (isBBranchLoad(l) ? "#27864b" : "#d52d35") + ';color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;font-size:12px;font-weight:950;line-height:1">' + (isBBranchLoad(l) ? "B" : "A") + '</b>' : ''}
- <strong style="font-size:13px!important;font-weight:950!important;color:#39291f!important;line-height:1!important">${(()=>{const raw=String(l.vehicle||'').trim();const m=raw.match(/M\s*[-#:]?\s*(\d+)/i);return m?'M'+m[1]:'M—';})()}</strong></span>
- <span class="atlas-load-spacer"></span>
- <strong class="atlas-load-qty"><bdi dir="ltr">${(Number(l.qty)||0).toFixed(3)}</bdi></strong>
- <button class="atlas-load-print" title="طباعة وصل الحمولة" aria-label="طباعة وصل الحمولة" onclick="receiptLoad('${esc(l.id)}')">🖨</button>
- ${['manager','plant','operator'].includes(currentRole) ? `<button class="atlas-load-edit" title="تعديل الحمولة" aria-label="تعديل الحمولة" onclick="editLoad('${esc(l.id)}')"></button><button class="atlas-load-delete" title="حذف الحمولة" aria-label="حذف الحمولة" onclick="delLoad('${esc(l.id)}')"></button>` : ''}
-</div>`).join('')}${''}</div>`:'<p class="muted">لا توجد حمولات مسجلة بعد.</p>'}
-<div class="atlas-load-total"><strong><bdi dir="ltr">${fmt(totalLoadQty)}&nbsp;&nbsp;m³</bdi></strong>${isSharedOrder ? `<div class="atlas-shared-branch-totals"><span class="atlas-branch-total atlas-branch-total-a"><b>A</b><strong><bdi dir="ltr">${fmt(qtyA)}</bdi></strong></span><span class="atlas-branch-total atlas-branch-total-b"><b>B</b><strong><bdi dir="ltr">${fmt(qtyB)}</bdi></strong></span></div>` : ''}</div>
-${currentRole === 'plant' && !isOrderClosed ? `<button class="atlas-register-load" title="تسجيل حمولة" aria-label="تسجيل حمولة" onclick="openLoad('${esc(o.no)}','${esc(o.id)}')">🚚 تسجيل حمولة</button>` : ''}
-</div>
-
-
-</td></tr>`;
+</tr>`;
 },8
 );
 }
@@ -5333,6 +5299,52 @@ body{background:#ffffff!important}
 }
 </style>
 </body>
+
+<style id="atlas-order-card-loads-layout-20261128">
+/* وضع بطاقة الحمولات داخل بطاقة أمر التجهيز، ثم نوع المضاف والإجراءات أسفلها */
+#orders #ordersBody tr.order-card>td.atlas-order-cell{
+ display:block!important;width:100%!important;box-sizing:border-box!important;
+ padding:0!important;overflow:hidden!important;
+}
+#orders #ordersBody .atlas-load-container{
+ display:block!important;width:100%!important;box-sizing:border-box!important;
+ padding:0 8px!important;margin:7px auto 0!important;
+}
+#orders #ordersBody .atlas-load-container>.atlas-load-list{
+ display:block!important;width:100%!important;max-width:100%!important;
+ margin:0 auto!important;box-sizing:border-box!important;
+}
+#orders #ordersBody .atlas-order-admixture{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:12px!important;width:100%!important;box-sizing:border-box!important;
+ padding:9px 12px!important;margin:0!important;
+ background:transparent!important;border-top:1px solid #d7d7db!important;
+ color:#34343a!important;text-align:right!important;
+}
+#orders #ordersBody .atlas-order-admixture small{
+ font-size:12px!important;font-weight:800!important;color:#896b77!important;
+}
+#orders #ordersBody .atlas-order-admixture strong{
+ font-size:14px!important;font-weight:700!important;color:#34343a!important;
+}
+#orders #ordersBody .atlas-order-actions{
+ display:block!important;width:100%!important;box-sizing:border-box!important;
+ padding:8px 12px 10px!important;margin:0!important;
+ background:transparent!important;border-top:1px solid #d7d7db!important;
+}
+#orders #ordersBody .atlas-order-actions .actions{
+ display:flex!important;align-items:center!important;gap:5px!important;flex-wrap:wrap!important;
+}
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-admixture,
+#orders #ordersBody tr.order-card.shared-order-card .atlas-order-actions{
+ background:#dff1ff!important;border-color:#a9d5f2!important;
+}
+@media(max-width:520px){
+ #orders #ordersBody .atlas-load-container{padding:0 5px!important}
+ #orders #ordersBody .atlas-order-admixture{padding:8px 10px!important}
+ #orders #ordersBody .atlas-order-actions{padding:7px 10px 9px!important}
+}
+</style>
 </html>
 <!-- ATLAS deployment refresh: keep application behavior unchanged -->
 <!-- ATLAS layout deployment retry 2026-11-24 -->
