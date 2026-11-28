@@ -5480,6 +5480,7 @@ body{background:#ffffff!important}
   border-top:1px solid #aeb7c2!important;
   margin-top:5px!important;padding:7px 6px 4px!important;
 }
+/* زر تسجيل الحمولة يمتد بعرض بطاقة الحمولات مع توهج سماوي خفيف */
 #orders #ordersBody .atlas-load-container .atlas-load-list .atlas-register-load{
   display:block!important;width:100%!important;max-width:none!important;
   min-height:34px!important;box-sizing:border-box!important;
@@ -5496,3 +5497,31 @@ body{background:#ffffff!important}
 }
 </style>
 
+
+
+<style id="atlas-load-final-refinement-20261128">
+/* فاصل رفيع بين الحمولات والكمية الفعلية */
+#orders #ordersBody .atlas-load-container .atlas-load-list .atlas-load-total{
+  border-top:1px solid rgba(210,220,230,.72)!important;
+}
+/* زر تسجيل الحمولة يبقى بعرض البطاقة مع حجم أصغر قليلاً وتوهج هادئ */
+#orders #ordersBody .atlas-load-container .atlas-load-list .atlas-register-load{
+  display:block!important;width:100%!important;max-width:none!important;
+  min-height:29px!important;padding:3px 8px!important;margin:4px 0 0!important;
+  font-size:13px!important;line-height:1.25!important;font-weight:800!important;
+  border-radius:6px!important;
+  box-shadow:0 0 5px rgba(66,216,232,.25),inset 0 0 3px rgba(66,216,232,.10)!important;
+}
+/* كمية كل نقلة مثل 9.000 و5.000 بخط عادي واضح */
+#orders #ordersBody .atlas-load-list .atlas-load-row>strong.atlas-load-qty,
+#orders #ordersBody .atlas-load-list .atlas-load-row>strong.atlas-load-qty bdi{
+  font-size:15px!important;font-weight:400!important;
+  text-shadow:none!important;font-variant-numeric:tabular-nums!important;
+}
+@media(max-width:520px){
+ #orders #ordersBody .atlas-load-list .atlas-load-row>strong.atlas-load-qty,
+ #orders #ordersBody .atlas-load-list .atlas-load-row>strong.atlas-load-qty bdi{
+  font-size:14px!important;font-weight:400!important;
+ }
+}
+</style>
